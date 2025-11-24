@@ -1,0 +1,215 @@
+/* --- Presensi layout --- */
+.fx-presensi-card {
+  border-radius: 22px;
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.8),
+    0 0 40px rgba(129, 140, 248, 0.35);
+}
+
+/* Laporan presensi */
+.fx-presensi-card .card-header {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+#presensiChart {
+  max-height: 260px;
+}
+
+
+/* Input & select ala Fixplay */
+.fx-label {
+  font-size: .85rem;
+  font-weight: 600;
+  color: #c7d2fe;
+  margin-bottom: .25rem;
+}
+
+.fx-select {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(129, 140, 248, 0.45);
+  background: radial-gradient(circle at top left, rgba(79, 70, 229, .35), transparent 55%),
+              #020617;
+  color: #e5e7eb;
+  padding: .6rem .9rem;
+  font-size: .9rem;
+}
+
+.fx-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(129, 140, 248, .7), 0 0 18px rgba(79, 70, 229, .7);
+}
+
+/* Table styling */
+.fx-table-wrapper {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(88, 28, 135, .45);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, .9);
+}
+
+.fx-table thead th {
+  background: linear-gradient(90deg, rgba(30, 64, 175, .6), rgba(109, 40, 217, .7));
+  border-bottom-color: rgba(191, 219, 254, .25);
+  font-size: .8rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.fx-table tbody tr {
+  background: radial-gradient(circle at top left, rgba(30, 64, 175, .2), transparent 55%),
+              #020617;
+}
+
+.fx-table tbody tr:nth-child(even) {
+  background: radial-gradient(circle at bottom right, rgba(17, 24, 39, .75), transparent 50%),
+              #020617;
+}
+
+.fx-table tbody tr:hover {
+  background: radial-gradient(circle at center, rgba(79, 70, 229, .35), transparent 60%),
+              #020617;
+}
+
+/* Avatar kecil di tabel */
+.fx-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 0%, #f9a8d4, #4c1d95);
+  color: #f9fafb;
+  font-weight: 800;
+  font-size: .8rem;
+  box-shadow: 0 0 18px rgba(236, 72, 153, .7);
+}
+
+.fx-avatar-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 999px;
+  display: block;
+}
+
+
+.fx-avatar-xs {
+  width: 30px;
+  height: 30px;
+  font-size: .75rem;
+}
+
+/* Badges status */
+.fx-badge-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: .22rem .9rem;
+  font-size: .82rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: .03em;
+  white-space: nowrap;
+}
+
+.fx-badge-success {
+  background: rgba(22, 163, 74, 0.18);
+  color: #16231a; /* hijau muda terang */
+  border: 1px solid rgba(34, 197, 94, 0.95);
+  box-shadow: 0 0 14px rgba(34, 197, 94, 0.5);
+}
+
+.fx-badge-warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: #302a23;
+  border: 1px solid rgba(249, 115, 22, 0.95);
+  box-shadow: 0 0 14px rgba(249, 115, 22, 0.55);
+}
+
+.fx-badge-danger {
+  background: rgba(239, 68, 68, 0.22);
+  color: #3d2626;
+  border: 1px solid rgba(248, 113, 113, 0.98);
+  box-shadow: 0 0 14px rgba(248, 113, 113, 0.6);
+}
+
+.fx-badge-info {
+  background: rgba(56, 189, 248, 0.18);
+  color: #e0f2fe;
+  border: 1px solid rgba(56, 189, 248, 0.95);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.55);
+}
+
+.fx-badge-pill {
+  border-radius: 999px;
+  padding: .18rem .7rem;
+  background: rgba(79, 70, 229, .18);
+  border: 1px solid rgba(129, 140, 248, .7);
+  color: #21242f;
+  font-size: .75rem;
+}
+
+/* Buttons */
+.fx-btn-outline {
+  border-radius: 999px;
+  border: 1px solid rgba(209, 213, 219, .7);
+  background: transparent;
+  color: #e5e7eb;
+}
+
+.fx-btn-outline:hover {
+  background: rgba(243, 244, 246, .07);
+}
+
+.fx-btn-primary {
+  border-radius: 999px;
+  border: 0;
+  background: linear-gradient(135deg, #7c3aed, #3b82f6);
+  color: #f9fafb;
+  font-weight: 700;
+  box-shadow: 0 10px 25px rgba(59, 130, 246, .55);
+}
+
+.fx-btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+.fx-btn-icon {
+  border-radius: 10px;
+  padding-inline: .5rem;
+}
+
+/* Text kecil */
+.text-neon-sub {
+  color: #9ca3af;
+  font-size: .85rem;
+}
+
+/* --- Jadwal mingguan --- */
+.fx-select-sm {
+  padding-block: .35rem;
+  font-size: .82rem;
+}
+
+.fx-chip-day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  padding: .2rem .5rem;
+  border-radius: 999px;
+  background: rgba(129, 140, 248, .25);
+  border: 1px solid rgba(129, 140, 248, .9);
+  color: #21242f;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+
+/* .fx-row-today {
+  box-shadow: 0 0 0 1px rgba(96, 165, 250, .75) inset,
+              0 0 18px rgba(0, 0, 0, 0.6);
+} */
