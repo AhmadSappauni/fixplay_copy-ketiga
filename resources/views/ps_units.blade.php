@@ -241,7 +241,7 @@
     </div>
   </div>
 
-  {{-- ALERT SUCCESS (kalau ada) --}}
+  {{-- ALERT SUCCESS --}}
   @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
       <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
@@ -255,7 +255,7 @@
       <div class="unit-card h-100">
         <div class="unit-card-header">Tambah Unit PS</div>
         <div class="small mb-2 text-gray-400">
-          Buat unit baru untuk digunakan di halaman sesi rental PS.
+          Buat unit baru dan tentukan tipenya (PS4/PS5/VVIP) untuk perhitungan tarif otomatis.
         </div>
 
         <form method="post" action="{{ route('ps_units.store') }}" class="mt-2">
@@ -267,6 +267,17 @@
                    required
                    value="{{ old('name') }}">
           </div>
+
+          {{-- DROPDOWN TIPE UNIT (BARU) --}}
+          <div class="mb-2">
+            <label class="form-label">Tipe / Kategori</label>
+            <select name="type" class="form-select unit-input" required>
+              <option value="PS4" {{ old('type') == 'PS4' ? 'selected' : '' }}>PS4 (Reguler)</option>
+              <option value="PS5" {{ old('type') == 'PS5' ? 'selected' : '' }}>PS5</option>
+              <option value="VVIP" {{ old('type') == 'VVIP' ? 'selected' : '' }}>VVIP</option>
+            </select>
+          </div>
+
           <div class="mb-2">
             <label class="form-label">Tarif per Jam (Rp)</label>
             <input name="hourly_rate"
@@ -307,6 +318,7 @@
             <thead>
               <tr>
                 <th>Nama</th>
+                <th>Tipe</th> {{-- KOLOM BARU --}}
                 <th>Tarif / Jam</th>
                 <th class="text-end d-print-none">Aksi</th>
               </tr>
@@ -320,12 +332,19 @@
                       <span class="badge badge-addon badge-glow ms-2">Nonaktif</span>
                     @endif
                   </td>
+                  <td>
+                    {{-- Menampilkan Tipe dengan Badge --}}
+                    <span class="badge badge-addon" style="background:rgba(99,102,241,0.2); color:#a5b4fc;">
+                        {{ $u->type ?? 'PS4' }}
+                    </span>
+                  </td>
                   <td class="mono">
                     Rp {{ number_format($u->hourly_rate ?? 0,0,',','.') }}
                   </td>
                   <td class="text-end d-print-none">
+                    {{-- Update parameter fungsi editUnit --}}
                     <button class="btn btn-xs-ghost btn-outline-secondary me-1"
-                            onclick="return editUnit({{ $u->id }}, '{{ addslashes($u->name) }}', {{ $u->hourly_rate ?? 0 }})">
+                            onclick="return editUnit({{ $u->id }}, '{{ addslashes($u->name) }}', '{{ $u->type ?? 'PS4' }}', {{ $u->hourly_rate ?? 0 }})">
                       Edit
                     </button>
 
@@ -350,7 +369,7 @@
                 </tr>
               @empty
                 <tr>
-                  <td colspan="3" class="text-center text-muted p-3">
+                  <td colspan="4" class="text-center text-muted p-3">
                     Belum ada unit.
                   </td>
                 </tr>
@@ -367,9 +386,15 @@
 
 @push('scripts')
 <script>
-function editUnit(id, name, rate){
+function editUnit(id, name, type, rate){
   const newName = prompt("Nama Unit:", name);
   if (newName === null) return false;
+
+  // Prompt untuk edit Tipe
+  let newType = prompt("Tipe (PS4 / PS5 / VVIP):", type);
+  if (newType === null) return false;
+  newType = newType.toUpperCase(); // Pastikan format huruf besar
+
   const newRate = prompt("Tarif/Jam (Rp):", rate);
   if (newRate === null) return false;
 
@@ -399,7 +424,8 @@ function editUnit(id, name, rate){
   _method.value = "PUT";
   form.appendChild(_method);
 
-  [["name", newName], ["hourly_rate", newRate]].forEach(([k,v])=>{
+  // Kirim data termasuk tipe
+  [["name", newName], ["type", newType], ["hourly_rate", newRate]].forEach(([k,v])=>{
     const i = document.createElement("input");
     i.type  = "hidden";
     i.name  = k;

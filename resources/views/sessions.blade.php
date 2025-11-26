@@ -190,48 +190,24 @@
     box-shadow:0 0 14px rgba(129,140,248,.6);
   }
 
-  /* MAX HEIGHT TABEL (BIAR RAPI DI DESKTOP & HP) */
+  /* MAX HEIGHT TABEL */
   .session-history-scroll{
     max-height: 520px;
     overflow-y:auto;
   }
 
-  /* ====== RESPONSIVE ====== */
   @media (max-width: 992px){
-    .session-shell{
-      padding:1.35rem 1rem 1.8rem;
-      border-radius:1.1rem;
-    }
+    .session-shell{ padding:1.35rem 1rem 1.8rem; border-radius:1.1rem; }
   }
   @media (max-width: 768px){
-    .session-header-stack{
-      flex-direction:column;
-      align-items:flex-start !important;
-    }
-    .session-header-actions{
-      width:100%;
-      justify-content:flex-end;
-    }
-    .session-card{
-      margin-bottom:.25rem;
-    }
+    .session-header-stack{ flex-direction:column; align-items:flex-start !important; }
+    .session-header-actions{ width:100%; justify-content:flex-end; }
+    .session-card{ margin-bottom:.25rem; }
   }
-
   @media print{
-    .session-shell{
-      background:#fff;
-      box-shadow:none;
-    }
-    .session-card{
-      box-shadow:none;
-      border-color:#e5e7eb;
-      background:#fff;
-      color:#111827;
-    }
-    .table-neon thead th{
-      background:#f3f4f6;
-      color:#111827;
-    }
+    .session-shell{ background:#fff; box-shadow:none; }
+    .session-card{ box-shadow:none; border-color:#e5e7eb; background:#fff; color:#111827; }
+    .table-neon thead th{ background:#f3f4f6; color:#111827; }
     .d-print-none{ display:none !important; }
   }
 </style>
@@ -286,8 +262,11 @@
             <select class="form-select" name="ps_unit_id" id="unitSel" required>
               <option value="">-- pilih --</option>
               @foreach($units as $u)
-                <option value="{{ $u->id }}" data-rate="{{ $u->hourly_rate }}">
-                  {{ $u->name }} — Rp {{ number_format($u->hourly_rate,0,',','.') }}/jam
+                {{-- PENTING: data-type untuk logika harga paket --}}
+                <option value="{{ $u->id }}" 
+                        data-rate="{{ $u->hourly_rate }}" 
+                        data-type="{{ $u->type ?? 'PS4' }}">
+                  {{ $u->name }} [{{ $u->type ?? 'PS4' }}] — Rp {{ number_format($u->hourly_rate,0,',','.') }}/jam
                 </option>
               @endforeach
             </select>
@@ -389,7 +368,7 @@
               <tbody>
                 @forelse($closed_sessions as $s)
                   <tr>
-                    <td class="text-Dark">
+                    <td class="text-white">
                       {{ $s->ps_unit->name ?? '-' }}
                       @if(!empty($s->extra_controllers) && $s->extra_controllers > 0)
                         <span class="badge badge-addon badge-glow ms-2">
@@ -419,7 +398,7 @@
                     <td class="text-end d-print-none">
                       <form class="d-inline confirm-delete" method="post"
                             action="{{ route('sessions.delete', ['sid' => $s->id]) }}"
-                            onsubmit="return confirm('Hapus riwayat sesi ini? Pendapatan di laporan akan ikut terhapus.');">
+                            data-confirm="Hapus riwayat sesi ini? Pendapatan di laporan akan ikut terhapus.">
                         @csrf
                         @method('DELETE')
                         <button class="btn btn-sm btn-outline-danger">
@@ -459,6 +438,8 @@
     const unit = document.getElementById('unitSel');
     return {
       base:   parseFloat(unit?.selectedOptions[0]?.dataset?.rate || '0'),
+      // AMBIL DATA TIPE DARI OPSI
+      type:   unit?.selectedOptions[0]?.dataset?.type || 'PS4',
       extra:  parseInt(document.getElementById('extraSel').value  || '0', 10),
       arcade: parseInt(document.getElementById('arcadeSel').value || '0', 10),
       hours:  parseFloat(document.getElementById('hoursSel').value  || '0'),
@@ -468,7 +449,7 @@
   function getUnitName(){
     const unit = document.getElementById('unitSel');
     const txt  = unit?.selectedOptions?.[0]?.textContent || '';
-    return txt.split(' — ')[0].trim();
+    return txt.split(' [')[0].trim(); // Bersihkan nama agar tidak termasuk [TIPE]
   }
 
   function getStartDT(){
@@ -510,14 +491,13 @@
 
   let currentBill = 0;
 
-  // pembulatan ke atas ke kelipatan 1000
   function roundToThousandCeil(n){
     return Math.ceil(n / 1000) * 1000;
   }
 
   function updateCalc(){
     const start = document.getElementById('startInput').value;
-    const {base, extra, arcade, hours} = getNumbers();
+    const {base, type, extra, arcade, hours} = getNumbers();
 
     const endLbl = document.getElementById('endLbl');
     try{
@@ -532,17 +512,42 @@
       }
     }catch(e){ endLbl.textContent = '—:—'; }
 
-    const hourlyBase    = base || 0;
-    const extrasPerHour = (extra || 0) * EX_RATE;
-    const arcadePerHour = (arcade || 0) * ARC_RATE;
+    // === LOGIKA HARGA BARU BERDASARKAN TIPE ===
+    
+    // 1. Biaya Tambahan (Linear)
+    const extrasCost = (extra * EX_RATE) + (arcade * ARC_RATE);
+    const totalExtras = extrasCost * hours;
 
-    let rawBill = (hourlyBase + extrasPerHour + arcadePerHour) * (hours || 0);
+    // 2. Biaya Unit (Paket vs Linear)
+    let unitBill = 0;
 
-    if (hours === 0.5) {
-      const halfRaw = (hourlyBase + extrasPerHour + arcadePerHour) * 0.5;
-      rawBill = roundToThousandCeil(halfRaw);
+    // Cek tipe (pastikan konsisten dengan huruf besar dari controller)
+    if (type === 'PS4') {
+        // Paket Khusus PS4 Reguler
+        if (hours === 3) {
+            unitBill = 25000;
+        } else if (hours === 4) {
+            unitBill = 35000;
+        } else if (hours === 5) {
+            unitBill = 45000;
+        } else if (hours === 6) {
+            unitBill = 50000;
+        } else {
+            // 1 jam, 2 jam, atau setengah jam tetap tarif/jam
+            unitBill = base * hours;
+        }
     } else {
-      rawBill = Math.round(rawBill);
+        // PS5 atau VVIP (Linear sesuai tarif/jam)
+        unitBill = base * hours;
+    }
+
+    // 3. Total Sementara & Pembulatan (khusus 30 menit)
+    let rawBill = unitBill + totalExtras;
+    
+    if (hours === 0.5) {
+        rawBill = roundToThousandCeil(rawBill);
+    } else {
+        rawBill = Math.round(rawBill);
     }
 
     currentBill = rawBill || 0;
