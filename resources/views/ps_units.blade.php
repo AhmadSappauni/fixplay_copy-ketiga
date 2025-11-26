@@ -261,7 +261,7 @@
         <form method="post" action="{{ route('ps_units.store') }}" class="mt-2">
           @csrf
           <div class="mb-2">
-            <label class="form-label">Nama Unit (mis. PS 4 - A)</label>
+            <label class="form-label">Nama Unit (mis. Box - 1)</label>
             <input name="name"
                    class="form-control unit-input"
                    required

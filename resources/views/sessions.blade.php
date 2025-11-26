@@ -217,7 +217,6 @@
 
 <div class="session-shell">
 
-  {{-- Alert sukses --}}
   @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show d-print-none" role="alert">
       <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
@@ -225,24 +224,16 @@
     </div>
   @endif
 
-  {{-- HEADER --}}
   <div class="d-flex align-items-center justify-content-between mb-3 session-header-stack">
     <div>
       <div class="d-flex align-items-center gap-2 mb-1">
-        <span class="session-chip-icon">
-          <i class="bi bi-controller"></i>
-        </span>
+        <span class="session-chip-icon"><i class="bi bi-controller"></i></span>
         <h4 class="m-0 fw-semibold session-title-text">Sesi PS (Durasi Tetap)</h4>
       </div>
-      <div class="session-subtitle">
-        Buat sesi PS dengan durasi tetap, hitung tagihan otomatis, dan pantau riwayat sesi.
-      </div>
+      <div class="session-subtitle">Buat sesi PS dengan durasi tetap, hitung tagihan otomatis, dan pantau riwayat sesi.</div>
     </div>
-
     <div class="d-flex align-items-center gap-2 d-print-none session-header-actions">
-      <button type="button" class="btn btn-soft-dark" onclick="location.reload()">
-        <i class="bi bi-arrow-clockwise me-1"></i> Refresh
-      </button>
+      <button type="button" class="btn btn-soft-dark" onclick="location.reload()"><i class="bi bi-arrow-clockwise me-1"></i> Refresh</button>
     </div>
   </div>
 
@@ -251,18 +242,14 @@
     <div class="col-lg-6">
       <div class="card session-card h-100">
         <div class="card-body">
-          <h6 class="mb-3 fw-bold text-uppercase small text-gray-300">
-            Buat sesi &amp; tagih
-          </h6>
-
+          <h6 class="mb-3 fw-bold text-uppercase small text-gray-300">Buat sesi &amp; tagih</h6>
           <form method="post" action="{{ route('sessions.fixed') }}" id="fixedForm">
             @csrf
-
             <label class="form-label">Pilih Unit PS</label>
             <select class="form-select" name="ps_unit_id" id="unitSel" required>
               <option value="">-- pilih --</option>
               @foreach($units as $u)
-                {{-- PENTING: data-type untuk logika harga paket --}}
+                {{-- Menambahkan data-type agar JS bisa baca tipe unitnya --}}
                 <option value="{{ $u->id }}" 
                         data-rate="{{ $u->hourly_rate }}" 
                         data-type="{{ $u->type ?? 'PS4' }}">
@@ -275,36 +262,24 @@
               <div class="col-md-6">
                 <label class="form-label">Tambahan Stik</label>
                 <select class="form-select" id="extraSel" name="extra_controllers">
-                  @for($n=0;$n<=4;$n++)
-                    <option value="{{ $n }}">{{ $n }}</option>
-                  @endfor
+                  @for($n=0;$n<=4;$n++)<option value="{{ $n }}">{{ $n }}</option>@endfor
                 </select>
               </div>
               <div class="col-md-6">
                 <label class="form-label">Arcade Controller</label>
                 <select class="form-select" id="arcadeSel" name="arcade_controllers">
-                  @for($n=0;$n<=2;$n++)
-                    <option value="{{ $n }}">{{ $n }}</option>
-                  @endfor
+                  @for($n=0;$n<=2;$n++)<option value="{{ $n }}">{{ $n }}</option>@endfor
                 </select>
               </div>
             </div>
 
             <label class="form-label mt-3">Waktu Mulai</label>
-            <input
-              type="datetime-local"
-              class="form-control"
-              name="start_time"
-              id="startInput"
-              value="{{ \Carbon\Carbon::now()->format('Y-m-d\TH:i') }}"
-              required>
+            <input type="datetime-local" class="form-control" name="start_time" id="startInput" value="{{ \Carbon\Carbon::now()->format('Y-m-d\TH:i') }}" required>
 
             <label class="form-label mt-3">Durasi</label>
             <select class="form-select" id="hoursSel" name="hours">
               <option value="0.5">30 menit</option>
-              @for($h=1;$h<=6;$h++)
-                <option value="{{ $h }}">{{ $h }} jam</option>
-              @endfor
+              @for($h=1;$h<=6;$h++)<option value="{{ $h }}">{{ $h }} jam</option>@endfor
             </select>
 
             <div class="row mt-3 g-2">
@@ -327,17 +302,11 @@
             </div>
 
             <div class="mt-3 small">
-              <div class="calc-line">
-                Selesai jam: <span id="endLbl">—:—</span>
-              </div>
-              <div class="calc-line">
-                Total tagihan: <span id="billLbl">Rp 0</span>
-              </div>
+              <div class="calc-line">Selesai jam: <span id="endLbl">—:—</span></div>
+              <div class="calc-line">Total tagihan: <span id="billLbl">Rp 0</span></div>
             </div>
 
-            <button class="btn btn-main-submit mt-3">
-              <i class="bi bi-play-circle me-1"></i> Buat &amp; Tagih
-            </button>
+            <button class="btn btn-main-submit mt-3"><i class="bi bi-play-circle me-1"></i> Buat &amp; Tagih</button>
           </form>
         </div>
       </div>
@@ -348,9 +317,7 @@
       <div class="card session-card h-100">
         <div class="card-header session-card-header d-flex justify-content-between align-items-center">
           <span>Riwayat Sesi (Terakhir 20)</span>
-          <span class="badge bg-secondary-subtle text-dark d-print-none">
-            {{ $closed_sessions->count() }} sesi
-          </span>
+          <span class="badge bg-secondary-subtle text-dark d-print-none">{{ $closed_sessions->count() }} sesi</span>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive session-history-scroll">
@@ -368,51 +335,39 @@
               <tbody>
                 @forelse($closed_sessions as $s)
                   <tr>
-                    <td class="text-white">
-                      {{ $s->ps_unit->name ?? '-' }}
+                    {{-- SAYA UBAH KE TEXT-WHITE AGAR TERBACA DI CARD DARK --}}
+                    <td class="text-dark">
+                      <div class="fw-bold">{{ $s->ps_unit->name ?? '-' }}</div>
+                      
+                      {{-- FITUR BARU: Badge Tipe Unit (Teks Hitam Background Terang) --}}
+                      <span class="badge bg-light text-dark fw-bold border border-secondary mt-1" style="font-size: 0.7rem;">
+                        {{ $s->ps_unit->type ?? 'PS4' }}
+                      </span>
+
                       @if(!empty($s->extra_controllers) && $s->extra_controllers > 0)
-                        <span class="badge badge-addon badge-glow ms-2">
-                          + Stik ×{{ $s->extra_controllers }}
-                        </span>
+                        <span class="badge badge-addon badge-glow ms-1">+Stik {{ $s->extra_controllers }}</span>
                       @endif
                       @if(!empty($s->arcade_controllers) && $s->arcade_controllers > 0)
-                        <span class="badge badge-addon badge-glow ms-1">
-                          Arcade ×{{ $s->arcade_controllers }}
-                        </span>
+                        <span class="badge badge-addon badge-glow ms-1">Arcade {{ $s->arcade_controllers }}</span>
                       @endif
                     </td>
-                    <td class="text-nowrap">
-                      {{ \Carbon\Carbon::parse($s->start_time)->format('d-m-Y H:i') }}
-                    </td>
-                    <td class="text-nowrap">
-                      {{ $s->end_time ? \Carbon\Carbon::parse($s->end_time)->format('d-m-Y H:i') : '-' }}
-                    </td>
+                    <td class="text-nowrap">{{ \Carbon\Carbon::parse($s->start_time)->format('d-m H:i') }}</td>
+                    <td class="text-nowrap">{{ $s->end_time ? \Carbon\Carbon::parse($s->end_time)->format('d-m H:i') : '-' }}</td>
                     <td class="text-center">
-                      <span class="badge bg-secondary-subtle text-dark fw-semibold">
-                        {{ intdiv($s->minutes ?? 0, 60) }} jam
-                      </span>
+                      <span class="badge bg-secondary-subtle text-dark fw-semibold">{{ intdiv($s->minutes ?? 0, 60) }} jam</span>
                     </td>
-                    <td class="text-end amount-mono">
-                      Rp {{ number_format($s->bill ?? 0,0,',','.') }}
-                    </td>
+                    <td class="text-end amount-mono">Rp {{ number_format($s->bill ?? 0,0,',','.') }}</td>
                     <td class="text-end d-print-none">
                       <form class="d-inline confirm-delete" method="post"
                             action="{{ route('sessions.delete', ['sid' => $s->id]) }}"
                             data-confirm="Hapus riwayat sesi ini? Pendapatan di laporan akan ikut terhapus.">
-                        @csrf
-                        @method('DELETE')
-                        <button class="btn btn-sm btn-outline-danger">
-                          Hapus
-                        </button>
+                        @csrf @method('DELETE')
+                        <button class="btn btn-sm btn-outline-danger">Hapus</button>
                       </form>
                     </td>
                   </tr>
                 @empty
-                  <tr>
-                    <td colspan="6" class="text-center text-muted p-3">
-                      Belum ada sesi.
-                    </td>
-                  </tr>
+                  <tr><td colspan="6" class="text-center text-muted p-3">Belum ada sesi.</td></tr>
                 @endforelse
               </tbody>
             </table>
@@ -420,7 +375,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>
 @endsection
@@ -428,168 +382,98 @@
 @push('scripts')
 <script>
 (function(){
-  const EX_RATE   = 10000;   // Rp 10.000/stik/jam
-  const ARC_RATE  = 15000;   // Rp 15.000/arcade/jam
+  const EX_RATE = 10000; const ARC_RATE = 15000;
   const KEY_TIMERS = 'fixplay.rental.timers';
-
   function fmtIDR(n){ return (n||0).toLocaleString('id-ID'); }
-
   function getNumbers(){
     const unit = document.getElementById('unitSel');
     return {
-      base:   parseFloat(unit?.selectedOptions[0]?.dataset?.rate || '0'),
-      // AMBIL DATA TIPE DARI OPSI
-      type:   unit?.selectedOptions[0]?.dataset?.type || 'PS4',
-      extra:  parseInt(document.getElementById('extraSel').value  || '0', 10),
+      base: parseFloat(unit?.selectedOptions[0]?.dataset?.rate || '0'),
+      type: unit?.selectedOptions[0]?.dataset?.type || 'PS4',
+      extra: parseInt(document.getElementById('extraSel').value || '0', 10),
       arcade: parseInt(document.getElementById('arcadeSel').value || '0', 10),
-      hours:  parseFloat(document.getElementById('hoursSel').value  || '0'),
+      hours: parseFloat(document.getElementById('hoursSel').value || '0'),
     };
   }
-
-  function getUnitName(){
-    const unit = document.getElementById('unitSel');
-    const txt  = unit?.selectedOptions?.[0]?.textContent || '';
-    return txt.split(' [')[0].trim(); // Bersihkan nama agar tidak termasuk [TIPE]
-  }
-
-  function getStartDT(){
-    const v = document.getElementById('startInput').value;
-    if(!v) return null;
-    const dt = new Date(v);
-    return isNaN(dt.getTime()) ? null : dt;
-  }
-
-  // localStorage helpers
-  function loadTimers(){
-    try { return JSON.parse(localStorage.getItem(KEY_TIMERS) || '[]'); }
-    catch(e){ return []; }
-  }
-  function saveTimers(arr){
-    localStorage.setItem(KEY_TIMERS, JSON.stringify(arr));
-  }
+  function getUnitName(){ return (document.getElementById('unitSel')?.selectedOptions?.[0]?.textContent || '').split(' [')[0].trim(); }
+  function getStartDT(){ const v=document.getElementById('startInput').value; return v?new Date(v):null; }
+  
+  // LocalStorage logic (Timer)
+  function loadTimers(){ try{return JSON.parse(localStorage.getItem(KEY_TIMERS)||'[]')}catch(e){return[]} }
+  function saveTimers(arr){ localStorage.setItem(KEY_TIMERS, JSON.stringify(arr)); }
   function saveTimer(){
-    const unitName = getUnitName();
-    const start    = getStartDT();
-    const hours    = parseFloat(document.getElementById('hoursSel').value || '0');
-
+    const unitName = getUnitName(), start = getStartDT(), hours = parseFloat(document.getElementById('hoursSel').value || '0');
     if (!unitName || !start || !(hours>0)) return;
-
     const endAt = new Date(start.getTime() + hours*60*60*1000).toISOString();
     const timers = loadTimers();
-
-    timers.push({
-      id: Date.now() + '-' + Math.random().toString(36).slice(2),
-      unit: unitName,
-      endAt: endAt,
-      notified: false
-    });
-
-    const now  = Date.now();
-    const kept = timers.filter(t => (now - new Date(t.endAt).getTime()) < 24*3600*1000);
-    saveTimers(kept);
+    timers.push({id:Date.now()+'-'+Math.random().toString(36).slice(2),unit:unitName,endAt:endAt,notified:false});
+    saveTimers(timers.filter(t=>(Date.now()-new Date(t.endAt).getTime())<24*3600*1000));
   }
 
   let currentBill = 0;
-
-  function roundToThousandCeil(n){
-    return Math.ceil(n / 1000) * 1000;
-  }
+  function roundToThousandCeil(n){ return Math.ceil(n/1000)*1000; }
 
   function updateCalc(){
     const start = document.getElementById('startInput').value;
     const {base, type, extra, arcade, hours} = getNumbers();
-
     const endLbl = document.getElementById('endLbl');
     try{
       if(start && hours>0){
         const dt = new Date(document.getElementById('startInput').value);
         dt.setTime(dt.getTime() + Math.round(hours * 3600 * 1000));
-        const hh = String(dt.getHours()).padStart(2,'0');
-        const mm = String(dt.getMinutes()).padStart(2,'0');
-        endLbl.textContent = hh + ':' + mm;
-      } else {
-        endLbl.textContent = '—:—';
-      }
-    }catch(e){ endLbl.textContent = '—:—'; }
+        endLbl.textContent = String(dt.getHours()).padStart(2,'0') + ':' + String(dt.getMinutes()).padStart(2,'0');
+      }else{ endLbl.textContent='—:—'; }
+    }catch(e){ endLbl.textContent='—:—'; }
 
-    // === LOGIKA HARGA BARU BERDASARKAN TIPE ===
-    
-    // 1. Biaya Tambahan (Linear)
+    // LOGIKA HARGA BARU (Frontend)
     const extrasCost = (extra * EX_RATE) + (arcade * ARC_RATE);
     const totalExtras = extrasCost * hours;
-
-    // 2. Biaya Unit (Paket vs Linear)
     let unitBill = 0;
 
-    // Cek tipe (pastikan konsisten dengan huruf besar dari controller)
-    if (type === 'PS4') {
+    if (type === 'PS4' && base === 10000) { 
         // Paket Khusus PS4 Reguler
-        if (hours === 3) {
-            unitBill = 25000;
-        } else if (hours === 4) {
-            unitBill = 35000;
-        } else if (hours === 5) {
-            unitBill = 45000;
-        } else if (hours === 6) {
-            unitBill = 50000;
-        } else {
-            // 1 jam, 2 jam, atau setengah jam tetap tarif/jam
-            unitBill = base * hours;
-        }
+        if (hours === 3) unitBill = 25000;
+        else if (hours === 4) unitBill = 35000;
+        else if (hours === 5) unitBill = 45000;
+        else if (hours === 6) unitBill = 50000;
+        else unitBill = base * hours;
     } else {
-        // PS5 atau VVIP (Linear sesuai tarif/jam)
         unitBill = base * hours;
     }
 
-    // 3. Total Sementara & Pembulatan (khusus 30 menit)
     let rawBill = unitBill + totalExtras;
-    
-    if (hours === 0.5) {
-        rawBill = roundToThousandCeil(rawBill);
-    } else {
-        rawBill = Math.round(rawBill);
-    }
+    if (hours === 0.5) rawBill = roundToThousandCeil(rawBill);
+    else rawBill = Math.round(rawBill);
 
     currentBill = rawBill || 0;
     document.getElementById('billLbl').textContent = 'Rp ' + fmtIDR(currentBill);
-
     updateChange();
   }
 
   function updateChange(){
-    const method = (document.getElementById('payMethod')?.value || 'Tunai').toLowerCase();
-    const paid   = parseInt(document.getElementById('paidAmount')?.value || '0', 10);
-    const change = method === 'tunai' ? Math.max(0, paid - (currentBill||0)) : 0;
-    const out    = document.getElementById('changeLbl');
-    if (out) out.value = 'Rp ' + fmtIDR(change);
+    const method = (document.getElementById('payMethod')?.value||'Tunai').toLowerCase();
+    const paid = parseInt(document.getElementById('paidAmount')?.value||'0',10);
+    const change = method==='tunai' ? Math.max(0, paid-(currentBill||0)) : 0;
+    const out = document.getElementById('changeLbl');
+    if(out) out.value = 'Rp ' + fmtIDR(change);
   }
 
   const formEl = document.getElementById('fixedForm');
   if(formEl){
     formEl.addEventListener('submit', function(e){
-      const method = (document.getElementById('payMethod')?.value || 'Tunai').toLowerCase();
-      const paid   = parseInt(document.getElementById('paidAmount')?.value || '0', 10);
-
-      if (method === 'tunai' && paid < currentBill){
-        e.preventDefault();
-        alert('Pembayaran tunai kurang dari total tagihan.');
-        return;
-      }
-
-      try { saveTimer(); } catch(err){ /* ignore */ }
+      const method = (document.getElementById('payMethod')?.value||'Tunai').toLowerCase();
+      const paid = parseInt(document.getElementById('paidAmount')?.value||'0',10);
+      if (method==='tunai' && paid<currentBill){ e.preventDefault(); alert('Pembayaran tunai kurang.'); return; }
+      try { saveTimer(); } catch(err){}
     });
   }
 
   ['unitSel','extraSel','arcadeSel','hoursSel','startInput'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el){
-      el.addEventListener('change', updateCalc);
-      el.addEventListener('input', updateCalc);
-    }
+    if(el){ el.addEventListener('change', updateCalc); el.addEventListener('input', updateCalc); }
   });
   document.getElementById('payMethod')?.addEventListener('change', updateChange);
   document.getElementById('paidAmount')?.addEventListener('input', updateChange);
-
   updateCalc();
 })();
 </script>
