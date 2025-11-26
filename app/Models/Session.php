@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUuids; // 1. Import Trait HasUuids
 
 class Session extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids; // 2. Gunakan Trait HasUuids di sini
 
     protected $table = 'game_sessions';
 
