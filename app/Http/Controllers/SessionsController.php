@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Session;   // Pastikan model Session sudah menggunakan trait HasUuids
+use App\Models\GameSession; // <-- PENTING: Sesuaikan dengan nama Model kamu
 use App\Models\PSUnit;
 use App\Models\Sale;
-use App\Models\SaleItem; // Tambahkan Model ini jika ada, atau pakai DB::table
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -14,13 +13,12 @@ class SessionsController extends Controller
 {
     public function index()
     {
-        // Hanya tampilkan unit yang aktif
-        $units = PSUnit::where('is_active', 1)->orderBy('name')->get();
+        $units = PSUnit::all();
 
-        // Ambil sesi yang sudah selesai (closed)
-        $closed_sessions = Session::with('ps_unit')
-            ->where('status', 'closed')
-            ->orderBy('created_at', 'desc')
+        // Ambil sesi yang sudah selesai (ended_at != null)
+        $closed_sessions = GameSession::with('psUnit') // <-- Sesuaikan dengan nama function di Model (psUnit)
+            ->whereNotNull('end_time')      
+            ->orderBy('start_time', 'desc') 
             ->limit(20)
             ->get();
 
@@ -30,132 +28,77 @@ class SessionsController extends Controller
     public function storeFixed(Request $request)
     {
         $request->validate([
-            'ps_unit_id'     => 'required',
-            'start_time'     => 'required|date',
-            'hours'          => 'required|numeric',
-            'paid_amount'    => 'required|numeric',
+            'ps_unit_id'   => 'required',
+            'start_time'   => 'required|date',
+            'hours'        => 'required|numeric',
+            'paid_amount'  => 'required|numeric',
             'payment_method' => 'required|string',
         ]);
 
-        // Gunakan Transaction agar data konsisten (Sale, Item, Session masuk semua atau tidak sama sekali)
         DB::transaction(function () use ($request) {
             $unit  = PSUnit::findOrFail($request->ps_unit_id);
             $start = Carbon::parse($request->start_time);
             $hours = (float) $request->hours;
             $end   = $start->copy()->addMinutes($hours * 60);
 
-            // --- 1. LOGIKA HARGA & PAKET ---
-            $baseRate   = $unit->hourly_rate;
-            $extraRate  = 10000;  // Tarif stik tambahan/jam
-            $arcadeRate = 15000;  // Tarif arcade/jam
+            // 1. Hitung Tagihan
+            $baseRate    = $unit->hourly_rate;
+            $extraRate   = 10000;  // stik tambahan
+            $arcadeRate  = 15000;  // arcade
 
             $extraControllers  = (int) ($request->extra_controllers ?? 0);
             $arcadeControllers = (int) ($request->arcade_controllers ?? 0);
 
-            // A. Hitung Biaya Unit (Cek Paket PS4 Reguler)
-            $unitBill = 0;
-            // Cek jika tipe PS4 (Reguler) dan tarif dasar 10.000
-            // Kita gunakan pengecekan tipe (jika kolom type ada) atau harga (10000) sebagai fallback
-            $isReguler = ($unit->type ?? '') === 'PS4' || $baseRate == 10000;
-
-            if ($isReguler) {
-                if ($hours == 3) $unitBill = 25000;
-                elseif ($hours == 4) $unitBill = 35000;
-                elseif ($hours == 5) $unitBill = 45000;
-                elseif ($hours == 6) $unitBill = 50000;
-                else $unitBill = $baseRate * $hours; // 1 jam, 2 jam, atau 0.5 jam
-            } else {
-                // Unit lain (PS5 / VVIP) hitung linear
-                $unitBill = $baseRate * $hours;
-            }
-
-            // B. Hitung Biaya Tambahan
+            $baseTotal   = $baseRate * $hours;
             $extraTotal  = $extraControllers * $extraRate * $hours;
             $arcadeTotal = $arcadeControllers * $arcadeRate * $hours;
 
-            // C. Total Tagihan
-            $totalBill = $unitBill + $extraTotal + $arcadeTotal;
+            $totalBill = $baseTotal + $extraTotal + $arcadeTotal;
 
-            // Pembulatan khusus 30 menit (setengah jam) -> bulatkan ke ribuan terdekat/atas
+            // Optional: pembulatan khusus 30 menit
             if ($hours == 0.5) {
                 $totalBill = ceil($totalBill / 1000) * 1000;
-            } else {
-                $totalBill = round($totalBill);
             }
 
-            // Validasi Pembayaran (Server Side)
-            if ($request->payment_method === 'Tunai' && $request->paid_amount < $totalBill) {
-                throw new \Exception('Pembayaran kurang dari total tagihan.');
-            }
-
-            // --- 2. BUAT DATA PENJUALAN (SALES) ---
+            // 2. Buat Data Penjualan
             $sale = Sale::create([
-                'sold_at'        => $end, // Pendapatan dicatat saat sesi selesai
-                'total'          => $totalBill, // Pastikan nama kolom di DB 'total' (bukan total_amount) sesuai perbaikan dashboard
-                'total_amount'   => $totalBill, // Backup jika kolom total_amount masih ada
+                'sold_at'        => Carbon::now(), // pendapatan dicatat saat sesi selesai
+                'total_amount'   => $totalBill,
                 'paid_amount'    => $request->paid_amount,
                 'change_amount'  => max(0, $request->paid_amount - $totalBill),
                 'payment_method' => $request->payment_method,
                 'note'           => "Sesi PS: {$unit->name} ({$hours} jam)",
             ]);
 
-            // --- 3. BUAT RINCIAN ITEM (SALE ITEMS) ---
-            // Item 1: Sewa Unit
+            // Item penjualan (jasa sewa PS)
             DB::table('sale_items')->insert([
-                'sale_id'     => $sale->id,
-                'product_id'  => null,
-                'description' => "Sewa {$unit->name} ({$hours} jam)",
-                'qty'         => 1,
-                'unit_price'  => $unitBill,
-                'subtotal'    => $unitBill,
-                'created_at'  => now(),
-                'updated_at'  => now(),
+                'sale_id'    => $sale->id,
+                'product_id' => null,      // bukan produk fisik
+                'qty'        => 1,
+                'unit_price' => $totalBill,
+                'subtotal'   => $totalBill,
             ]);
 
-            // Item 2: Tambahan Stik (Jika ada)
-            if ($extraTotal > 0) {
-                DB::table('sale_items')->insert([
-                    'sale_id'     => $sale->id,
-                    'product_id'  => null,
-                    'description' => "Tambahan Stik x{$extraControllers}",
-                    'qty'         => 1,
-                    'unit_price'  => $extraTotal,
-                    'subtotal'    => $extraTotal,
-                    'created_at'  => now(),
-                    'updated_at'  => now(),
-                ]);
-            }
-
-            // Item 3: Arcade (Jika ada)
-            if ($arcadeTotal > 0) {
-                DB::table('sale_items')->insert([
-                    'sale_id'     => $sale->id,
-                    'product_id'  => null,
-                    'description' => "Arcade Controller x{$arcadeControllers}",
-                    'qty'         => 1,
-                    'unit_price'  => $arcadeTotal,
-                    'subtotal'    => $arcadeTotal,
-                    'created_at'  => now(),
-                    'updated_at'  => now(),
-                ]);
-            }
-
-            // --- 4. SIMPAN SESI (GAME SESSIONS) ---
-            $session = new Session();
-            $session->ps_unit_id       = $unit->id;
-            $session->sale_id          = $sale->id;
-            $session->start_time       = $start;
-            $session->end_time         = $end;
-            $session->minutes          = (int) ($hours * 60);
-            $session->extra_controllers = $extraControllers;
-            $session->arcade_controllers = $arcadeControllers;
-            $session->bill             = $totalBill;
-            $session->payment_method   = $request->payment_method;
-            $session->paid_amount      = $request->paid_amount;
-            $session->status           = 'closed';
-            $session->note             = $request->note; // Jika ada input note tambahan
+            // 3. Simpan Data Sesi ke game_sessions
+            // Kita pakai cara object assignment agar aman
+            $session = new GameSession();
             
-            $session->save();
+            // JANGAN ISI ID DISINI (Biarkan database yang buat angka 1, 2, 3...)
+            
+            $session->ps_unit_id      = $unit->id;
+            $session->sale_id         = $sale->id;
+            $session->start_time      = $start;             
+            $session->end_time        = $end;               
+            $session->minutes         = (int) ($hours * 60);
+            $session->extra_controllers = $extraControllers; 
+            $session->arcade_controllers = $arcadeControllers;
+            $session->bill            = $totalBill;
+            $session->payment_method  = $request->payment_method;
+            $session->paid_amount     = $request->paid_amount;
+            $session->status          = 'closed';
+            $session->note            = null;
+
+            $session->save(); // <-- Disini data disimpan & ID otomatis dibuat
         });
 
         return redirect()
@@ -166,18 +109,17 @@ class SessionsController extends Controller
     public function destroy($sid)
     {
         DB::transaction(function () use ($sid) {
-            $session = Session::findOrFail($sid);
+            // Gunakan GameSession
+            $session = GameSession::findOrFail($sid);
 
-            // Hapus penjualan terkait agar laporan bersih
+            // Hapus penjualan terkait
             if ($session->sale_id) {
                 $sale = Sale::find($session->sale_id);
                 if ($sale) {
-                    // Hapus item rincian
                     DB::table('sale_items')
                         ->where('sale_id', $sale->id)
                         ->delete();
 
-                    // Hapus header penjualan
                     $sale->delete();
                 }
             }

@@ -23,7 +23,8 @@ class GameSession extends Model
 
     public function psUnit()
     {
-        return $this->belongsTo(PSUnit::class, 'ps_unit_id');
+        // Tambahkan ->withTrashed() agar unit yang dihapus tetap terbaca di riwayat
+        return $this->belongsTo(PSUnit::class, 'ps_unit_id')->withTrashed();
     }
 
     public function sale()

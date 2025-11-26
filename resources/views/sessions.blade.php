@@ -335,13 +335,13 @@
               <tbody>
                 @forelse($closed_sessions as $s)
                   <tr>
-                    {{-- SAYA UBAH KE TEXT-WHITE AGAR TERBACA DI CARD DARK --}}
+                    {{-- FIX: Menggunakan $s->psUnit (CamelCase) bukan $s->ps_unit --}}
                     <td class="text-dark">
-                      <div class="fw-bold">{{ $s->ps_unit->name ?? '-' }}</div>
+                      <div class="fw-bold">{{ $s->psUnit->name ?? '-' }}</div>
                       
-                      {{-- FITUR BARU: Badge Tipe Unit (Teks Hitam Background Terang) --}}
+                      {{-- Badge Tipe Unit --}}
                       <span class="badge bg-light text-dark fw-bold border border-secondary mt-1" style="font-size: 0.7rem;">
-                        {{ $s->ps_unit->type ?? 'PS4' }}
+                        {{ $s->psUnit->type ?? 'PS4' }}
                       </span>
 
                       @if(!empty($s->extra_controllers) && $s->extra_controllers > 0)

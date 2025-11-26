@@ -12,8 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('game_sessions', function (Blueprint $table) {
-            // karena di log insert id berupa UUID string (019ab0...),
-            // kita buat kolom id string (uuid)
             $table->id();
 
             $table->foreignId('ps_unit_id')->constrained('ps_units');
