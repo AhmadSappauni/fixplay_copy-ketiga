@@ -61,6 +61,7 @@
     font-size:.82rem;
     color:#cbd5f5;
     white-space:normal;
+    opacity: 60%;
   }
   .fp-header-text{
     min-width:0;

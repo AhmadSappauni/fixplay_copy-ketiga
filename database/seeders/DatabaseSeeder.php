@@ -20,5 +20,6 @@ class DatabaseSeeder extends Seeder
 
         // Panggil seeder demo
         $this->call(DemoSeeder::class);
+        $this->call(AdminUserSeeder::class);
     }
 }

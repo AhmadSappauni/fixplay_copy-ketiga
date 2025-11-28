@@ -112,10 +112,16 @@
                         @endforeach
                       </select>
                     </td>
-                    <td class="text-neon-sub">
-                      {{-- nanti bisa dikembangkan jadi input catatan per hari --}}
-                      {{ $record?->catatan ?? '-' }}
+                    <td>
+                      <input
+                          type="text"
+                          name="catatan[{{ $date->toDateString() }}]"
+                          class="fx-select fx-select-sm"
+                          placeholder="Tambahkan catatan..."
+                          value="{{ $record?->catatan ?? '' }}"
+                      >
                     </td>
+
                   </tr>
                 @endforeach
               </tbody>

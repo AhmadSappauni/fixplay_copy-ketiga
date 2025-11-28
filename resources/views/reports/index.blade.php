@@ -14,7 +14,7 @@
         </span>
         <h4 class="m-0 text-light fw-semibold">Kasir Fixplay - Laporan</h4>
       </div>
-      <div class="text-muted small">
+      <div class="fp-header-sub">
         Ringkasan pendapatan & pengeluaran usaha kamu
       </div>
     </div>
@@ -436,6 +436,12 @@
 @push('styles')
 <style>
   /* Shell utama: panel futuristik gelap */
+  .fp-header-sub{
+    font-size:.82rem;
+    color:#cbd5f5;
+    white-space:normal;
+    opacity: 60%;
+  }
   .report-shell{
     position: relative;
     padding: 1.75rem 1.75rem 2.25rem;

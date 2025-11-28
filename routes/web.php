@@ -124,3 +124,11 @@ Route::get('/buat-storage-link', function () {
     Artisan::call('storage:link');
     return 'Folder Storage berhasil di-link! Silakan kembali ke halaman karyawan.';
 });
+
+// --- ROUTE SEMENTARA UNTUK LINK STORAGE ---
+
+Route::get('/buat-storage-link', function () {
+    // Menjalankan perintah 'php artisan storage:link' lewat browser
+    Artisan::call('storage:link');
+    return 'Folder Storage berhasil di-link! Silakan kembali ke halaman karyawan.';
+});
