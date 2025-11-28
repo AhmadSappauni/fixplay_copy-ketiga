@@ -15,6 +15,7 @@ use App\Http\Controllers\POSController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\ExpenseController;
+use Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
@@ -115,4 +116,11 @@ Route::middleware('auth')->group(function () {
         Route::put('/{id}', [SaleController::class, 'update'])->name('update');
         Route::delete('/{id}', [SaleController::class, 'destroy'])->name('destroy');
     });
+});
+
+// Tambahkan route sementara ini
+
+Route::get('/buat-storage-link', function () {
+    Artisan::call('storage:link');
+    return 'Folder Storage berhasil di-link! Silakan kembali ke halaman karyawan.';
 });

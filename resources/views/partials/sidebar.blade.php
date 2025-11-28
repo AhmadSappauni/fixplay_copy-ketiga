@@ -11,7 +11,6 @@
 
   {{-- ============================================================
        MENU OPERASIONAL (KHUSUS KARYAWAN)
-       Bos TIDAK AKAN melihat menu di dalam blok if ini
        ============================================================ --}}
   @if(auth()->check() && auth()->user()->role !== 'boss')
       
@@ -45,10 +44,22 @@
         <i class="bi bi-bag-plus"></i> <span>Beli Stok</span>
       </a>
 
+      {{-- --- TAMBAHAN: AKSES LAPORAN UNTUK KARYAWAN --- --}}
+      <div class="mt-3 mb-1 px-3 text-uppercase"
+           style="font-size: .7rem; letter-spacing:.12em; opacity:.65;">
+          Laporan
+      </div>
+
+      <a href="{{ route('reports.index') }}"
+         class="{{ request()->routeIs('reports.index') ? 'active' : '' }}">
+        <i class="bi bi-graph-up-arrow"></i> <span>Laporan Keuangan</span>
+      </a>
+      {{-- ------------------------------------------------ --}}
+
       {{-- Presensi Hari Ini (Input Absen) --}}
       <div class="mt-3 mb-1 px-3 text-uppercase"
            style="font-size: .7rem; letter-spacing:.12em; opacity:.65;">
-         Absensi
+          Absensi
       </div>
 
       <a href="{{ route('presensi.index') }}"
@@ -65,7 +76,6 @@
 
   {{-- ============================================================
        MENU UMUM / SHARED (RIWAYAT)
-       Karyawan butuh lihat riwayat sendiri, Bos juga butuh lihat.
        ============================================================ --}}
   @if(auth()->check())
       <a href="{{ route('presensi.riwayat') }}"
@@ -77,7 +87,6 @@
 
   {{-- ============================================================
        MENU KHUSUS BOS (MANAGEMENT & REPORT)
-       Hanya muncul jika user adalah BOS
        ============================================================ --}}
   @if(auth()->check() && auth()->user()->role === 'boss')
     
@@ -86,7 +95,7 @@
       Laporan &amp; Manajemen
     </div>
 
-    {{-- Laporan Keuangan --}}
+    {{-- Laporan Keuangan (Bos juga tetap punya ini) --}}
     <a href="{{ route('reports.index') }}"
        class="{{ request()->routeIs('reports.index') ? 'active' : '' }}">
       <i class="bi bi-graph-up-arrow"></i> <span>Laporan Keuangan</span>
