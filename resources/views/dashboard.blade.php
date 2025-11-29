@@ -5,7 +5,7 @@
 
 @push('styles')
 <style>
-  /* ====== DASHBOARD SHELL : FUTURISTIC PANEL ====== */
+  /* ====== DASHBOARD SHELL ====== */
   .dash-shell{
     position: relative;
     padding: 1.75rem 1.75rem 2.25rem;
@@ -18,222 +18,156 @@
     color:#e5e7eb;
   }
   .dash-shell::before{
-    content:"";
-    position:absolute;
-    inset:-40%;
-    background:
-      radial-gradient(circle at 10% 0,#a855f755,transparent 52%),
-      radial-gradient(circle at 90% 100%,#0ea5e955,transparent 60%);
-    opacity:.7;
-    filter: blur(40px);
-    pointer-events:none;
+    content:""; position:absolute; inset:-40%;
+    background: radial-gradient(circle at 10% 0,#a855f755,transparent 52%), radial-gradient(circle at 90% 100%,#0ea5e955,transparent 60%);
+    opacity:.7; filter: blur(40px); pointer-events:none;
   }
-  .dash-shell > *{
-    position:relative;
-    z-index:1;
-  }
+  .dash-shell > *{ position:relative; z-index:1; }
 
   .dash-chip-icon{
-    width:36px;
-    height:36px;
-    border-radius:999px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    background:linear-gradient(135deg,#4f46e5,#a855f7);
-    color:#fff;
-    box-shadow:0 10px 24px rgba(79,70,229,.7);
-    font-size:18px;
+    width:36px; height:36px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg,#4f46e5,#a855f7); color:#fff; box-shadow:0 10px 24px rgba(79,70,229,.7); font-size:18px;
   }
 
-  .dash-title-text{
-    color:#f9fafb;
-  }
-  .dash-subtitle{
-    color:#9ca3af;
-    font-size:.8rem;
-  }
+  .dash-title-text{ color:#f9fafb; }
+  .dash-subtitle{ color:#9ca3af; font-size:.8rem; }
 
   .btn-soft-dark{
-    border-radius:999px;
-    border:1px solid rgba(148,163,184,.4);
-    background:rgba(15,23,42,.75);
-    color:#e5e7eb;
+    border-radius:999px; border:1px solid rgba(148,163,184,.4); background:rgba(15,23,42,.75); color:#e5e7eb;
   }
-  .btn-soft-dark:hover{
-    background:rgba(15,23,42,.95);
-    color:#fff;
-  }
+  .btn-soft-dark:hover{ background:rgba(15,23,42,.95); color:#fff; }
 
   .btn-soft-primary{
-    border-radius:999px;
-    border:none;
-    background:linear-gradient(135deg,#6366f1,#a855f7);
-    color:#f9fafb;
+    border-radius:999px; border:none; background:linear-gradient(135deg,#6366f1,#a855f7); color:#f9fafb;
     box-shadow:0 12px 24px rgba(79,70,229,.75);
   }
-  .btn-soft-primary:hover{
-    filter:brightness(1.06);
-  }
+  .btn-soft-primary:hover{ filter:brightness(1.06); }
 
-  /* ====== SUMMARY CARDS ====== */
+  /* ====== STAT CARDS (Kotak Ringkasan) ====== */
   .stat-card{
-    position:relative;
-    border-radius:1.25rem;
-    padding:1.05rem 1.2rem 1.1rem;
-    background:rgba(15,23,42,.92);
-    border:1px solid rgba(148,163,184,.45);
-    box-shadow:0 18px 36px rgba(15,23,42,.9);
-    backdrop-filter:blur(20px);
-    overflow:hidden;
+    position:relative; border-radius:1.25rem; padding:1.2rem;
+    background: linear-gradient(145deg, rgba(30,41,59,0.8), rgba(15,23,42,0.9));
+    border:1px solid rgba(148,163,184,.25);
+    box-shadow:0 10px 30px rgba(0,0,0,.4); backdrop-filter:blur(10px); overflow:hidden;
   }
   .stat-card::after{
-    content:"";
-    position:absolute;
-    inset:auto -45% -45% auto;
-    width:140px;
-    height:140px;
-    border-radius:999px;
-    opacity:.45;
-    filter:blur(18px);
+    content:""; position:absolute; inset:auto -45% -45% auto; width:120px; height:120px; border-radius:999px; opacity:.3; filter:blur(25px);
   }
-  .stat-card .stat-label{
-    font-size:.78rem;
-    letter-spacing:.12em;
-    text-transform:uppercase;
-    color:#9ca3af;
-    font-weight:600;
+  .stat-card .stat-label{ font-size:.75rem; letter-spacing:.1em; text-transform:uppercase; color:#94a3b8; font-weight:700; }
+  .stat-card .stat-sub{ font-size:.8rem; color:#cbd5e1; margin-top: 2px; }
+  .stat-card .stat-value{ font-size:1.6rem; font-weight:800; margin-top:.6rem; color:#fff; letter-spacing: 0.5px; }
+  
+  .stat-card.primary::after{ background:radial-gradient(circle,#6366f1,#0ea5e9); }
+  .stat-card.success::after{ background:radial-gradient(circle,#22c55e,#a3e635); }
+  .stat-card.warning::after{ background:radial-gradient(circle,#f97316,#facc15); }
+
+  /* ====== CARD GRAPH & TABLE (DARK THEME) ====== */
+  /* Ini yang membuat background tabel jadi gelap, bukan putih */
+  .card-trans {
+    border-radius: 1.25rem;
+    border: 1px solid rgba(148,163,184,.25);
+    background: linear-gradient(145deg, rgba(2,6,23,0.9), rgba(15,23,42,0.85));
+    box-shadow: 0 20px 40px rgba(0,0,0,.6);
+    backdrop-filter: blur(12px);
+    overflow: hidden;
+    color: #e5e7eb;
   }
-  .stat-card .stat-sub{
-    font-size:.78rem;
-    color:#6b7280;
-  }
-  .stat-card .stat-value{
-    font-size:1.6rem;
-    font-weight:800;
-    margin-top:.45rem;
-    color:#e5e7eb;
-  }
-  .stat-card.primary::after{
-    background:radial-gradient(circle,#6366f1,#0ea5e9);
-  }
-  .stat-card.success::after{
-    background:radial-gradient(circle,#22c55e,#a3e635);
-  }
-  .stat-card.warning::after{
-    background:radial-gradient(circle,#f97316,#facc15);
+  
+  .card-trans .card-header {
+    border-bottom: 1px solid rgba(148,163,184,.2);
+    background: rgba(30, 41, 59, 0.4); /* Header sedikit lebih terang */
+    color: #e5e7eb;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    font-size: .75rem;
+    padding: 1rem 1.5rem;
   }
 
-  /* ====== GRAPH CARD ====== */
-  .card-graph{
-    border-radius:1.25rem;
-    border:1px solid rgba(148,163,184,.5);
-    background:radial-gradient(circle at top,#020617,#030712 55%,#020617);
-    color:#e5e7eb;
-    box-shadow:0 20px 38px rgba(15,23,42,.9);
+  .card-graph {
+    border-radius: 1.25rem;
+    border: 1px solid rgba(148,163,184,.25);
+    background: linear-gradient(145deg, rgba(2,6,23,0.9), rgba(15,23,42,0.85));
+    color: #e5e7eb;
   }
-  .card-graph .card-header,
-  .card-graph .card-body{
-    background:transparent;
-    border-color:rgba(15,23,42,.6);
+  .card-graph .card-body { padding: 1.5rem; }
+
+  .chart-wrapper{ position:relative; width:100%; min-height:240px; max-height:300px; }
+  .chart-wrapper canvas{ width:100% !important; height:100% !important; }
+
+  /* ====== TABEL NEON (GAYA SESI RENTAL) ====== */
+  .table-neon {
+    width: 100%;
+    margin-bottom: 0;
+    color: #cbd5e1;
+  }
+  /* Header Tabel */
+  .table-neon thead th {
+    background: rgba(15, 23, 42, 0.8);
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    padding: 1rem 1.5rem;
+    white-space: nowrap;
+  }
+  /* Body Tabel */
+  .table-neon tbody td {
+    background: transparent; /* Transparan agar background card terlihat */
+    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    padding: 1rem 1.5rem;
+    vertical-align: middle;
+    font-size: 0.9rem;
+    color: #f8fafc; /* Teks Putih Terang */
+  }
+  /* Hover Effect */
+  .table-neon tbody tr:hover td {
+    background: rgba(99, 102, 241, 0.08); /* Highlight ungu tipis */
   }
 
-  /* batasi tinggi grafik supaya tidak memanjang */
-  .chart-wrapper{
-    position:relative;
-    width:100%;
-    min-height:220px;
-    max-height:280px;
+  .mono { font-family: 'Consolas', 'Monaco', monospace; color: #818cf8; font-weight: 600; }
+
+  /* Tombol Aksi Kecil */
+  .btn-action-group .btn {
+    padding: 0.3rem 0.75rem;
+    font-size: 0.75rem;
+    border-radius: 8px;
+    font-weight: 600;
   }
-  .chart-wrapper canvas{
-    width:100% !important;
-    height:100% !important;
+  .btn-outline-secondary { color: #cbd5e1; border-color: #475569; }
+  .btn-outline-secondary:hover { background: #475569; color: #fff; }
+  
+  .btn-outline-warning { color: #fcd34d; border-color: #b45309; }
+  .btn-outline-warning:hover { background: #b45309; color: #fff; }
+
+  .btn-outline-danger { color: #fca5a5; border-color: #991b1b; }
+  .btn-outline-danger:hover { background: #991b1b; color: #fff; }
+
+  /* Badge Hitungan */
+  .badge-count {
+    background: rgba(255,255,255,0.1);
+    color: #e2e8f0;
+    border: 1px solid rgba(255,255,255,0.2);
+    font-size: 0.7rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 99px;
   }
 
-  /* ====== TABLE CARD ====== */
-  .card-trans{
-    border-radius:1.25rem;
-    border:1px solid rgba(148,163,184,.45);
-    background:linear-gradient(145deg,#020617,#020617 40%,#0b1120 100%);
-    color:#e5e7eb;
-    box-shadow:0 20px 40px rgba(15,23,42,.9);
-  }
-  .card-trans .card-header{
-    border-bottom:1px solid rgba(30,64,175,.8);
-    background:linear-gradient(90deg,#111827,#020617);
-    color:#e5e7eb;
-    font-weight:700;
-    letter-spacing:.06em;
-    text-transform:uppercase;
-    font-size:.75rem;
-  }
-
-  .table-neon{
-    margin-bottom:0;
-    color:#d1d5db;
-  }
-  .table-neon thead th{
-    background:linear-gradient(90deg,#020617,#030712);
-    border-bottom:1px solid rgba(55,65,81,.9);
-    font-size:.78rem;
-    text-transform:uppercase;
-    letter-spacing:.08em;
-    color:#9ca3af;
-  }
-  .table-neon tbody tr{
-    border-color:rgba(31,41,55,.9);
-    transition:background .14s ease, transform .06s ease;
-  }
-  .table-neon tbody tr:hover{
-    background:rgba(79,70,229,.18);
-    transform:translateY(-1px);
-  }
-  .table-neon td,
-  .table-neon th{
-    border-color:rgba(31,41,55,.9);
-  }
-
-  .mono{
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,"Liberation Mono","Courier New", monospace;
-  }
-
-  /* ====== RESPONSIVE ====== */
-  @media (max-width: 992px){
-    .dash-shell{
-      padding:1.35rem 1.1rem 2rem;
-      border-radius:1.1rem;
-    }
-  }
+  /* Responsive */
+  @media (max-width: 992px){ .dash-shell{ padding:1.35rem 1.1rem 2rem; border-radius:1.1rem; } }
   @media (max-width: 768px){
-    .dash-header-stack{
-      flex-direction:column;
-      align-items:flex-start !important;
-      gap:.7rem;
-    }
-    .dash-header-actions{
-      width:100%;
-      justify-content:flex-end;
-    }
-    .stat-card{
-      margin-bottom:.25rem;
-    }
-    .chart-wrapper{
-      min-height:200px;
-      max-height:260px;
-    }
+    .dash-header-stack{ flex-direction:column; align-items:flex-start !important; gap:.7rem; }
+    .dash-header-actions{ width:100%; justify-content:flex-end; }
+    .stat-card{ margin-bottom:.5rem; }
+    .chart-wrapper{ min-height:200px; max-height:260px; }
   }
-
   @media print{
-    .dash-shell{
-      background:#fff;
-      box-shadow:none;
-    }
-    .card-trans,.card-graph,.stat-card{
-      box-shadow:none;
-      border-color:#e5e7eb;
-      background:#fff;
-      color:#111827;
-    }
+    .dash-shell{ background:#fff; box-shadow:none; }
+    .card-trans, .card-graph, .stat-card{ box-shadow:none; border-color:#e5e7eb; background:#fff; color:#111827; }
+    .table-neon thead th{ background:#f3f4f6; color:#111827; }
+    .table-neon tbody td{ color:#000; border-bottom:1px solid #e5e7eb; }
     .d-print-none{ display:none !important; }
   }
 </style>
@@ -243,17 +177,13 @@
 <div class="dash-shell">
 
   {{-- HEADER --}}
-  <div class="d-flex align-items-center justify-content-between mb-3 dash-header-stack">
+  <div class="d-flex align-items-center justify-content-between mb-4 dash-header-stack">
     <div>
       <div class="d-flex align-items-center gap-2 mb-1">
-        <span class="dash-chip-icon">
-          <i class="bi bi-speedometer2"></i>
-        </span>
-        <h4 class="m-0 fw-semibold dash-title-text">Kasir Fixplay - Dashboard</h4>
+        <span class="dash-chip-icon"><i class="bi bi-speedometer2"></i></span>
+        <h4 class="m-0 fw-bold dash-title-text">Kasir Fixplay - Dashboard</h4>
       </div>
-      <div class="dash-subtitle">
-        Ringkasan performa pendapatan harian dan transaksi terakhir.
-      </div>
+      <div class="dash-subtitle">Ringkasan performa pendapatan harian dan transaksi terakhir.</div>
     </div>
 
     <div class="d-flex align-items-center gap-2 d-print-none dash-header-actions">
@@ -267,121 +197,99 @@
   </div>
 
   {{-- RINGKASAN HARI INI --}}
-  <div class="row g-3 mb-3">
+  <div class="row g-4 mb-4">
     <div class="col-lg-4 col-md-6">
-      <div class="stat-card primary">
-        <div class="stat-label">Ringkasan hari ini</div>
-        <div class="stat-sub">Pendapatan PS (harian)</div>
-        <div class="stat-value mono">
-          Rp {{ number_format($todayPs,0,',','.') }}
-        </div>
+      <div class="stat-card primary h-100">
+        <div class="stat-label">Pendapatan PS</div>
+        <div class="stat-value mono">Rp {{ number_format($todayPs,0,',','.') }}</div>
+        <div class="stat-sub">Total sesi rental hari ini</div>
       </div>
     </div>
 
     <div class="col-lg-4 col-md-6">
-      <div class="stat-card success">
-        <div class="stat-label">Ringkasan hari ini</div>
-        <div class="stat-sub">Total pendapatan (PS + Produk)</div>
-        <div class="stat-value mono">
-          Rp {{ number_format($todayTotal,0,',','.') }}
-        </div>
+      <div class="stat-card success h-100">
+        <div class="stat-label">Total Pendapatan</div>
+        <div class="stat-value mono">Rp {{ number_format($todayTotal,0,',','.') }}</div>
+        <div class="stat-sub">Gabungan PS + Produk</div>
       </div>
     </div>
 
     <div class="col-lg-4 col-md-6">
-      <div class="stat-card warning">
-        <div class="stat-label">Ringkasan hari ini</div>
-        <div class="stat-sub">Pendapatan Produk (harian)</div>
-        <div class="stat-value mono">
-          Rp {{ number_format($todayProd,0,',','.') }}
-        </div>
+      <div class="stat-card warning h-100">
+        <div class="stat-label">Pendapatan Produk</div>
+        <div class="stat-value mono">Rp {{ number_format($todayProd,0,',','.') }}</div>
+        <div class="stat-sub">Penjualan makanan & minuman</div>
       </div>
     </div>
   </div>
 
   {{-- GRAFIK PENDAPATAN --}}
-  <div class="row g-4 mt-1">
+  <div class="row g-4">
     <div class="col-12">
-      <div class="card card-graph h-100">
+      <div class="card card-graph">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h5 class="mb-0 fw-bold">Grafik Pendapatan</h5>
-            <span class="text-xs text-muted small">Periode terakhir</span>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0 fw-bold text-white">Grafik Pendapatan</h5>
+            <span class="badge-count">10 Hari Terakhir</span>
           </div>
-
           <div class="chart-wrapper">
             <canvas id="revChart"></canvas>
           </div>
-
-          <div id="chartPayload"
-               data-labels='@json($chartLabels)'
-               data-series='@json($chartData)'
-               hidden></div>
+          {{-- Data Chart Tersembunyi --}}
+          <div id="chartPayload" data-labels='@json($chartLabels)' data-series='@json($chartData)' hidden></div>
         </div>
       </div>
     </div>
   </div>
 
   {{-- TRANSAKSI TERAKHIR --}}
-  <div class="row g-4 mt-3">
+  <div class="row g-4 mt-2">
     <div class="col-12">
       <div class="card card-trans">
-        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <div class="card-header d-flex justify-content-between align-items-center">
           <span>Transaksi Terakhir</span>
-          <span class="badge bg-secondary-subtle text-xs text-dark d-print-none">
-            {{ count($lastTx) }} transaksi
-          </span>
+          <span class="badge-count d-print-none">{{ count($lastTx) }} DATA</span>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
             <table class="table table-sm align-middle table-neon">
               <thead>
-              <tr>
-                <th style="width: 180px;">Tanggal</th>
-                <th>Transaksi</th>
-                <th class="text-end" style="width: 180px;">Total</th>
-                <th class="text-end d-print-none" style="width: 260px;">Aksi</th>
-              </tr>
+                <tr>
+                  <th style="width: 180px;">Tanggal</th>
+                  <th>Keterangan Transaksi</th>
+                  <th class="text-end" style="width: 180px;">Total</th>
+                  <th class="text-end d-print-none" style="width: 220px;">Aksi</th>
+                </tr>
               </thead>
               <tbody>
               @forelse ($lastTx as $t)
                 <tr>
-                  <td>{{ $t['date'] }}</td>
-                  <td>{{ $t['title'] }}</td>
-                  <td class="text-end mono">
-                    Rp {{ number_format($t['total'],0,',','.') }}
-                  </td>
+                  <td class="text-secondary fw-semibold">{{ $t['date'] }}</td>
+                  <td class="text-white fw-bold">{{ $t['title'] }}</td>
+                  <td class="text-end mono text-info">Rp {{ number_format($t['total'],0,',','.') }}</td>
                   <td class="text-end d-print-none">
-                    {{-- Detail --}}
-                    <a href="{{ route('sales.show', $t['id']) }}"
-                      class="btn btn-sm btn-outline-secondary text-dark me-1">
-                      Detail
-                    </a>
-
-                    {{-- Edit --}}
-                    <a href="{{ route('sales.edit', $t['id']) }}"
-                      class="btn btn-sm btn-outline-warning text-dark me-1">
-                      Edit
-                    </a>
-
-
-                    {{-- Hapus --}}
-                    <form class="d-inline"
-                          method="POST"
-                          action="{{ route('sales.destroy', $t['id']) }}"
-                          onsubmit="return confirm('Yakin ingin menghapus transaksi ini?');">
-                      @csrf
-                      @method('DELETE')
-                      <button type="submit" class="btn btn-sm btn-outline-danger">
-                        Hapus
-                      </button>
-                    </form>
+                    <div class="btn-action-group">
+                        {{-- Detail --}}
+                        <a href="{{ route('sales.show', $t['id']) }}" class="btn btn-outline-secondary me-1" title="Detail">
+                          Detail
+                        </a>
+                        {{-- Edit --}}
+                        <a href="{{ route('sales.edit', $t['id']) }}" class="btn btn-outline-warning me-1" title="Edit">
+                          Edit
+                        </a>
+                        {{-- Hapus --}}
+                        <form class="d-inline" method="POST" action="{{ route('sales.destroy', $t['id']) }}" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?');">
+                          @csrf @method('DELETE')
+                          <button type="submit" class="btn btn-outline-danger" title="Hapus">Hapus</button>
+                        </form>
+                    </div>
                   </td>
                 </tr>
               @empty
                 <tr>
-                  <td colspan="4" class="text-center text-muted p-3">
-                    Belum ada transaksi.
+                  <td colspan="4" class="text-center text-secondary p-5">
+                    <i class="bi bi-inbox display-4 d-block mb-3 opacity-25"></i>
+                    Belum ada transaksi hari ini.
                   </td>
                 </tr>
               @endforelse
@@ -403,8 +311,7 @@
   const payload = document.getElementById('chartPayload');
   if (!payload) return;
 
-  let labels = [];
-  let series = [];
+  let labels = [], series = [];
   try{
     labels = JSON.parse(payload.dataset.labels || '[]');
     series = JSON.parse(payload.dataset.series || '[]');
@@ -420,36 +327,38 @@
       datasets: [{
         label: 'Pendapatan',
         data: series,
-        borderWidth: 1.6,
-        borderRadius: 8,
-        backgroundColor: 'rgba(129,140,248,0.85)',
-        hoverBackgroundColor: 'rgba(251,191,36,0.95)',
+        borderWidth: 0,
+        borderRadius: 4,
+        backgroundColor: 'rgba(99, 102, 241, 0.85)', // Indigo
+        hoverBackgroundColor: 'rgba(168, 85, 247, 1)', // Purple
+        barThickness: 24
       }]
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false, // biar ikut tinggi .chart-wrapper
+      maintainAspectRatio: false, 
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0f172a',
+          titleColor: '#f8fafc',
+          bodyColor: '#cbd5e1',
+          borderColor: '#334155',
+          borderWidth: 1,
+          padding: 10,
+          displayColors: false,
+        }
+      },
       scales: {
         x: {
-          ticks: { color: '#9ca3af' },
-          grid: { display:false }
+          ticks: { color: '#94a3b8', font: { size: 11 } },
+          grid: { display: false }
         },
         y: {
           beginAtZero: true,
-          ticks: { color: '#9ca3af' },
-          grid: { color: 'rgba(55,65,81,0.55)' }
-        }
-      },
-      plugins: {
-        legend: {
-          display: false
-        },
-        tooltip: {
-          backgroundColor: '#020617',
-          borderColor: '#4f46e5',
-          borderWidth: 1,
-          titleColor: '#e5e7eb',
-          bodyColor: '#e5e7eb',
+          ticks: { color: '#94a3b8', font: { size: 11 } },
+          grid: { color: 'rgba(51, 65, 85, 0.2)', borderDash: [4, 4] },
+          border: { display: false }
         }
       }
     }

@@ -5,254 +5,229 @@
     <title>Login – Fixplay</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    {{-- Bootstrap Icons untuk ikon mata & lainnya --}}
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-
-    {{-- Kalau kamu punya CSS global (vite), boleh aktifkan ini --}}
-    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
+    {{-- Bootstrap Icons --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    
+    {{-- Font Poppins --}}
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --fixplay-purple: #7b2ff7;
-            --fixplay-blue: #00c6ff;
-            --bg-gray: #0f172a;
-        }
-
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
         }
 
         body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: radial-gradient(circle at top left, #1f2937, #020617);
             display: flex;
-            align-items: center;
             justify-content: center;
-            color: #e5e7eb;
-        }
-
-        .auth-wrapper {
-            width: 100%;
-            max-width: 960px;
-            min-height: 480px;
-            display: grid;
-            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-            background: #020617;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.8);
-        }
-
-        .auth-sidebar {
-            background: linear-gradient(180deg, var(--fixplay-purple), var(--fixplay-blue));
-            padding: 32px 28px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            color: #f9fafb;
-        }
-
-        .auth-logo {
-            display: flex;
             align-items: center;
-            gap: 12px;
+            min-height: 100vh;
+            background: #111; 
+            overflow: hidden;
         }
 
-        .auth-logo img {
-            width: 52px;
-            height: 52px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 20px rgba(15,23,42,0.6));
-        }
-
-        .auth-logo span {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-        }
-
-        .auth-sidebar h2 {
-            font-size: 26px;
-            margin-bottom: 8px;
-        }
-
-        .auth-sidebar p {
-            margin: 0;
-            opacity: .9;
-        }
-
-        .auth-sidebar-footer {
-            font-size: 13px;
-            opacity: .85;
-        }
-
-        .auth-main {
-            padding: 32px 32px 28px;
-            background: #020617;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .auth-main-header {
-            margin-bottom: 24px;
-        }
-
-        .auth-main-header h1 {
-            margin: 0 0 6px;
-            font-size: 24px;
-            color: #e5e7eb;
-        }
-
-        .auth-main-header p {
-            margin: 0;
-            font-size: 14px;
-            color: #9ca3af;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: #d1d5db;
-        }
-
-        .form-control-wrapper {
+        /* --- LOGIKA DESKTOP (DEFAULT) --- */
+        .box {
             position: relative;
+            width: 380px;
+            height: 100px; 
+            background: #1c1c1c;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: 0.5s ease-in-out;
+            z-index: 10;
         }
 
-        .form-control {
-            width: 100%;
-            padding: 10px 12px;
-            border-radius: 10px;
-            border: 1px solid #1f2937;
-            background: #020617;
-            color: #e5e7eb;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        /* Hover hanya berlaku di desktop: Membuka form */
+        .box:hover {
+            height: 520px; 
         }
 
-        .form-control::placeholder {
-            color: #6b7280;
-        }
-
-        .form-control:focus {
-            border-color: var(--fixplay-purple);
-            box-shadow: 0 0 0 1px rgba(123, 47, 247, 0.6);
-            background: #020617;
-        }
-
-        .toggle-password {
+        /* --- EFEK NEON BERPUTAR --- */
+        .box::before {
+            content: '';
             position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            border: none;
-            background: transparent;
-            color: #9ca3af;
-            cursor: pointer;
-            padding: 4px;
+            top: -50%; left: -50%; width: 380px; height: 420px;
+            background: linear-gradient(0deg, transparent, transparent, #00c6ff, #00c6ff, #00c6ff);
+            z-index: 1;
+            transform-origin: bottom right;
+            animation: animate 6s linear infinite;
         }
 
-        .toggle-password:hover {
-            color: #e5e7eb;
+        .box::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 380px; height: 420px;
+            background: linear-gradient(0deg, transparent, transparent, #7b2ff7, #7b2ff7, #7b2ff7);
+            z-index: 1;
+            transform-origin: bottom right;
+            animation: animate 6s linear infinite;
+            animation-delay: -3s;
         }
 
-        .btn-primary {
-            border: none;
-            border-radius: 999px;
-            padding: 10px 16px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            background: linear-gradient(135deg, var(--fixplay-purple), var(--fixplay-blue));
-            color: #fff;
-            margin-top: 4px;
-            box-shadow: 0 16px 40px rgba(37, 99, 235, 0.35);
+        @keyframes animate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .btn-primary:hover {
-            filter: brightness(1.05);
-        }
-
-        .auth-footer {
-            margin-top: 18px;
-            font-size: 12px;
-            color: #6b7280;
+        /* --- ISI FORM --- */
+        .form-content {
+            position: absolute;
+            inset: 4px; 
+            background: #222; 
+            padding: 30px 40px;
+            border-radius: 8px;
+            z-index: 2;
             display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            flex-wrap: wrap;
+            flex-direction: column;
+            overflow: hidden; 
         }
 
-        .error-box {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(248, 113, 113, 0.6);
-            color: #fecaca;
-            border-radius: 10px;
-            padding: 8px 10px;
-            font-size: 13px;
-            margin-bottom: 4px;
+        h2 {
+            color: #fff; font-weight: 500; text-align: center; letter-spacing: 0.1em;
+            margin-top: 5px; margin-bottom: 40px; width: 100%;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
         }
 
+        .logo-icon { width: 30px; height: auto; filter: drop-shadow(0 0 5px rgba(123, 47, 247, 0.8)); }
+
+        /* --- INPUT FIELD --- */
+        .inputBox {
+            position: relative; width: 100%; margin-top: 35px;
+            opacity: 0; transform: translateY(20px); transition: 0.5s;
+        }
+
+        .box:hover .inputBox { opacity: 1; transform: translateY(0); }
+        .box:hover .inputBox:nth-child(2) { transition-delay: 0.1s; }
+        .box:hover .inputBox:nth-child(3) { transition-delay: 0.2s; }
+
+        .inputBox input {
+            position: relative; width: 100%; padding: 20px 10px 10px;
+            background: transparent; outline: none; box-shadow: none; border: none;
+            color: #23242a; font-size: 1em; letter-spacing: 0.05em; transition: 0.5s; z-index: 10;
+        }
+
+        .inputBox span {
+            position: absolute; left: 0; padding: 20px 10px 10px; pointer-events: none;
+            font-size: 1em; color: #8f8f8f; letter-spacing: 0.05em; transition: 0.5s;
+        }
+
+        .inputBox input:valid ~ span, .inputBox input:focus ~ span {
+            color: #fff; font-size: 0.75em; transform: translateY(-34px);
+        }
+
+        .inputBox i {
+            position: absolute; left: 0; bottom: 0; width: 100%; height: 2px;
+            background: #fff; border-radius: 4px; overflow: hidden; transition: 0.5s; pointer-events: none;
+        }
+
+        .inputBox input:valid ~ i, .inputBox input:focus ~ i {
+            height: 44px; background: #fff; border: 1px solid #fff;
+        }
+        .inputBox input:valid, .inputBox input:focus { color: #222; padding-left: 15px; }
+
+        /* --- TOMBOL MATA --- */
+        .toggle-password {
+            position: absolute; right: 10px; top: 25px; border: none; background: transparent;
+            /* PERBAIKAN WARNA DEFAULT: Abu terang agar terlihat di background gelap */
+            color: #8f8f8f; 
+            cursor: pointer; z-index: 11; opacity: 0; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center;
+            width: 30px; height: 30px; border-radius: 50%;
+        }
+        
+        /* Saat input password aktif (background jadi putih), ubah ikon jadi hitam agar kontras */
+        .inputBox input:focus ~ .toggle-password, .inputBox input:valid ~ .toggle-password { 
+            opacity: 1; 
+            color: #222; 
+        }
+        
+        /* EFEK SINAR KUNING PADA MATA (SAAT AKTIF) */
+        .toggle-password.active {
+            color: #ffeb3b !important; /* Paksa kuning terang */
+            text-shadow: 0 0 5px #ffeb3b, 0 0 10px #ffeb3b, 0 0 20px #ffeb3b; 
+            filter: drop-shadow(0 0 5px rgba(255, 235, 59, 0.8));
+            z-index: 100; 
+        }
+
+        /* Efek "Senter" Mata (Beam) */
+        .beam {
+            position: absolute;
+            top: 50%;
+            right: 35px; 
+            /* PERBAIKAN PANJANG: Diperpanjang jadi 300px */
+            width: 300px; 
+            height: 100px;
+            /* Gradient disesuaikan agar lebih halus memudar ke kiri */
+            background: linear-gradient(90deg, rgba(255, 235, 59, 0.35), transparent 90%);
+            transform-origin: right center;
+            transform: translateY(-50%) rotate(var(--beamDegrees, 0deg));
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            clip-path: polygon(100% 50%, 0 0, 0 100%); 
+            z-index: 90;
+        }
+        
+        .show-password .beam {
+            opacity: 1;
+        }
+
+        /* Footer Links */
+        .links {
+            display: flex; justify-content: space-between; margin-top: 20px;
+            opacity: 0; transition: 0.5s; transition-delay: 0s;
+        }
+        .box:hover .links { opacity: 1; transition-delay: 0.3s; }
+        .links a, .links span { font-size: 0.75em; color: #8f8f8f; text-decoration: none; }
+        .links a:hover { color: #fff; }
+
+        /* Submit Button */
+        .submit-container {
+            display: flex; justify-content: center; margin-top: 20px;
+            opacity: 0; transition: 0.5s;
+        }
+        .box:hover .submit-container { opacity: 1; transition-delay: 0.4s; }
+
+        button[type="submit"] {
+            border: none; outline: none; padding: 11px 25px;
+            background: #00c6ff; cursor: pointer; border-radius: 4px;
+            font-weight: 600; width: 120px; color: #000; transition: 0.3s;
+        }
+        button[type="submit"]:hover {
+            background: #7b2ff7; box-shadow: 0 0 10px #7b2ff7, 0 0 40px #7b2ff7; color: #fff;
+        }
+
+        .error-message {
+            color: #ff2770; font-size: 0.75em; text-align: center;
+            margin-top: -10px; margin-bottom: 10px; display: block; opacity: 0;
+            animation: fadeIn 0.5s forwards 0.5s;
+        }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        /* KHUSUS HP (LAYAR KECIL < 768px) */
         @media (max-width: 768px) {
-            .auth-wrapper {
-                grid-template-columns: minmax(0, 1fr);
-                max-width: 480px;
-            }
-
-            .auth-sidebar {
-                display: none;
-            }
-
-            .auth-main {
-                padding: 24px 20px 20px;
+            .box { height: 520px; width: 350px; }
+            .inputBox, .links, .submit-container, .error-message {
+                opacity: 1 !important; transform: translateY(0) !important; transition-delay: 0s !important;
             }
         }
     </style>
 </head>
 <body>
-<div class="auth-wrapper">
-    {{-- Panel kiri ala sidebar Fixplay --}}
-    <aside class="auth-sidebar">
-        <div>
-            <div class="auth-logo">
-                <img src="{{ asset('img/logo-fixplay.png') }}" alt="Fixplay Logo">
-                <span>FIXPLAY</span>
-            </div>
 
-            <div style="margin-top: 48px;">
-                <h2>Kasir Fixplay</h2>
-                <p>Kelola rental PS, makanan, dan laporan harian dalam satu dashboard.</p>
-            </div>
-        </div>
-
-        <div class="auth-sidebar-footer">
-            <div>💾 Data tersimpan otomatis di sistem.</div>
-            <div>🔒 Akses hanya untuk akun terdaftar.</div>
-        </div>
-    </aside>
-
-    {{-- Panel kanan: form login --}}
-    <main class="auth-main">
-        <div>
-            <div class="auth-main-header">
-                <h1>Masuk ke Fixplay</h1>
-                <p>Gunakan email dan password yang sudah terdaftar.</p>
-            </div>
+    <div class="box" id="root">
+        <div class="form-content">
+            <h2>
+                <img src="{{ asset('img/logo-fixplay.png') }}" alt="Logo" class="logo-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline'"> 
+                <span class="bi bi-controller" style="display:none; font-size:1.2em;"></span>
+                FIXPLAY LOGIN
+            </h2>
 
             @if ($errors->any())
-                <div class="error-box">
+                <div class="error-message">
                     {{ $errors->first() }}
                 </div>
             @endif
@@ -260,69 +235,79 @@
             <form method="POST" action="{{ route('login.post') }}">
                 @csrf
 
-                {{-- Email --}}
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <div class="form-control-wrapper">
-                        <input id="email"
-                               type="email"
-                               name="email"
-                               class="form-control"
-                               value="{{ old('email') }}"
-                               placeholder="contoh: karyawan@fixplay.test"
-                               required
-                               autofocus>
-                    </div>
+                <div class="inputBox">
+                    <input type="email" name="email" required="required" value="{{ old('email') }}">
+                    <span>Email</span>
+                    <i></i>
                 </div>
 
-                {{-- Password + ikon mata --}}
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="form-control-wrapper">
-                        <input id="password"
-                               type="password"
-                               name="password"
-                               class="form-control"
-                               placeholder="Masukkan password"
-                               required>
+                <div class="inputBox">
+                    <input type="password" name="password" id="password" required="required">
+                    <span>Password</span>
+                    <i></i>
+                    
+                    <!-- Beam Effect (Sinar Kuning) -->
+                    <div class="beam"></div>
 
-                        <button type="button"
-                                class="toggle-password"
-                                id="togglePassword"
-                                aria-label="Tampilkan / sembunyikan password">
-                            <i class="bi bi-eye" id="togglePasswordIcon"></i>
-                        </button>
-                    </div>
+                    <!-- Ikon Mata -->
+                    <button type="button" class="toggle-password" id="togglePassword">
+                        <i class="bi bi-eye" id="toggleIcon"></i>
+                    </button>
                 </div>
 
-                <button type="submit" class="btn-primary">
-                    Masuk
-                </button>
+                <div class="links">
+                    <span>&copy; {{ date('Y') }} Fixplay</span>
+                </div>
+
+                <div class="submit-container">
+                    <button type="submit">Masuk</button>
+                </div>
             </form>
         </div>
+    </div>
 
-        <div class="auth-footer">
-            <span>© {{ date('Y') }} Fixplay. All rights reserved.</span>
-            <span>Versi kasir: v1.0</span>
-        </div>
-    </main>
-</div>
+    <script>
+        const root = document.documentElement; // Atau document.body
+        const toggleBtn = document.getElementById('togglePassword');
+        const pwdInput = document.getElementById('password');
+        const icon = document.getElementById('toggleIcon');
+        const beam = document.querySelector('.beam');
 
-<script>
-    const toggleBtn = document.getElementById('togglePassword');
-    const toggleIcon = document.getElementById('togglePasswordIcon');
-    const pwdInput = document.getElementById('password');
-
-    if (toggleBtn && pwdInput && toggleIcon) {
-        toggleBtn.addEventListener('click', () => {
-            const isHidden = pwdInput.type === 'password';
-            pwdInput.type = isHidden ? 'text' : 'password';
-
-            // Ganti ikon
-            toggleIcon.classList.toggle('bi-eye');
-            toggleIcon.classList.toggle('bi-eye-slash');
+        // Logika Pergerakan Sinar (Beam) mengikuti Mouse
+        document.addEventListener('mousemove', (e) => {
+            if (!beam) return;
+            let rect = beam.getBoundingClientRect();
+            let mouseX = rect.right; 
+            let mouseY = rect.top + (rect.height / 2);
+            let rad = Math.atan2(mouseX - e.pageX, mouseY - e.pageY);
+            let degrees = (rad * (180 / Math.PI) * -1) + 90; 
+            root.style.setProperty('--beamDegrees', `${degrees}deg`);
         });
-    }
-</script>
+
+        // Logika Klik Mata
+        if(toggleBtn && pwdInput){
+            toggleBtn.addEventListener('click', function(e){
+                e.preventDefault(); 
+                
+                const type = pwdInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                pwdInput.setAttribute('type', type);
+                
+                document.body.classList.toggle('show-password'); 
+                pwdInput.focus();
+
+                // Ganti ikon bootstrap & efek glow tombol
+                if(type === 'text'){
+                    icon.classList.remove('bi-eye');
+                    icon.classList.add('bi-eye-fill');
+                    toggleBtn.classList.add('active');
+                } else {
+                    icon.classList.remove('bi-eye-fill');
+                    icon.classList.add('bi-eye');
+                    toggleBtn.classList.remove('active');
+                }
+            });
+        }
+    </script>
+
 </body>
 </html>

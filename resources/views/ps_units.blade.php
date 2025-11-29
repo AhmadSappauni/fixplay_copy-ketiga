@@ -4,7 +4,7 @@
 
 @push('styles')
 <style>
-  /* ====== SHELL FUTURISTIK ====== */
+  /* ====== SHELL FUTURISTIK (Sama dengan Dashboard/Session) ====== */
   .unit-shell{
     position: relative;
     padding: 1.75rem 1.75rem 2.25rem;
@@ -52,6 +52,7 @@
     font-size:.8rem;
   }
 
+  /* Tombol Soft Dark */
   .btn-soft-dark{
     border-radius:999px;
     border:1px solid rgba(148,163,184,.4);
@@ -63,27 +64,18 @@
     color:#fff;
   }
 
-  .btn-soft-primary{
-    border-radius:999px;
-    border:none;
-    background:linear-gradient(135deg,#6366f1,#a855f7);
-    color:#f9fafb;
-    box-shadow:0 12px 24px rgba(79,70,229,.75);
-  }
-  .btn-soft-primary:hover{
-    filter:brightness(1.06);
-  }
-
-  /* ====== CARD FORM & LIST ====== */
+  /* ====== CARD STYLE (DARK GLASS) ====== */
   .unit-card{
     position:relative;
     border-radius:1.25rem;
-    padding:1.1rem 1.25rem 1.25rem;
-    background:radial-gradient(circle at top,#020617,#030712 55%,#020617);
-    border:1px solid rgba(148,163,184,.5);
-    box-shadow:0 20px 40px rgba(15,23,42,.9);
+    padding:1.5rem;
+    background: linear-gradient(145deg, rgba(2,6,23,0.9), rgba(15,23,42,0.8));
+    border:1px solid rgba(148,163,184,.25);
+    box-shadow:0 20px 38px rgba(0,0,0,.6);
+    backdrop-filter:blur(12px);
     color:#e5e7eb;
     overflow:hidden;
+    height: 100%;
   }
   .unit-card::after{
     content:"";
@@ -92,126 +84,183 @@
     width:140px;
     height:140px;
     border-radius:999px;
-    opacity:.35;
-    filter:blur(18px);
+    opacity:.15;
+    filter:blur(25px);
     background:radial-gradient(circle,#6366f1,#0ea5e9);
+    pointer-events: none;
   }
+  
   .unit-card-header{
-    font-size:.8rem;
+    font-size:.85rem;
     text-transform:uppercase;
-    letter-spacing:.12em;
-    color:#9ca3af;
+    letter-spacing:.1em;
+    color:#94a3b8;
     font-weight:700;
-    margin-bottom:.6rem;
-  }
-  .unit-card label.form-label{
-    font-size:.8rem;
-    color:#cbd5f5;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(148,163,184,.15);
+    padding-bottom: 0.75rem;
   }
 
+  /* Input Style */
   .unit-input, .unit-shell .form-select{
-    border-radius:.75rem;
-    border:1px solid rgba(148,163,184,.5);
-    background:rgba(15,23,42,.92);
-    color:#e5e7eb;
+    background:rgba(15,23,42,.6);
+    border-radius:.6rem;
+    border:1px solid rgba(148,163,184,.3);
+    color:#f3f4f6;
+    font-size:.9rem;
   }
   .unit-input:focus,
   .unit-shell .form-select:focus{
     border-color:#6366f1;
-    box-shadow:0 0 0 1px rgba(99,102,241,.55);
-    background:rgba(15,23,42,.98);
-    color:#e5e7eb;
+    box-shadow:0 0 0 2px rgba(99,102,241,.25);
+    background:rgba(2,6,23,.8);
+    color:#fff;
+  }
+  
+  /* Label */
+  .form-label {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      font-weight: 600;
   }
 
-  /* ====== TABEL UNIT ====== */
+  /* Tombol Simpan */
+  .btn-main-submit{
+    width: 100%;
+    border-radius:.75rem;
+    padding:.7rem;
+    font-weight:700;
+    background:linear-gradient(135deg,#8b5cf6,#6366f1);
+    border:none;
+    color:#fff;
+    box-shadow:0 4px 12px rgba(139, 92, 246, 0.4);
+    transition: all 0.2s;
+  }
+  .btn-main-submit:hover{
+    filter:brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow:0 6px 15px rgba(139, 92, 246, 0.5);
+  }
+
+  /* ====== TABEL UNIT (NEON DARK) ====== */
   .unit-table-wrapper{
     max-height:520px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #475569 #1e293b;
   }
 
-  .table-unit{
-    margin-bottom:0;
-    color:#d1d5db;
+  .table-unit {
+    width: 100%;
+    margin-bottom: 0;
+    color: #cbd5e1;
   }
-  .table-unit thead th{
-    background:linear-gradient(90deg,#020617,#030712);
-    border-bottom:1px solid rgba(55,65,81,.9);
-    font-size:.78rem;
-    text-transform:uppercase;
-    letter-spacing:.08em;
-    color:#9ca3af;
+  .table-unit thead th {
+    background: rgba(15, 23, 42, 0.8);
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    padding: 0.85rem 1rem;
+    white-space: nowrap;
   }
-  .table-unit tbody tr{
-    border-color:rgba(31,41,55,.9);
-    transition:background .14s ease, transform .06s ease;
+  .table-unit tbody td {
+    background: transparent;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    padding: 0.85rem 1rem;
+    vertical-align: middle;
+    font-size: 0.9rem;
   }
-  .table-unit tbody tr:hover{
-    background:rgba(79,70,229,.18);
-    transform:translateY(-1px);
-  }
-  .table-unit td,
-  .table-unit th{
-    border-color:rgba(31,41,55,.9);
+  .table-unit tbody tr:hover td {
+    background: rgba(99, 102, 241, 0.08);
   }
 
   .mono{
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,"Liberation Mono","Courier New", monospace;
+    font-family: 'Consolas', 'Monaco', monospace;
+    color: #818cf8;
+    font-weight: 600;
   }
 
-  .badge-addon{
-    border-radius:999px;
-    padding:.1rem .45rem;
-    font-size:.7rem;
+  /* Badge Status & Tipe */
+  .badge-type {
+    background: #fbbf24; /* Kuning */
+    color: #1e293b; /* Hitam */
+    font-weight: 800;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 5px rgba(251, 191, 36, 0.4);
   }
-  .badge-glow{
-    background:rgba(129,140,248,.12);
-    color:#c7d2fe;
-    box-shadow:0 0 14px rgba(129,140,248,.4);
-    border:1px solid rgba(129,140,248,.4);
+  
+  .badge-inactive {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: 0.7rem;
   }
 
-  .btn-xs-ghost{
-    border-radius:999px;
-    padding:.15rem .55rem;
-    font-size:.72rem;
+  /* Action Buttons Kecil */
+  .btn-action-group .btn {
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    border-radius: 6px;
+    margin-right: 4px;
+  }
+  .btn-outline-secondary { color: #cbd5e1; border-color: #475569; }
+  .btn-outline-secondary:hover { background: #475569; color: #fff; }
+  
+  .btn-outline-warning { color: #fbbf24; border-color: #fbbf24; }
+  .btn-outline-warning:hover { background: #fbbf24; color: #000; }
+
+  .btn-outline-success { color: #4ade80; border-color: #4ade80; }
+  .btn-outline-success:hover { background: #4ade80; color: #000; }
+
+  .btn-outline-danger { color: #f87171; border-color: #f87171; }
+  .btn-outline-danger:hover { background: #f87171; color: #fff; }
+
+
+  /* MODAL STYLE CUSTOM */
+  .modal-glass .modal-content {
+    background: radial-gradient(circle at top left, #1e1e2f, #0f1020);
+    border: 1px solid rgba(124,58,237,.3);
+    box-shadow: 0 0 30px rgba(0,0,0,.8);
+    color: #e5e7eb;
+    border-radius: 1.25rem;
+  }
+  .modal-glass .modal-header { border-bottom: 1px solid rgba(255,255,255,.08); }
+  .modal-glass .modal-footer { border-top: 1px solid rgba(255,255,255,.08); }
+  .modal-glass .btn-close-white { filter: invert(1) grayscale(100%) brightness(200%); }
+  
+  /* Input di dalam modal */
+  .modal-glass .form-control, .modal-glass .form-select {
+    background: rgba(2, 6, 23, 0.8); 
+    border: 1px solid rgba(148,163,184,.2); 
+    color: #f1f5f9;
+    border-radius: 0.75rem;
+  }
+  .modal-glass .form-control:focus, .modal-glass .form-select:focus {
+    border-color: #8b5cf6; 
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
   }
 
   /* ====== RESPONSIVE ====== */
   @media (max-width: 992px){
-    .unit-shell{
-      padding:1.35rem 1.1rem 2rem;
-      border-radius:1.1rem;
-    }
+    .unit-shell{ padding:1.35rem 1.1rem 2rem; border-radius:1.1rem; }
   }
   @media (max-width: 768px){
-    .unit-header-stack{
-      flex-direction:column;
-      align-items:flex-start !important;
-      gap:.7rem;
-    }
-    .unit-header-actions{
-      width:100%;
-      justify-content:flex-end;
-    }
-    .unit-card{
-      margin-bottom:.25rem;
-      padding:1rem 1rem 1.1rem;
-    }
-    .unit-table-wrapper{
-      max-height:360px;
-    }
+    .unit-header-stack{ flex-direction:column; align-items:flex-start !important; gap:.7rem; }
+    .unit-header-actions{ width:100%; justify-content:flex-end; }
+    .unit-card{ margin-bottom:.25rem; padding:1rem; }
+    .unit-table-wrapper{ max-height:360px; }
   }
-
   @media print{
-    .unit-shell{
-      background:#fff;
-      box-shadow:none;
-    }
-    .unit-card{
-      box-shadow:none;
-      border-color:#e5e7eb;
-      background:#fff;
-      color:#111827;
-    }
+    .unit-shell{ background:#fff; box-shadow:none; }
+    .unit-card{ box-shadow:none; border-color:#e5e7eb; background:#fff; color:#111827; }
     .d-print-none{ display:none !important; }
   }
 </style>
@@ -221,104 +270,100 @@
 <div class="unit-shell">
 
   {{-- HEADER --}}
-  <div class="d-flex align-items-center justify-content-between mb-3 unit-header-stack">
+  <div class="d-flex align-items-center justify-content-between mb-4 unit-header-stack">
     <div>
       <div class="d-flex align-items-center gap-2 mb-1">
         <span class="unit-chip-icon">
           <i class="bi bi-controller"></i>
         </span>
-        <h4 class="m-0 fw-semibold unit-title-text">Unit PS</h4>
+        <h4 class="m-0 fw-bold text-white">Unit PS</h4>
       </div>
       <div class="unit-subtitle">
-        Kelola daftar unit PlayStation dan tarif per jam untuk sesi rental.
+        Kelola daftar unit PlayStation dan tarif per jam.
       </div>
     </div>
 
     <div class="d-flex align-items-center gap-2 d-print-none unit-header-actions">
-      <button type="button" class="btn btn-soft-dark" onclick="location.reload()">
+      <button type="button" class="btn btn-soft-dark btn-sm px-3 py-2" onclick="location.reload()">
         <i class="bi bi-arrow-clockwise me-1"></i> Refresh
       </button>
     </div>
   </div>
 
-  {{-- ALERT SUCCESS --}}
+  {{-- ALERT MESSAGES --}}
   @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+    <div class="alert alert-success alert-dismissible fade show d-print-none bg-success-subtle border-success text-success-emphasis" role="alert">
       <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
   @endif
+  @if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show d-print-none bg-danger-subtle border-danger text-danger-emphasis" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  @endif
 
-  <div class="row g-3">
-    <!-- Kiri: form tambah unit PS -->
-    <div class="col-lg-5 col-md-6">
-      <div class="unit-card h-100">
-        <div class="unit-card-header">Tambah Unit PS</div>
-        <div class="small mb-2 text-gray-400">
-          Buat unit baru dan tentukan tipenya (PS4/PS5/VVIP) untuk perhitungan tarif otomatis.
+  <div class="row g-4">
+    <!-- KIRI: FORM TAMBAH UNIT PS -->
+    <div class="col-lg-4 col-md-5">
+      <div class="unit-card">
+        <div class="unit-card-header">
+            <i class="bi bi-plus-square me-2"></i> Tambah Unit Baru
         </div>
-
-        <form method="post" action="{{ route('ps_units.store') }}" class="mt-2">
+        
+        <form method="post" action="{{ route('ps_units.store') }}">
           @csrf
-          <div class="mb-2">
-            <label class="form-label">Nama Unit (mis. Box - 1)</label>
-            <input name="name"
-                   class="form-control unit-input"
-                   required
-                   value="{{ old('name') }}">
+          <div class="mb-3">
+            <label class="form-label">Nama Unit</label>
+            <input name="name" class="form-control unit-input" required value="{{ old('name') }}" placeholder="Contoh: Box 1">
           </div>
 
-          {{-- DROPDOWN TIPE UNIT (BARU) --}}
-          <div class="mb-2">
+          {{-- DROPDOWN TIPE UNIT --}}
+          <div class="mb-3">
             <label class="form-label">Tipe / Kategori</label>
             <select name="type" class="form-select unit-input" required>
               <option value="PS4" {{ old('type') == 'PS4' ? 'selected' : '' }}>PS4 (Reguler)</option>
               <option value="PS5" {{ old('type') == 'PS5' ? 'selected' : '' }}>PS5</option>
               <option value="VVIP" {{ old('type') == 'VVIP' ? 'selected' : '' }}>VVIP</option>
             </select>
+            <div class="form-text text-muted small" style="font-size: 0.75rem;">*Tipe mempengaruhi harga paket otomatis.</div>
           </div>
 
-          <div class="mb-2">
-            <label class="form-label">Tarif per Jam (Rp)</label>
-            <input name="hourly_rate"
-                   type="number"
-                   class="form-control unit-input mono"
-                   value="{{ old('hourly_rate') }}"
-                   min="0"
-                   required>
+          <div class="mb-3">
+            <label class="form-label">Tarif per Jam</label>
+            <div class="input-group">
+                <span class="input-group-text bg-dark border-secondary text-light">Rp</span>
+                <input name="hourly_rate" type="number" class="form-control unit-input mono" value="{{ old('hourly_rate') }}" min="0" required placeholder="0">
+            </div>
           </div>
-          <div class="mb-2 form-check">
-            <input type="checkbox"
-                   name="is_active"
-                   value="1"
-                   id="activeCheck"
-                   class="form-check-input"
-                   {{ old('is_active',1) ? 'checked' : '' }}>
-            <label for="activeCheck" class="form-check-label small">Aktif</label>
+          
+          <div class="mb-4 form-check">
+            <input type="checkbox" name="is_active" value="1" id="activeCheck" class="form-check-input" {{ old('is_active',1) ? 'checked' : '' }}>
+            <label for="activeCheck" class="form-check-label small text-light">Status Aktif</label>
           </div>
-          <button class="btn btn-soft-primary mt-1">
-            <i class="bi bi-save me-1"></i> Simpan Unit
+          
+          <button class="btn-main-submit">
+            <i class="bi bi-save me-2"></i> SIMPAN UNIT
           </button>
         </form>
       </div>
     </div>
 
-    <!-- Kanan: daftar unit -->
-    <div class="col-lg-7 col-md-6">
+    <!-- KANAN: DAFTAR UNIT -->
+    <div class="col-lg-8 col-md-7">
       <div class="unit-card h-100">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <div class="unit-card-header mb-0">Daftar Unit PS</div>
-          <span class="badge bg-secondary-subtle text-dark d-print-none">
-            {{ $units->count() }} unit
-          </span>
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+          <div class="fw-bold text-light">Daftar Unit PS</div>
+          <span class="badge bg-dark border border-secondary">{{ $units->count() }} Unit</span>
         </div>
 
-        <div class="unit-table-wrapper table-responsive mt-2">
-          <table class="table table-sm table-hover m-0 align-middle table-unit">
+        <div class="unit-table-wrapper">
+          <table class="table-unit">
             <thead>
               <tr>
-                <th>Nama</th>
-                <th>Tipe</th> {{-- KOLOM BARU --}}
+                <th>Nama Unit</th>
+                <th>Tipe</th>
                 <th>Tarif / Jam</th>
                 <th class="text-end d-print-none">Aksi</th>
               </tr>
@@ -327,14 +372,13 @@
               @forelse($units as $u)
                 <tr>
                   <td>
-                    {{ $u->name }}
+                    <div class="fw-bold text-white">{{ $u->name }}</div>
                     @if(!$u->is_active)
-                      <span class="badge badge-addon badge-glow ms-2">Nonaktif</span>
+                      <span class="badge-inactive mt-1 d-inline-block">Nonaktif</span>
                     @endif
                   </td>
                   <td>
-                    {{-- Menampilkan Tipe dengan Badge --}}
-                    <span class="badge badge-addon" style="background:rgba(99,102,241,0.2); color:#a5b4fc;">
+                    <span class="badge-type">
                         {{ $u->type ?? 'PS4' }}
                     </span>
                   </td>
@@ -342,35 +386,40 @@
                     Rp {{ number_format($u->hourly_rate ?? 0,0,',','.') }}
                   </td>
                   <td class="text-end d-print-none">
-                    {{-- Update parameter fungsi editUnit --}}
-                    <button class="btn btn-xs-ghost btn-outline-secondary me-1"
-                            onclick="return editUnit({{ $u->id }}, '{{ addslashes($u->name) }}', '{{ $u->type ?? 'PS4' }}', {{ $u->hourly_rate ?? 0 }})">
-                      Edit
-                    </button>
+                    <div class="btn-action-group">
+                        {{-- Tombol Edit --}}
+                        <button class="btn btn-outline-secondary"
+                                onclick="openEditModal({{ $u->id }}, '{{ addslashes($u->name) }}', '{{ $u->type ?? 'PS4' }}', {{ $u->hourly_rate ?? 0 }})">
+                          Edit
+                        </button>
 
-                    <form class="d-inline" method="post" action="{{ route('ps_units.toggle', $u->id) }}">
-                      @csrf
-                      <button class="btn btn-xs-ghost {{ $u->is_active ? 'btn-outline-warning' : 'btn-outline-success' }}">
-                        {{ $u->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                      </button>
-                    </form>
+                        {{-- Tombol Toggle Aktif/Nonaktif --}}
+                        <form class="d-inline" method="post" action="{{ route('ps_units.toggle', $u->id) }}">
+                          @csrf
+                          <button class="btn {{ $u->is_active ? 'btn-outline-warning' : 'btn-outline-success' }}">
+                            {{ $u->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                          </button>
+                        </form>
 
-                    <form class="d-inline confirm-delete"
-                          method="post"
-                          action="{{ route('ps_units.destroy', $u->id) }}"
-                          onsubmit="return confirm('Hapus unit PS?')">
-                      @csrf
-                      @method('DELETE')
-                      <button class="btn btn-xs-ghost btn-outline-danger">
-                        Hapus
-                      </button>
-                    </form>
+                        {{-- Tombol Hapus --}}
+                        <form class="d-inline confirm-delete"
+                              method="post"
+                              action="{{ route('ps_units.destroy', $u->id) }}"
+                              onsubmit="return confirm('Yakin ingin menghapus unit PS ini?')">
+                          @csrf
+                          @method('DELETE')
+                          <button class="btn btn-outline-danger">
+                            Hapus
+                          </button>
+                        </form>
+                    </div>
                   </td>
                 </tr>
               @empty
                 <tr>
-                  <td colspan="4" class="text-center text-muted p-3">
-                    Belum ada unit.
+                  <td colspan="4" class="text-center text-muted p-5">
+                    <i class="bi bi-inbox display-6 d-block mb-2 opacity-25"></i>
+                    Belum ada unit yang terdaftar.
                   </td>
                 </tr>
               @endforelse
@@ -382,60 +431,67 @@
     </div>
   </div>
 </div>
+
+<!-- MODAL EDIT (Fitur Baru yang Lebih Bagus) -->
+<div class="modal fade modal-glass" id="editUnitModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-white">Edit Unit PS</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pt-3">
+        <form id="editUnitForm" method="post">
+          @csrf
+          @method('PUT')
+          
+          <div class="mb-3">
+            <label class="form-label">Nama Unit</label>
+            <input type="text" name="name" id="editName" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Tipe / Kategori</label>
+            <select name="type" id="editType" class="form-select" required>
+              <option value="PS4">PS4 (Reguler)</option>
+              <option value="PS5">PS5</option>
+              <option value="VVIP">VVIP</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Tarif per Jam (Rp)</label>
+            <input type="number" name="hourly_rate" id="editRate" class="form-control mono" min="0" required>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-main-submit w-auto px-4 py-2">Simpan Perubahan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 @endsection
 
 @push('scripts')
 <script>
-function editUnit(id, name, type, rate){
-  const newName = prompt("Nama Unit:", name);
-  if (newName === null) return false;
-
-  // Prompt untuk edit Tipe
-  let newType = prompt("Tipe (PS4 / PS5 / VVIP):", type);
-  if (newType === null) return false;
-  newType = newType.toUpperCase(); // Pastikan format huruf besar
-
-  const newRate = prompt("Tarif/Jam (Rp):", rate);
-  if (newRate === null) return false;
-
-  // buat form update dinamis (PUT)
-  const form = document.createElement("form");
-  form.method = "post";
+function openEditModal(id, name, type, rate){
+  // Set action URL form
+  const form = document.getElementById('editUnitForm');
   form.action = "/ps-units/" + id;
 
-  // csrf token
-  const tokenMeta = document.querySelector('meta[name="csrf-token"]');
-  if (!tokenMeta) {
-    alert('CSRF token tidak ditemukan di <meta>.');
-    return false;
-  }
-  const token = tokenMeta.getAttribute('content');
+  // Isi data ke input modal
+  document.getElementById('editName').value = name;
+  document.getElementById('editType').value = type;
+  document.getElementById('editRate').value = rate;
 
-  const _token = document.createElement("input");
-  _token.type  = "hidden";
-  _token.name  = "_token";
-  _token.value = token;
-  form.appendChild(_token);
-
-  // spoof PUT
-  const _method = document.createElement("input");
-  _method.type  = "hidden";
-  _method.name  = "_method";
-  _method.value = "PUT";
-  form.appendChild(_method);
-
-  // Kirim data termasuk tipe
-  [["name", newName], ["type", newType], ["hourly_rate", newRate]].forEach(([k,v])=>{
-    const i = document.createElement("input");
-    i.type  = "hidden";
-    i.name  = k;
-    i.value = v;
-    form.appendChild(i);
-  });
-
-  document.body.appendChild(form);
-  form.submit();
-  return false;
+  // Tampilkan modal Bootstrap
+  const modalEl = document.getElementById('editUnitModal');
+  const modal = new bootstrap.Modal(modalEl);
+  modal.show();
 }
 </script>
 @endpush

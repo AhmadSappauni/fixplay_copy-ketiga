@@ -2,194 +2,324 @@
 
 @section('page_title','Kasir Fixplay - Laporan')
 
+@push('styles')
+<style>
+  /* ====== SHELL UTAMA (DARK GRADIENT) ====== */
+  .fp-header-sub{ font-size:.82rem; color:#cbd5f5; white-space:normal; opacity: 60%; }
+  
+  .report-shell{
+    position: relative; padding: 1.75rem 1.75rem 2.25rem; border-radius: 1.5rem;
+    background: radial-gradient(circle at top left,#4f46e533,#0f172a), radial-gradient(circle at bottom right,#22c55e22,#020617 70%);
+    box-shadow: 0 22px 50px rgba(15,23,42,0.75); overflow: hidden; color:#e5e7eb;
+  }
+  .report-shell::before{
+    content:""; position:absolute; inset:-40%;
+    background: radial-gradient(circle at 10% 0,#ffffff33,transparent 55%), radial-gradient(circle at 90% 100%,#22c55e33,transparent 60%);
+    opacity:.7; filter: blur(40px); pointer-events:none;
+  }
+  .report-shell > *{ position:relative; z-index:1; }
+
+  .report-chip-icon{
+    width:32px; height:32px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg,#4f46e5,#a855f7); color:#fff; box-shadow:0 8px 18px rgba(79,70,229,.65); font-size:15px;
+  }
+
+  /* ====== INPUT & BUTTONS ====== */
+  .report-filter .input-glass{
+    border-radius:999px; background:rgba(15,23,42,.9); border:1px solid rgba(148,163,184,.5);
+    padding:2px 10px; box-shadow:0 10px 25px rgba(15,23,42,.65); backdrop-filter:blur(18px);
+  }
+  .report-filter .form-control, .report-filter .form-select{
+    background: transparent; border: none; color:#e5e7eb; font-size: 0.9rem;
+  }
+  .report-filter .form-control:focus, .report-filter .form-select:focus{ box-shadow:none; }
+  .report-filter option { background: #0f172a; color: #e5e7eb; }
+
+  .btn-light-soft{
+    border-radius:999px; border:1px solid rgba(148,163,184,.4); background:rgba(15,23,42,.85); color:#e5e7eb; font-size: 0.85rem; padding: 0.4rem 1rem;
+  }
+  .btn-light-soft:hover{ background:rgba(31,41,55,.95); color: #fff; }
+  
+  .btn-outline-primary { border-radius: 999px; padding: 0.4rem 1rem; font-size: 0.85rem; }
+
+  .bg-dark-soft{ background:rgba(15,23,42,.9); }
+
+  /* ====== METRIC CARDS ====== */
+  .metric-card{
+    position:relative; border-radius:1.2rem; padding:1rem 1.1rem 1.1rem;
+    background:linear-gradient(145deg,#020617,#0f172a); border:1px solid rgba(148,163,184,.3);
+    box-shadow:0 18px 38px rgba(0,0,0,.6); backdrop-filter:blur(22px); overflow:hidden; color:#e5e7eb; height: 100%;
+  }
+  .metric-card::after{ content:""; position:absolute; inset:auto -40% -40% auto; width:120px; height:120px; border-radius:999px; opacity:.4; filter:blur(30px); }
+  
+  .metric-card .metric-icon{
+    width:34px; height:34px; border-radius:999px; display:flex; align-items:center; justify-content:center;
+    color:#0f172a; background:#e0e7ff; margin-bottom:.5rem; font-size:18px;
+  }
+  .metric-card .metric-label{ font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; color:#94a3b8; margin-bottom:.2rem; font-weight:700; }
+  .metric-card .metric-value{ font-size:1.35rem; font-weight:700; color:#f9fafb; letter-spacing: 0.5px; }
+  .metric-card .metric-caption{ font-size:.7rem; color:#64748b; margin-top:.25rem; }
+  
+  .metric-blue::after   { background:radial-gradient(circle,#6366f1,#0ea5e9); }
+  .metric-green::after  { background:radial-gradient(circle,#22c55e,#a3e635); }
+  .metric-purple::after { background:radial-gradient(circle,#a855f7,#6366f1); }
+  .metric-yellow::after { background:radial-gradient(circle,#facc15,#fb923c); }
+
+  /* ====== CARD GLASS & TABLES ====== */
+  .card-glass{
+    border-radius:1.1rem; border:1px solid rgba(148,163,184,.25);
+    /* Latar Belakang Gelap Transparan */
+    background: linear-gradient(145deg, rgba(2,6,23,0.9), rgba(15,23,42,0.85));
+    box-shadow:0 18px 38px rgba(0,0,0,.6); backdrop-filter:blur(20px); color:#e5e7eb;
+    overflow: hidden;
+  }
+  .card-glass .card-header{
+    border-bottom:1px solid rgba(148,163,184,.2); 
+    background: rgba(30, 41, 59, 0.4); /* Header sedikit lebih terang */
+    font-weight:700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color:#cbd5e1;
+    padding: 0.8rem 1.2rem;
+  }
+
+  .table-modern{ width: 100%; margin-bottom: 0; color:#cbd5e1; }
+  .table-modern thead th{
+    background: rgba(15, 23, 42, 0.8);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:#94a3b8;
+    padding: 0.75rem 1rem; white-space: nowrap;
+  }
+  .table-modern tbody tr{ transition:background .15s ease; }
+  .table-modern tbody tr:hover{ background:rgba(99, 102, 241, 0.08); }
+  .table-modern td{
+    background: transparent;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    padding: 0.75rem 1rem; vertical-align: middle; font-size: 0.85rem;
+  }
+
+  .amount-mono{ font-family: 'Consolas', 'Monaco', monospace; font-weight: 600; color: #818cf8; }
+  
+  /* Badge */
+  .badge-soft-primary{ background:rgba(59,130,246,.2); color:#93c5fd; border: 1px solid rgba(59,130,246,.3); border-radius:99px; font-size: 0.65rem; padding: 0.3rem 0.6rem; }
+  .badge-soft-danger{ background:rgba(248,113,113,.2); color:#fca5a5; border: 1px solid rgba(248,113,113,.3); border-radius:99px; font-size: 0.65rem; padding: 0.3rem 0.6rem; }
+
+  /* Tombol Aksi Kecil */
+  .btn-action-group .btn { padding: 0.2rem 0.5rem; font-size: 0.7rem; border-radius: 6px; margin-right: 4px; }
+  .btn-outline-primary-soft { color: #a5b4fc; border: 1px solid #6366f1; background: rgba(99,102,241,0.1); }
+  .btn-outline-primary-soft:hover { background: #6366f1; color: #fff; }
+  .btn-outline-secondary-soft { color: #cbd5e1; border: 1px solid #475569; background: rgba(71,85,105,0.1); }
+  .btn-outline-secondary-soft:hover { background: #475569; color: #fff; }
+  .btn-outline-danger-soft { color: #fca5a5; border: 1px solid #ef4444; background: rgba(239,68,68,0.1); }
+  .btn-outline-danger-soft:hover { background: #ef4444; color: #fff; }
+
+  /* Tabs */
+  .rng-day, .rng-week, .rng-month, .rng-custom { display:none; }
+  #rekapTabs .nav-link{
+    border-radius:999px; padding:.3rem .9rem; font-size:.75rem; border:1px solid transparent; color:#94a3b8; background:transparent;
+  }
+  #rekapTabs .nav-link:hover { color: #fff; background: rgba(255,255,255,0.05); }
+  #rekapTabs .nav-link.active{
+    background:linear-gradient(135deg,#6366f1,#a855f7); color:#fff; box-shadow:0 4px 12px rgba(124, 58, 237, 0.4);
+  }
+  .rekap-pane { display:none; }
+  .rekap-pane.show { display:block; }
+
+  /* MODAL STYLE (DARK GLASS) */
+  .modal-glass .modal-content {
+    background: radial-gradient(circle at top left, #1e1e2f, #0f1020);
+    border: 1px solid rgba(124,58,237,.3);
+    box-shadow: 0 0 30px rgba(0,0,0,.8);
+    color: #e5e7eb;
+    border-radius: 1.25rem;
+  }
+  .modal-glass .modal-header { border-bottom: 1px solid rgba(255,255,255,.08); }
+  .modal-glass .modal-footer { border-top: 1px solid rgba(255,255,255,.08); }
+  .modal-glass .form-control, .modal-glass .form-select {
+    background: rgba(2, 6, 23, 0.8); border: 1px solid rgba(148,163,184,.2); color: #f1f5f9; border-radius: 0.6rem;
+  }
+  .modal-glass .form-control:focus, .modal-glass .form-select:focus {
+    border-color: #8b5cf6; box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
+  }
+  .modal-glass .btn-close-white { filter: invert(1) grayscale(100%) brightness(200%); }
+  .btn-gradient-primary {
+    background: linear-gradient(135deg, #8b5cf6, #3b82f6); border: none; color: white; font-weight: 600;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); border-radius: 999px;
+  }
+  .btn-gradient-primary:hover {
+    background: linear-gradient(135deg, #7c3aed, #2563eb); color: white; transform: translateY(-1px);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px){
+    .report-shell{ padding:1.25rem 1rem 2rem; border-radius:1rem; }
+    .metric-card{ padding:.9rem .95rem 1rem; margin-bottom:.5rem; }
+    .d-flex.align-items-center.justify-content-between.mb-3{ flex-direction:column; align-items:flex-start !important; gap:.75rem; }
+    .report-filter .col-6, .report-filter .col-12{ flex:0 0 100%; max-width:100%; }
+  }
+
+  @media print {
+    .report-shell, .card-glass, .table-modern tbody tr, .table-modern tfoot tr{ background:#fff; box-shadow:none; color:#000; }
+    .card-glass{ border-color:#e5e7eb; }
+    .table-modern thead{ background:#f3f4f6; color:#111827; }
+    .d-print-none { display: none !important; }
+    .card, .table { break-inside: avoid; }
+  }
+</style>
+@endpush
+
 @section('page_content')
 <div class="report-shell">
 
   {{-- Header + tombol cetak --}}
-  <div class="d-flex align-items-center justify-content-between mb-3">
+  <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
       <div class="d-flex align-items-center gap-2 mb-1">
-        <span class="report-chip-icon">
-          <i class="bi bi-activity"></i>
-        </span>
-        <h4 class="m-0 text-light fw-semibold">Kasir Fixplay - Laporan</h4>
+        <span class="report-chip-icon"><i class="bi bi-activity"></i></span>
+        <h4 class="m-0 text-light fw-bold">Laporan Keuangan</h4>
       </div>
-      <div class="fp-header-sub">
-        Ringkasan pendapatan & pengeluaran usaha kamu
-      </div>
+      <div class="fp-header-sub">Ringkasan pendapatan & pengeluaran usaha.</div>
     </div>
 
     <div class="d-flex align-items-center gap-2 d-print-none">
-      <button type="button" class="btn btn-light-soft rounded-pill" onclick="location.reload()">
-        <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+      <button type="button" class="btn btn-light-soft" onclick="location.reload()">
+        <i class="bi bi-arrow-clockwise"></i>
       </button>
-      <button class="btn btn-outline-primary rounded-pill" onclick="window.print()">
-        <i class="bi bi-printer me-1"></i> Cetak / PDF
+      <button class="btn btn-outline-primary" onclick="window.print()">
+        <i class="bi bi-printer me-1"></i> PDF
       </button>
     </div>
   </div>
 
   {{-- Filter rentang tanggal --}}
-  <form method="get" class="mb-3 row g-2 align-items-end report-filter d-print-none">
+  <form method="get" class="mb-4 row g-3 align-items-end report-filter d-print-none">
     <div class="col-md-3 col-6">
-      <label class="form-label fw-semibold text-light small text-uppercase mb-1">Rentang</label>
+      <label class="form-label fw-bold text-secondary small text-uppercase mb-1">Rentang</label>
       <div class="input-glass">
-        <select name="range"
-        class="form-select border-0 shadow-none text-light"
-        id="rangeSel"
-        style="background: rgba(15,23,42,.9);">
-        <option value="day"    @selected($range=='day')>Harian</option>
-        <option value="week"   @selected($range=='week')>Mingguan</option>
-        <option value="month"  @selected($range=='month')>Bulanan</option>
-        <option value="custom" @selected($range=='custom')>Kustom (Start–End)</option>
-      </select>
-
+        <select name="range" class="form-select" id="rangeSel">
+          <option value="day"    @selected($range=='day')>Harian</option>
+          <option value="week"   @selected($range=='week')>Mingguan</option>
+          <option value="month"  @selected($range=='month')>Bulanan</option>
+          <option value="custom" @selected($range=='custom')>Kustom</option>
+        </select>
       </div>
     </div>
 
     <div class="col-md-3 col-6 rng-day rng-week rng-month">
-      <label class="form-label fw-semibold text-light small text-uppercase mb-1">Tanggal referensi</label>
+      <label class="form-label fw-bold text-secondary small text-uppercase mb-1">Tanggal</label>
       <div class="input-glass">
-        <input name="date" type="date"
-               class="form-control border-0 bg-transparent shadow-none text-light"
-               value="{{ request('date', $start_date->format('Y-m-d')) }}">
+        <input name="date" type="date" class="form-control" value="{{ request('date', $start_date->format('Y-m-d')) }}">
       </div>
     </div>
 
     <div class="col-md-3 col-6 rng-custom">
-      <label class="form-label fw-semibold text-light small text-uppercase mb-1">Start</label>
+      <label class="form-label fw-bold text-secondary small text-uppercase mb-1">Mulai</label>
       <div class="input-glass">
-        <input name="start" type="date"
-               class="form-control border-0 bg-transparent shadow-none text-light"
-               value="{{ $start_date->format('Y-m-d') }}">
+        <input name="start" type="date" class="form-control" value="{{ $start_date->format('Y-m-d') }}">
       </div>
     </div>
 
     <div class="col-md-3 col-6 rng-custom">
-      <label class="form-label fw-semibold text-light small text-uppercase mb-1">End</label>
+      <label class="form-label fw-bold text-secondary small text-uppercase mb-1">Sampai</label>
       <div class="input-glass">
-        <input name="end" type="date"
-               class="form-control border-0 bg-transparent shadow-none text-light"
-               value="{{ $end_date->format('Y-m-d') }}">
+        <input name="end" type="date" class="form-control" value="{{ $end_date->format('Y-m-d') }}">
       </div>
     </div>
 
-    <div class="col-md-3 ms-md-auto col-12">
-      <label class="form-label d-block mb-1 opacity-0">Terapkan</label>
-      <button class="btn btn-primary w-100 rounded-pill">
-        <i class="bi bi-funnel me-1"></i> Terapkan
-      </button>
+    <div class="col-md-2 ms-md-auto col-12">
+      <label class="d-block mb-1 opacity-0">Go</label>
+      <button class="btn btn-gradient-primary w-100 shadow-lg">Terapkan</button>
     </div>
   </form>
 
   {{-- Ringkasan metrik utama --}}
-  <div class="row g-3 mb-2">
+  <div class="row g-4 mb-4">
     <div class="col-md-3 col-6">
       <div class="metric-card metric-blue">
-        <div class="metric-icon">
-          <i class="bi bi-controller"></i>
-        </div>
+        <div class="metric-icon"><i class="bi bi-controller"></i></div>
         <div class="metric-label">Pendapatan PS</div>
         <div class="metric-value">Rp {{ number_format($ps_total,0,',','.') }}</div>
-        <div class="metric-caption">Dari semua sesi rental PS</div>
+        <div class="metric-caption">Sewa Unit & Alat</div>
       </div>
     </div>
     <div class="col-md-3 col-6">
       <div class="metric-card metric-green">
-        <div class="metric-icon">
-          <i class="bi bi-basket3"></i>
-        </div>
+        <div class="metric-icon"><i class="bi bi-basket3"></i></div>
         <div class="metric-label">Pendapatan Produk</div>
         <div class="metric-value">Rp {{ number_format($prod_total,0,',','.') }}</div>
-        <div class="metric-caption">Makanan, minuman, dan produk lain</div>
+        <div class="metric-caption">F&B / Barang</div>
       </div>
     </div>
     <div class="col-md-3 col-6">
       <div class="metric-card metric-purple">
-        <div class="metric-icon">
-          <i class="bi bi-receipt"></i>
-        </div>
+        <div class="metric-icon"><i class="bi bi-receipt"></i></div>
         <div class="metric-label">Total Penjualan</div>
         <div class="metric-value">Rp {{ number_format($sales_total,0,',','.') }}</div>
-        <div class="metric-caption">PS + Produk</div>
+        <div class="metric-caption">Semua Pemasukan</div>
       </div>
     </div>
     <div class="col-md-3 col-6">
       <div class="metric-card metric-yellow">
-        <div class="metric-icon">
-          <i class="bi bi-graph-up-arrow"></i>
-        </div>
-        <div class="metric-label">Laba Bersih (setelah pengeluaran)</div>
-        <div class="metric-value">
-          Rp {{ number_format($sales_total - $expenses_total,0,',','.') }}
-        </div>
-        <div class="metric-caption">Pengeluaran: Rp {{ number_format($expenses_total,0,',','.') }}</div>
+        <div class="metric-icon"><i class="bi bi-wallet2"></i></div>
+        <div class="metric-label">Laba Bersih</div>
+        <div class="metric-value">Rp {{ number_format($sales_total - $expenses_total,0,',','.') }}</div>
+        <div class="metric-caption text-danger">Keluar: Rp {{ number_format($expenses_total,0,',','.') }}</div>
       </div>
     </div>
   </div>
 
   {{-- Detail transaksi & pengeluaran --}}
-  <div class="row g-3 mt-1">
+  <div class="row g-4 mt-2">
+    
+    {{-- TABEL PENJUALAN --}}
     <div class="col-lg-6">
-      <div class="card card-glass">
+      <div class="card card-glass h-100">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <span>Penjualan ({{ $start_date->format('d-m-Y') }} — {{ $end_date->format('d-m-Y') }})</span>
-          <span class="badge badge-soft-primary d-print-none">
-            {{ $sales->count() }} transaksi
-          </span>
+          <span>Penjualan ({{ $start_date->format('d M') }} — {{ $end_date->format('d M') }})</span>
+          <span class="badge badge-soft-primary d-print-none">{{ $sales->count() }} Data</span>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-sm m-0 align-middle table-modern">
+            <table class="table table-modern table-sm">
               <thead>
                 <tr>
                   <th>Waktu</th>
-                  <th>Catatan / Produk</th>
+                  <th>Item / Catatan</th>
                   <th class="text-end">Total</th>
-                  <th class="text-end d-print-none"></th>
+                  <th class="text-end d-print-none" style="width: 100px;">Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 @forelse($sales as $s)
                   <tr>
-                    <td>{{ \Carbon\Carbon::parse($s->sold_at)->format('d-m H:i') }}</td>
-                    <td>{{ $s->display_note }}</td>
-                    <td class="text-end amount-mono">
-                      Rp {{ number_format($s->total ?? 0,0,',','.') }}
+                    <td>
+                        <div class="d-flex flex-column small text-secondary">
+                            <span>{{ \Carbon\Carbon::parse($s->sold_at)->format('d-m-y') }}</span>
+                            <span class="text-light fw-bold">{{ \Carbon\Carbon::parse($s->sold_at)->format('H:i') }}</span>
+                        </div>
                     </td>
+                    <td>
+                        <div class="text-truncate text-light" style="max-width: 180px;" title="{{ $s->display_note }}">
+                            {{ $s->display_note }}
+                        </div>
+                    </td>
+                    <td class="text-end amount-mono text-info">Rp {{ number_format($s->total ?? 0,0,',','.') }}</td>
                     <td class="text-end d-print-none">
-                      <a class="btn btn-xs btn-outline-primary bg-dark-soft text-light px-2 py-1"
-                         href="{{ url('/sales/'.$s->id) }}">
-                        Lihat
-                      </a>
-                      <button type="button"
-                              class="btn btn-xs btn-outline-secondary bg-dark-soft text-light px-2 py-1"
-                              onclick='return editSale({{ $s->id }}, {!! json_encode($s->note) !!}, {!! json_encode($s->payment_method) !!}, {{ $s->paid_amount ?? 0 }}, {{ $s->total ?? 0 }})'>
-                        Edit
-                      </button>
+                      <div class="btn-action-group">
+                          <a class="btn btn-outline-primary-soft" href="{{ url('/sales/'.$s->id) }}" title="Lihat"><i class="bi bi-eye"></i></a>
+                          <button type="button" class="btn btn-outline-secondary-soft" title="Edit"
+                                  onclick='editSaleModal({{ $s->id }}, {!! json_encode($s->note) !!}, {!! json_encode($s->payment_method) !!}, {{ $s->paid_amount ?? 0 }}, {{ $s->total ?? 0 }}, {!! json_encode($s->sold_at->format("Y-m-d\TH:i")) !!})'>
+                            <i class="bi bi-pencil"></i>
+                          </button>
+                      </div>
                     </td>
                   </tr>
                 @empty
-                  <tr>
-                    <td colspan="4" class="text-center text-muted p-3">Belum ada penjualan.</td>
-                  </tr>
+                  <tr><td colspan="4" class="text-center text-muted p-4">Belum ada penjualan.</td></tr>
                 @endforelse
               </tbody>
               <tfoot>
-                <tr class="fw-semibold">
-                  <td colspan="2">Total PS</td>
-                  <td class="text-end">Rp {{ number_format($ps_total,0,',','.') }}</td>
-                  <td class="d-print-none"></td>
-                </tr>
-                <tr class="fw-semibold">
-                  <td colspan="2">Total Produk</td>
-                  <td class="text-end">Rp {{ number_format($prod_total,0,',','.') }}</td>
-                  <td class="d-print-none"></td>
-                </tr>
-                <tr class="fw-semibold">
-                  <td colspan="2">Total Penjualan</td>
-                  <td class="text-end">Rp {{ number_format($sales_total,0,',','.') }}</td>
-                  <td class="d-print-none"></td>
+                <tr class="fw-bold bg-dark bg-opacity-50">
+                  <td colspan="2" class="text-end text-secondary">TOTAL PERIODE</td>
+                  <td class="text-end text-white">Rp {{ number_format($sales_total,0,',','.') }}</td>
+                  <td></td>
                 </tr>
               </tfoot>
             </table>
@@ -198,65 +328,59 @@
       </div>
     </div>
 
+    {{-- TABEL PENGELUARAN --}}
     <div class="col-lg-6">
-      <div class="card card-glass">
+      <div class="card card-glass h-100">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <span>Pengeluaran ({{ $start_date->format('d-m-Y') }} — {{ $end_date->format('d-m-Y') }})</span>
-          <span class="badge badge-soft-danger d-print-none">
-            {{ $expenses->count() }} item
-          </span>
+          <span>Pengeluaran</span>
+          <span class="badge badge-soft-danger d-print-none">{{ $expenses->count() }} Item</span>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-sm m-0 align-middle table-modern">
+            <table class="table table-modern table-sm">
               <thead>
                 <tr>
                   <th>Waktu</th>
                   <th>Kategori</th>
-                  <th>Deskripsi</th>
                   <th class="text-end">Jumlah</th>
-                  <th class="text-end d-print-none"></th>
+                  <th class="text-end d-print-none" style="width: 100px;">Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 @forelse($expenses as $e)
-                  <tr>
-                    <td>
-                      {{ $e->timestamp_fmt ?? (isset($e->timestamp) && $e->timestamp ? $e->timestamp->format('d-m H:i') : '') }}
-                    </td>
-                    <td>{{ $e->category }}</td>
-                    <td>{{ $e->description }}</td>
-                    <td class="text-end amount-mono">
-                      Rp {{ number_format($e->amount ?? 0,0,',','.') }}
-                    </td>
-                    <td class="text-end d-print-none">
-                      <button type="button"
-                              class="btn btn-xs btn-outline-secondary bg-dark-soft text-light px-2 py-1"
-                              onclick='return editExpense({{ $e->id }}, {!! json_encode($e->category) !!}, {!! json_encode($e->description ?? "") !!}, {{ (int)($e->amount ?? 0) }}, {!! json_encode(isset($e->timestamp) ? ($e->timestamp_fmt ?? $e->timestamp) : "") !!})'>
-                        Edit
-                      </button>
-                      <form class="d-inline" method="POST"
-                            action="{{ route('purchases.expenses.destroy', $e->id) }}"
-                            onsubmit="return confirm('Hapus pengeluaran ini?');">
-                        @csrf
-                        @method('DELETE')
-                        <button class="btn btn-xs btn-outline-danger bg-dark-soft text-light px-2 py-1">
-                          Hapus
+                <tr>
+                  <td>
+                      <div class="d-flex flex-column small text-secondary">
+                          <span>{{ $e->timestamp ? \Carbon\Carbon::parse($e->timestamp)->format('d-m-y') : '-' }}</span>
+                      </div>
+                  </td>
+                  <td>
+                      <div class="text-light fw-semibold">{{ $e->category }}</div>
+                      <div class="small text-muted text-truncate" style="max-width: 150px;">{{ $e->description }}</div>
+                  </td>
+                  <td class="text-end amount-mono text-danger">Rp {{ number_format($e->amount ?? 0,0,',','.') }}</td>
+                  <td class="text-end d-print-none">
+                    <div class="btn-action-group">
+                        <button type="button" class="btn btn-outline-secondary-soft" title="Edit"
+                                onclick='editExpenseModal({{ $e->id }}, {!! json_encode($e->category) !!}, {!! json_encode($e->description ?? "") !!}, {{ (int)($e->amount ?? 0) }}, {!! json_encode(isset($e->timestamp) ? ($e->timestamp_fmt ?? $e->timestamp) : "") !!})'>
+                          <i class="bi bi-pencil"></i>
                         </button>
-                      </form>
-                    </td>
-                  </tr>
+                        <form class="d-inline" method="POST" action="{{ route('purchases.expenses.destroy', $e->id) }}" onsubmit="return confirm('Hapus pengeluaran ini?');">
+                          @csrf @method('DELETE')
+                          <button class="btn btn-outline-danger-soft" title="Hapus"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </div>
+                  </td>
+                </tr>
                 @empty
-                  <tr>
-                    <td colspan="5" class="text-center text-muted p-3">Belum ada data.</td>
-                  </tr>
+                  <tr><td colspan="4" class="text-center text-muted p-4">Belum ada data pengeluaran.</td></tr>
                 @endforelse
               </tbody>
               <tfoot>
-                <tr class="fw-semibold">
-                  <td colspan="3">Total Pengeluaran</td>
-                  <td class="text-end">Rp {{ number_format($expenses_total,0,',','.') }}</td>
-                  <td class="d-print-none"></td>
+                <tr class="fw-bold bg-dark bg-opacity-50">
+                  <td colspan="2" class="text-end text-secondary">TOTAL PERIODE</td>
+                  <td class="text-end text-danger">Rp {{ number_format($expenses_total,0,',','.') }}</td>
+                  <td></td>
                 </tr>
               </tfoot>
             </table>
@@ -266,133 +390,83 @@
     </div>
   </div>
 
-  {{-- Rekap per periode --}}
-  <div class="card card-glass mt-3">
-    <div class="card-header d-flex align-items-center gap-3">
-      <span>Rekap per Periode (dalam rentang terpilih)</span>
+  {{-- Rekap per periode (Tabular) --}}
+  <div class="card card-glass mt-4">
+    <div class="card-header d-flex align-items-center gap-3 border-bottom border-secondary border-opacity-25 py-2">
+      <span class="text-uppercase small text-secondary fw-bold"><i class="bi bi-table me-1"></i> Rekapitulasi</span>
       <ul class="nav nav-pills ms-auto d-print-none" id="rekapTabs">
-        <li class="nav-item">
-          <button class="nav-link active" data-target="#tabHarian">Harian</button>
-        </li>
-        <li class="nav-item">
-          <button class="nav-link" data-target="#tabMingguan">Mingguan</button>
-        </li>
-        <li class="nav-item">
-          <button class="nav-link" data-target="#tabBulanan">Bulanan</button>
-        </li>
+        <li class="nav-item"><button class="nav-link active" data-target="#tabHarian">Harian</button></li>
+        <li class="nav-item"><button class="nav-link" data-target="#tabMingguan">Mingguan</button></li>
+        <li class="nav-item"><button class="nav-link" data-target="#tabBulanan">Bulanan</button></li>
       </ul>
     </div>
     <div class="card-body p-0">
       <div class="p-3">
         <div id="tabHarian" class="rekap-pane show">
           <div class="table-responsive">
-            <table class="table table-sm align-middle table-modern">
-              <thead>
-                <tr>
-                  <th>Periode</th>
-                  <th class="text-end">PS</th>
-                  <th class="text-end">Produk</th>
-                  <th class="text-end">Total</th>
-                </tr>
-              </thead>
+            <table class="table table-modern table-sm">
+              <thead><tr><th>Periode</th><th class="text-end text-primary">Pendapatan PS</th><th class="text-end text-success">Produk</th><th class="text-end text-light">Total</th></tr></thead>
               <tbody>
                 @forelse($daily_rows as $r)
                   <tr>
-                    <td>{{ $r->label }}</td>
-                    <td class="text-end">Rp {{ number_format($r->ps ?? 0,0,',','.') }}</td>
-                    <td class="text-end">Rp {{ number_format($r->prod ?? 0,0,',','.') }}</td>
-                    <td class="text-end">Rp {{ number_format($r->total ?? 0,0,',','.') }}</td>
+                      <td>{{ $r->label }}</td>
+                      <td class="text-end amount-mono">{{ number_format($r->ps ?? 0,0,',','.') }}</td>
+                      <td class="text-end amount-mono">{{ number_format($r->prod ?? 0,0,',','.') }}</td>
+                      <td class="text-end amount-mono text-white fw-bold">{{ number_format($r->total ?? 0,0,',','.') }}</td>
                   </tr>
                 @empty
-                  <tr><td colspan="4" class="text-center text-muted">Tidak ada data.</td></tr>
+                  <tr><td colspan="4" class="text-center text-muted py-3">Tidak ada data.</td></tr>
                 @endforelse
               </tbody>
             </table>
           </div>
         </div>
-
         <div id="tabMingguan" class="rekap-pane">
-          <div class="table-responsive">
-            <table class="table table-sm align-middle table-modern">
-              <thead>
-                <tr>
-                  <th>Periode</th>
-                  <th class="text-end">PS</th>
-                  <th class="text-end">Produk</th>
-                  <th class="text-end">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                @forelse($weekly_rows as $r)
-                  <tr>
-                    <td>{{ $r->label }}</td>
-                    <td class="text-end">Rp {{ number_format($r->ps ?? 0,0,',','.') }}</td>
-                    <td class="text-end">Rp {{ number_format($r->prod ?? 0,0,',','.') }}</td>
-                    <td class="text-end">Rp {{ number_format($r->total ?? 0,0,',','.') }}</td>
-                  </tr>
-                @empty
-                  <tr><td colspan="4" class="text-center text-muted">Tidak ada data.</td></tr>
-                @endforelse
-              </tbody>
-            </table>
-          </div>
+            <div class="table-responsive">
+                <table class="table table-modern table-sm">
+                  <thead><tr><th>Periode</th><th class="text-end text-primary">PS</th><th class="text-end text-success">Produk</th><th class="text-end text-light">Total</th></tr></thead>
+                  <tbody>
+                    @forelse($weekly_rows as $r)
+                      <tr><td>{{ $r->label }}</td><td class="text-end amount-mono">{{ number_format($r->ps ?? 0,0,',','.') }}</td><td class="text-end amount-mono">{{ number_format($r->prod ?? 0,0,',','.') }}</td><td class="text-end amount-mono text-white fw-bold">{{ number_format($r->total ?? 0,0,',','.') }}</td></tr>
+                    @empty
+                      <tr><td colspan="4" class="text-center text-muted py-3">Tidak ada data.</td></tr>
+                    @endforelse
+                  </tbody>
+                </table>
+            </div>
         </div>
-
         <div id="tabBulanan" class="rekap-pane">
-          <div class="table-responsive">
-            <table class="table table-sm align-middle table-modern">
-              <thead>
-                <tr>
-                  <th>Periode</th>
-                  <th class="text-end">PS</th>
-                  <th class="text-end">Produk</th>
-                  <th class="text-end">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                @forelse($monthly_rows as $r)
-                  <tr>
-                    <td>{{ $r->label }}</td>
-                    <td class="text-end">Rp {{ number_format($r->ps ?? 0,0,',','.') }}</td>
-                    <td class="text-end">Rp {{ number_format($r->prod ?? 0,0,',','.') }}</td>
-                    <td class="text-end">Rp {{ number_format($r->total ?? 0,0,',','.') }}</td>
-                  </tr>
-                @empty
-                  <tr><td colspan="4" class="text-center text-muted">Tidak ada data.</td></tr>
-                @endforelse
-              </tbody>
-            </table>
-          </div>
+            <div class="table-responsive">
+                <table class="table table-modern table-sm">
+                  <thead><tr><th>Periode</th><th class="text-end text-primary">PS</th><th class="text-end text-success">Produk</th><th class="text-end text-light">Total</th></tr></thead>
+                  <tbody>
+                    @forelse($monthly_rows as $r)
+                      <tr><td>{{ $r->label }}</td><td class="text-end amount-mono">{{ number_format($r->ps ?? 0,0,',','.') }}</td><td class="text-end amount-mono">{{ number_format($r->prod ?? 0,0,',','.') }}</td><td class="text-end amount-mono text-white fw-bold">{{ number_format($r->total ?? 0,0,',','.') }}</td></tr>
+                    @empty
+                      <tr><td colspan="4" class="text-center text-muted py-3">Tidak ada data.</td></tr>
+                    @endforelse
+                  </tbody>
+                </table>
+            </div>
         </div>
-
       </div>
     </div>
   </div>
 
   {{-- Top produk & stok rendah --}}
-  <div class="row g-3 mt-1">
+  <div class="row g-4 mt-2">
     <div class="col-md-6">
-      <div class="card card-glass">
-        <div class="card-header">Top Produk (Qty) — Rentang terpilih</div>
+      <div class="card card-glass h-100">
+        <div class="card-header">Top Produk (Qty)</div>
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-sm m-0 align-middle table-modern">
-              <thead>
-                <tr>
-                  <th>Produk</th>
-                  <th class="text-center">Qty</th>
-                  <th class="text-end">Omzet</th>
-                </tr>
-              </thead>
+            <table class="table table-modern table-sm">
+              <thead><tr><th>Produk</th><th class="text-center">Qty</th><th class="text-end">Omzet</th></tr></thead>
               <tbody>
                 @forelse($top as $t)
-                  <tr>
-                    <td>{{ $t->name }}</td>
-                    <td class="text-center">{{ $t->qty }}</td>
-                    <td class="text-end">Rp {{ number_format($t->amount,0,',','.') }}</td>
-                  </tr>
+                  <tr><td>{{ $t->name }}</td><td class="text-center text-warning fw-bold">{{ $t->qty }}</td><td class="text-end amount-mono">{{ number_format($t->amount,0,',','.') }}</td></tr>
                 @empty
-                  <tr><td colspan="3" class="text-center text-muted">Tidak ada data.</td></tr>
+                  <tr><td colspan="3" class="text-center text-muted py-3">Tidak ada data.</td></tr>
                 @endforelse
               </tbody>
             </table>
@@ -400,27 +474,18 @@
         </div>
       </div>
     </div>
-
     <div class="col-md-6">
-      <div class="card card-glass">
-        <div class="card-header">Stok Rendah (≤ 5)</div>
+      <div class="card card-glass h-100">
+        <div class="card-header text-danger">Stok Menipis (≤ 5)</div>
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-sm m-0 align-middle table-modern">
-              <thead>
-                <tr>
-                  <th>Produk</th>
-                  <th>Stok</th>
-                </tr>
-              </thead>
+            <table class="table table-modern table-sm">
+              <thead><tr><th>Produk</th><th>Stok</th></tr></thead>
               <tbody>
                 @forelse($low_stock as $p)
-                  <tr>
-                    <td>{{ $p->name }}</td>
-                    <td>{{ $p->stock }} {{ $p->unit }}</td>
-                  </tr>
+                  <tr><td>{{ $p->name }}</td><td class="text-danger fw-bold">{{ $p->stock }} {{ $p->unit }}</td></tr>
                 @empty
-                  <tr><td colspan="2" class="text-center text-muted">Tidak ada.</td></tr>
+                  <tr><td colspan="2" class="text-center text-muted py-3">Stok aman.</td></tr>
                 @endforelse
               </tbody>
             </table>
@@ -431,280 +496,103 @@
   </div>
 
 </div> {{-- /.report-shell --}}
+
+{{-- MODAL EDIT PENJUALAN --}}
+<div class="modal fade modal-glass" id="editSaleModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-white">Edit Transaksi</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pt-3">
+        <form id="editSaleForm" method="POST">
+          @csrf @method('PUT')
+          
+          <div class="mb-3">
+            <label class="form-label small text-muted">Waktu Transaksi</label>
+            <input type="datetime-local" name="created_at" id="saleDate" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Total Tagihan</label>
+            <input type="number" name="total_bill" id="saleTotal" class="form-control" min="0" required>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label small text-muted">Metode Bayar</label>
+              <select name="payment_method" id="saleMethod" class="form-select">
+                <option value="Tunai">Tunai</option>
+                <option value="QRIS">QRIS</option>
+                <option value="Transfer">Transfer</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label small text-muted">Dibayar</label>
+              <input type="number" name="paid_amount" id="salePaid" class="form-control" min="0">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Catatan</label>
+            <textarea name="note" id="saleNote" class="form-control bg-secondary bg-opacity-25" rows="2" readonly style="cursor: not-allowed; color: #94a3b8;"></textarea>
+            <div class="form-text small text-muted">Catatan transaksi tidak dapat diubah manual.</div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-outline-secondary-soft btn-sm" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-gradient-primary px-4">Simpan Perubahan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{-- MODAL EDIT PENGELUARAN --}}
+<div class="modal fade modal-glass" id="editExpenseModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-white">Edit Pengeluaran</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pt-3">
+        <form id="editExpenseForm" method="POST">
+          @csrf @method('PUT')
+          
+          <div class="mb-3">
+            <label class="form-label small text-muted">Waktu</label>
+            <input type="text" name="timestamp" id="expDate" class="form-control" placeholder="YYYY-MM-DD HH:MM" required>
+            <div class="form-text text-muted small">Format: YYYY-MM-DD HH:MM</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Kategori</label>
+            <input type="text" name="category" id="expCat" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Jumlah (Rp)</label>
+            <input type="number" name="amount" id="expAmount" class="form-control" min="0" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Deskripsi</label>
+            <textarea name="description" id="expDesc" class="form-control" rows="2"></textarea>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-outline-secondary-soft btn-sm" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-gradient-primary px-4">Simpan Perubahan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
-
-@push('styles')
-<style>
-  /* Shell utama: panel futuristik gelap */
-  .fp-header-sub{
-    font-size:.82rem;
-    color:#cbd5f5;
-    white-space:normal;
-    opacity: 60%;
-  }
-  .report-shell{
-    position: relative;
-    padding: 1.75rem 1.75rem 2.25rem;
-    border-radius: 1.5rem;
-    background:
-      radial-gradient(circle at top left,#4f46e533,#0f172a),
-      radial-gradient(circle at bottom right,#22c55e22,#020617 70%);
-    box-shadow: 0 22px 50px rgba(15,23,42,0.75);
-    overflow: hidden;
-    color:#e5e7eb;
-  }
-  .report-shell::before{
-    content:"";
-    position:absolute;
-    inset:-40%;
-    background:
-      radial-gradient(circle at 10% 0,#ffffff33,transparent 55%),
-      radial-gradient(circle at 90% 100%,#22c55e33,transparent 60%);
-    opacity:.7;
-    filter: blur(40px);
-    pointer-events:none;
-  }
-  .report-shell > *{
-    position:relative;
-    z-index:1;
-  }
-
-  .report-chip-icon{
-    width:32px;
-    height:32px;
-    border-radius:999px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    background:linear-gradient(135deg,#4f46e5,#a855f7);
-    color:#fff;
-    box-shadow:0 8px 18px rgba(79,70,229,.65);
-    font-size:15px;
-  }
-
-  /* Input glass dark */
-  .report-filter .input-glass{
-    border-radius:999px;
-    background:rgba(15,23,42,.9);
-    border:1px solid rgba(148,163,184,.5);
-    padding:2px 10px;
-    box-shadow:0 10px 25px rgba(15,23,42,.65);
-    backdrop-filter:blur(18px);
-  }
-  .report-filter .form-control,
-  .report-filter .form-select{
-    color:#e5e7eb;
-  }
-  .report-filter .form-control:focus,
-  .report-filter .form-select:focus{
-    box-shadow:none;
-  }
-
-  .btn-light-soft{
-    border-radius:999px;
-    border:1px solid rgba(148,163,184,.4);
-    background:rgba(15,23,42,.85);
-    color:#e5e7eb;
-  }
-  .btn-light-soft:hover{
-    background:rgba(31,41,55,.95);
-  }
-  .bg-dark-soft{
-    background:rgba(15,23,42,.9);
-  }
-
-  /* Metric cards - dark glassmorphism */
-  .metric-card{
-    position:relative;
-    border-radius:1.2rem;
-    padding:1rem 1.1rem 1.1rem;
-    background:linear-gradient(145deg,#020617,#020617);
-    border:1px solid rgba(148,163,184,.55);
-    box-shadow:0 18px 38px rgba(15,23,42,.9);
-    backdrop-filter:blur(22px);
-    overflow:hidden;
-    color:#e5e7eb;
-  }
-  .metric-card::after{
-    content:"";
-    position:absolute;
-    inset:auto -40% -40% auto;
-    width:120px;
-    height:120px;
-    border-radius:999px;
-    opacity:.55;
-    filter:blur(22px);
-  }
-  .metric-card .metric-icon{
-    width:34px;
-    height:34px;
-    border-radius:999px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#0f172a;
-    background:#e0e7ff;
-    margin-bottom:.5rem;
-    font-size:18px;
-  }
-  .metric-card .metric-label{
-    font-size:.75rem;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    color:#9ca3af;
-    margin-bottom:.15rem;
-    font-weight:600;
-  }
-  .metric-card .metric-value{
-    font-size:1.45rem;
-    font-weight:700;
-    color:#f9fafb;
-  }
-  .metric-card .metric-caption{
-    font-size:.75rem;
-    color:#9ca3af;
-    margin-top:.15rem;
-  }
-
-  .metric-blue::after   { background:radial-gradient(circle,#6366f1,#0ea5e9); }
-  .metric-green::after  { background:radial-gradient(circle,#22c55e,#a3e635); }
-  .metric-purple::after { background:radial-gradient(circle,#a855f7,#6366f1); }
-  .metric-yellow::after { background:radial-gradient(circle,#facc15,#fb923c); }
-
-  /* Cards & table futuristik gelap */
-  .card-glass{
-    border-radius:1.1rem;
-    border:1px solid rgba(148,163,184,.45);
-    background:radial-gradient(circle at top,#020617 0,#020617 55%,#020617 100%);
-    box-shadow:0 18px 38px rgba(15,23,42,.9);
-    backdrop-filter:blur(20px);
-    color:#e5e7eb;
-  }
-  .card-glass .card-header{
-    border-bottom:1px solid rgba(148,163,184,.45);
-    background:linear-gradient(90deg,rgba(15,23,42,.95),rgba(31,41,55,.9));
-    font-weight:600;
-    color:#f9fafb;
-  }
-
-  .table-modern{
-    color:#e5e7eb;
-  }
-  .table-modern thead{
-    background:linear-gradient(90deg,#020617,#020617);
-    color:#e5e7eb;
-  }
-  .table-modern thead th{
-    border-bottom:none;
-    font-size:.78rem;
-    text-transform:uppercase;
-    letter-spacing:.08em;
-  }
-  .table-modern tbody tr{
-    background:rgba(15,23,42,.92);
-    transition:background .15s ease, transform .08s ease, box-shadow .08s ease;
-  }
-  .table-modern tbody tr:nth-child(even){
-    background:rgba(15,23,42,.86);
-  }
-  .table-modern tbody tr:hover{
-    background:rgba(79,70,229,.35);
-    transform:translateY(-1px);
-    box-shadow:0 8px 20px rgba(15,23,42,.7);
-  }
-  .table-modern td,
-  .table-modern th{
-    border-color:rgba(55,65,81,.8);
-  }
-  .table-modern tfoot tr{
-    background:rgba(15,23,42,.9);
-  }
-
-  .amount-mono{
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,"Liberation Mono","Courier New", monospace;
-  }
-
-  .badge-soft-primary{
-    background:rgba(59,130,246,.22);
-    color:#bfdbfe;
-    border-radius:999px;
-  }
-  .badge-soft-danger{
-    background:rgba(248,113,113,.22);
-    color:#fecaca;
-    border-radius:999px;
-  }
-
-  /* Range visibility + tabs */
-  .rng-day, .rng-week, .rng-month, .rng-custom { display:none; }
-
-  #rekapTabs .nav-link{
-    border-radius:999px;
-    padding:.25rem .85rem;
-    font-size:.8rem;
-    border:1px solid transparent;
-    color:#e5e7eb;
-    background:rgba(15,23,42,.9);
-  }
-  #rekapTabs .nav-link.active{
-    background:linear-gradient(135deg,#6366f1,#a855f7);
-    color:#fff;
-    box-shadow:0 8px 18px rgba(79,70,229,.8);
-    border-color:transparent;
-  }
-
-  .rekap-pane { display:none; }
-  .rekap-pane.show { display:block; }
-
-  /* Mobile tweaks */
-  @media (max-width: 768px){
-    .report-shell{
-      padding:1.25rem 1rem 2rem;
-      border-radius:1rem;
-    }
-    .metric-card{
-      padding:.9rem .95rem 1rem;
-      margin-bottom:.25rem;
-    }
-    .d-flex.align-items-center.justify-content-between.mb-3{
-      flex-direction:column;
-      align-items:flex-start !important;
-      gap:.75rem;
-    }
-    .report-filter .col-6,
-    .report-filter .col-12{
-      flex:0 0 100%;
-      max-width:100%;
-    }
-  }
-
-  /* Print mode: kembali simple dan putih */
-  @media print {
-    .report-shell{
-      background:#fff;
-      box-shadow:none;
-      color:#000;
-    }
-    .card-glass{
-      background:#fff;
-      box-shadow:none;
-      border-color:#e5e7eb;
-      color:#000;
-    }
-    .table-modern thead{
-      background:#f3f4f6;
-      color:#111827;
-    }
-    .table-modern tbody tr,
-    .table-modern tfoot tr{
-      background:#fff;
-      box-shadow:none;
-    }
-    .d-print-none { display: none !important; }
-    .card, .table { break-inside: avoid; }
-  }
-</style>
-@endpush
 
 @push('scripts')
 <script>
@@ -739,78 +627,33 @@
   }));
 })();
 
-/* fungsi editSale & editExpense */
-function editSale(id, note, method, paid, total) {
-  const newNote = prompt("Catatan:", note || "");
-  if (newNote === null) return false;
+// Fungsi untuk membuka Modal Edit Penjualan
+function editSaleModal(id, note, method, paid, total, date) {
+  const form = document.getElementById('editSaleForm');
+  form.action = '/sales/' + id; // Pastikan route ini benar
 
-  const newMethod = prompt("Metode Bayar (Tunai/QRIS/Transfer/Lainnya):", method || "Tunai");
-  if (newMethod === null) return false;
+  document.getElementById('saleDate').value = date;
+  document.getElementById('saleNote').value = note || '';
+  document.getElementById('saleMethod').value = method || 'Tunai';
+  document.getElementById('salePaid').value = paid || 0;
+  document.getElementById('saleTotal').value = total || 0;
 
-  let newPaid = paid;
-  if ((newMethod || '').toLowerCase() === 'tunai') {
-    const val = prompt("Dibayar (angka):", paid || total);
-    if (val === null) return false;
-    newPaid = parseInt(val || "0");
-  }
-
-  const f = document.createElement('form');
-  f.method = 'post';
-  f.action = '/sales/' + id;
-
-  const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-  if(token) {
-    const _token = document.createElement('input');
-    _token.type='hidden'; _token.name='_token'; _token.value=token; f.appendChild(_token);
-  }
-  const _method = document.createElement('input');
-  _method.type='hidden'; _method.name='_method'; _method.value='PUT'; f.appendChild(_method);
-
-  [['note', newNote], ['payment_method', newMethod], ['paid_amount', newPaid], ['total_bill', total]]
-    .forEach(([k,v])=>{
-      const i = document.createElement('input'); i.type='hidden'; i.name=k; i.value=v; f.appendChild(i);
-    });
-
-  const nowIso = new Date().toISOString().slice(0,16);
-  const _created = document.createElement('input');
-  _created.type='hidden'; _created.name='created_at'; _created.value=nowIso; f.appendChild(_created);
-
-  document.body.appendChild(f); f.submit();
-  return false;
+  const modal = new bootstrap.Modal(document.getElementById('editSaleModal'));
+  modal.show();
 }
 
-function editExpense(id, category, description, amount, ts) {
-  const newCat  = prompt("Kategori:", category || "");
-  if (newCat === null) return false;
+// Fungsi untuk membuka Modal Edit Pengeluaran
+function editExpenseModal(id, category, description, amount, ts) {
+  const form = document.getElementById('editExpenseForm');
+  form.action = '/purchases/expenses/' + id;
 
-  const newDesc = prompt("Deskripsi:", description || "");
-  if (newDesc === null) return false;
+  document.getElementById('expDate').value = ts || '';
+  document.getElementById('expCat').value = category || '';
+  document.getElementById('expDesc').value = description || '';
+  document.getElementById('expAmount').value = amount || 0;
 
-  const newAmt  = prompt("Jumlah (Rp):", amount);
-  if (newAmt === null) return false;
-
-  const newTs   = prompt("Waktu (YYYY-MM-DDTHH:MM):", ts || "");
-  if (newTs === null) return false;
-
-  const f = document.createElement('form');
-  f.method = 'post';
-  f.action = '/purchases/expenses/' + id;
-
-  const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-  if(token) {
-    const _token = document.createElement('input');
-    _token.type='hidden'; _token.name='_token'; _token.value=token; f.appendChild(_token);
-  }
-  const _method = document.createElement('input');
-  _method.type='hidden'; _method.name='_method'; _method.value='PUT'; f.appendChild(_method);
-
-  [['category', newCat], ['description', newDesc], ['amount', newAmt], ['timestamp', newTs]]
-    .forEach(([k,v])=>{
-      const i = document.createElement('input'); i.type='hidden'; i.name=k; i.value=v; f.appendChild(i);
-    });
-
-  document.body.appendChild(f); f.submit();
-  return false;
+  const modal = new bootstrap.Modal(document.getElementById('editExpenseModal'));
+  modal.show();
 }
 </script>
 @endpush
