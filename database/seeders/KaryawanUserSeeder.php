@@ -14,7 +14,7 @@ class KaryawanUserSeeder extends Seeder
             ['email' => 'karyawan@fixplay.test'], // email unik
             [
                 'name'     => 'Karyawan Fixplay',
-                'password' => Hash::make('password-karyawan'), // ganti ke password yang aman
+                'password' => Hash::make('pw-karyawan'), // ganti ke password yang aman
                 'role'     => 'employee', // sesuaikan dengan kolom role di project kamu
             ]
         );

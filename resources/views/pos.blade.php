@@ -270,7 +270,7 @@
                   </tr>
                 @empty
                   <tr>
-                    <td colspan="4" class="text-center text-muted p-5">
+                    <td colspan="4" class="text-center text-white p-5">
                         <i class="bi bi-inbox display-6 d-block mb-2 opacity-25"></i>
                         Belum ada pembelian produk.
                     </td>

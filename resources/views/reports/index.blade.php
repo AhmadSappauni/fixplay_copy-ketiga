@@ -373,7 +373,7 @@
                   </td>
                 </tr>
                 @empty
-                  <tr><td colspan="4" class="text-center text-muted p-4">Belum ada data pengeluaran.</td></tr>
+                  <tr><td colspan="4" class="text-center text-white p-4">Belum ada data pengeluaran.</td></tr>
                 @endforelse
               </tbody>
               <tfoot>
@@ -427,7 +427,7 @@
                   <thead><tr><th>Periode</th><th class="text-end text-primary">PS</th><th class="text-end text-success">Produk</th><th class="text-end text-light">Total</th></tr></thead>
                   <tbody>
                     @forelse($weekly_rows as $r)
-                      <tr><td>{{ $r->label }}</td><td class="text-end amount-mono">{{ number_format($r->ps ?? 0,0,',','.') }}</td><td class="text-end amount-mono">{{ number_format($r->prod ?? 0,0,',','.') }}</td><td class="text-end amount-mono text-white fw-bold">{{ number_format($r->total ?? 0,0,',','.') }}</td></tr>
+                      <tr><td class="text-white ">{{ $r->label }}</td><td class="text-end amount-mono text-white">{{ number_format($r->ps ?? 0,0,',','.') }}</td><td class="text-end amount-mono text-white">{{ number_format($r->prod ?? 0,0,',','.') }}</td><td class="text-end amount-mono text-white fw-bold">{{ number_format($r->total ?? 0,0,',','.') }}</td></tr>
                     @empty
                       <tr><td colspan="4" class="text-center text-muted py-3">Tidak ada data.</td></tr>
                     @endforelse
@@ -441,7 +441,7 @@
                   <thead><tr><th>Periode</th><th class="text-end text-primary">PS</th><th class="text-end text-success">Produk</th><th class="text-end text-light">Total</th></tr></thead>
                   <tbody>
                     @forelse($monthly_rows as $r)
-                      <tr><td>{{ $r->label }}</td><td class="text-end amount-mono">{{ number_format($r->ps ?? 0,0,',','.') }}</td><td class="text-end amount-mono">{{ number_format($r->prod ?? 0,0,',','.') }}</td><td class="text-end amount-mono text-white fw-bold">{{ number_format($r->total ?? 0,0,',','.') }}</td></tr>
+                      <tr><td class="text-white ">{{ $r->label }}</td><td class="text-end amount-mono text-white">{{ number_format($r->ps ?? 0,0,',','.') }}</td><td class="text-end amount-mono text-white">{{ number_format($r->prod ?? 0,0,',','.') }}</td><td class="text-end amount-mono text-white fw-bold">{{ number_format($r->total ?? 0,0,',','.') }}</td></tr>
                     @empty
                       <tr><td colspan="4" class="text-center text-muted py-3">Tidak ada data.</td></tr>
                     @endforelse
@@ -466,7 +466,7 @@
                 @forelse($top as $t)
                   <tr><td class="text-white fw-bold">{{ $t->name }}</td><td class="text-center text-warning fw-bold">{{ $t->qty }}</td><td class="text-end amount-mono text-white fw-bold">{{ number_format($t->amount,0,',','.') }}</td></tr>
                 @empty
-                  <tr><td colspan="3" class="text-center text-muted py-3">Tidak ada data.</td></tr>
+                  <tr><td colspan="3" class="text-center text-white py-3">Tidak ada data.</td></tr>
                 @endforelse
               </tbody>
             </table>
@@ -485,7 +485,7 @@
                 @forelse($low_stock as $p)
                   <tr><td class="text-white fw-bold">{{ $p->name }}</td><td class="text-danger fw-bold">{{ $p->stock }} {{ $p->unit }}</td></tr>
                 @empty
-                  <tr><td colspan="2" class="text-center text-muted py-3">Stok aman.</td></tr>
+                  <tr><td colspan="2" class="text-center text-white py-3">Stok aman.</td></tr>
                 @endforelse
               </tbody>
             </table>

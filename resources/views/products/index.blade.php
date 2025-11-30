@@ -269,7 +269,7 @@
         <table class="table table-hover table-sm mb-0 fp-table align-middle">
           <thead>
           <tr>
-            <th style="width:60px;">#</th>
+            <th style="width:60px;">No.</th>
             <th>Nama</th>
             <th style="width:170px;">Kategori</th>
             <th style="width:160px;" class="text-end">Harga</th>
@@ -318,7 +318,7 @@
             </tr>
           @empty
             <tr>
-              <td colspan="8" class="text-center text-muted py-4">
+              <td colspan="8" class="text-center text-white py-4">
                 Belum ada produk yang terdaftar.
               </td>
             </tr>

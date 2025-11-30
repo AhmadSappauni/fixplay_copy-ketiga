@@ -127,26 +127,39 @@ class ReportController extends Controller
             });
 
         // 2. Weekly Rows
+        // 2. Weekly Rows - label "Minggu ke-X Bulan YYYY"
         $weekly_rows = DB::table('sales')
             ->join('sale_items', 'sales.id', '=', 'sale_items.sale_id')
             ->selectRaw("
-                YEAR(sales.sold_at) as y, WEEK(sales.sold_at,1) as w, 
+                YEAR(sales.sold_at) as y,
+                WEEK(sales.sold_at,1) as w,
                 SUM(sale_items.subtotal) as total,
                 COALESCE(SUM(CASE WHEN sale_items.product_id IS NULL THEN sale_items.subtotal ELSE 0 END),0) as ps_amount,
                 COALESCE(SUM(CASE WHEN sale_items.product_id IS NOT NULL THEN sale_items.subtotal ELSE 0 END),0) as prod_amount
             ")
             ->whereBetween('sales.sold_at', [$start, $end])
             ->groupBy('y','w')
-            ->orderBy('y','asc')->orderBy('w','asc')
+            ->orderBy('y','asc')
+            ->orderBy('w','asc')
             ->get()
             ->map(function($r){
+                // Dapatkan tanggal awal minggu tsb berdasarkan year + ISO week
+                $weekStart = Carbon::now()->setISODate($r->y, $r->w)->startOfWeek(); // Senin
+
+                // Minggu ke berapa di bulan itu
+                $weekOfMonth = $weekStart->weekOfMonth;
+
+                // Label contoh: "Minggu ke-2 Nov 2025"
+                $label = 'Minggu ke-' . $weekOfMonth . ' ' . $weekStart->translatedFormat('M Y');
+
                 return (object)[
-                    'label' => "W{$r->w}-{$r->y}",
+                    'label' => $label,
                     'ps'    => (int)$r->ps_amount,
                     'prod'  => (int)$r->prod_amount,
-                    'total' => (int)$r->total
+                    'total' => (int)$r->total,
                 ];
             });
+
 
         // 3. Monthly Rows
         $monthly_rows = DB::table('sales')

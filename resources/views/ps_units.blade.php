@@ -356,7 +356,7 @@
               <option value="PS5" {{ old('type') == 'PS5' ? 'selected' : '' }}>PS5</option>
               <option value="VVIP" {{ old('type') == 'VVIP' ? 'selected' : '' }}>VVIP</option>
             </select>
-            <div class="form-text text-muted small" style="font-size: 0.75rem;">*Tipe mempengaruhi harga paket otomatis.</div>
+            <div class="form-text text-white small" style="font-size: 0.75rem;">*Tipe mempengaruhi harga paket otomatis.</div>
           </div>
 
           <div class="mb-3">
