@@ -257,10 +257,14 @@
                       <div class="btn-icon-group">
                         <a href="{{ route('sales.show', $rs->id) }}" class="btn-icon btn-icon-view" title="Lihat Struk"><i class="bi bi-eye"></i></a>
                         <a href="{{ route('sales.edit', $rs->id) }}" class="btn-icon btn-icon-edit" title="Edit"><i class="bi bi-pencil"></i></a>
-                        <form action="{{ route('sales.destroy', $rs->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus transaksi ini? Stok produk akan dikembalikan otomatis.');">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="btn-icon btn-icon-del" title="Hapus"><i class="bi bi-trash3"></i></button>
-                        </form>
+                        
+                        {{-- HANYA BOS (ADMIN) YANG BISA HAPUS --}}
+                        @if(auth()->user() && auth()->user()->role === 'admin')
+                            <form action="{{ route('sales.destroy', $rs->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus transaksi ini? Stok produk akan dikembalikan otomatis.');">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn-icon btn-icon-del" title="Hapus"><i class="bi bi-trash3"></i></button>
+                            </form>
+                        @endif
                       </div>
                     </td>
                   </tr>

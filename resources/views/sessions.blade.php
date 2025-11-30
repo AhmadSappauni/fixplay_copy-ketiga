@@ -241,6 +241,55 @@
     border-color: transparent;
   }
 
+  /* Style Tombol Tambah Jam Kecil (Fitur Baru) */
+  .btn-add-time {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    border-radius: 6px;
+    background: rgba(34, 197, 94, 0.15);
+    color: #86efac;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    margin-right: 4px;
+    transition: all 0.2s;
+  }
+  .btn-add-time:hover {
+    background: rgba(34, 197, 94, 0.9);
+    color: #022c22;
+    border-color: transparent;
+  }
+
+  /* [BARU] Style untuk kotak estimasi harga di modal */
+  .price-display-box {
+    background: rgba(34, 197, 94, 0.1); 
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+
+  /* MODAL DARK GLASS STYLE (Untuk Modal Tambah Jam) */
+  .modal-glass .modal-content {
+    background: radial-gradient(circle at top left, #1e1e2f, #0f1020);
+    border: 1px solid rgba(124,58,237,.3);
+    box-shadow: 0 0 30px rgba(0,0,0,.8);
+    color: #e5e7eb;
+    border-radius: 1.25rem;
+  }
+  .modal-glass .modal-header { border-bottom: 1px solid rgba(255,255,255,.08); }
+  .modal-glass .modal-footer { border-top: 1px solid rgba(255,255,255,.08); }
+  .modal-glass .form-control, .modal-glass .form-select {
+    background: rgba(15,23,42,.6); border: 1px solid rgba(148,163,184,.3); color: #fff;
+  }
+  .modal-glass .btn-close-white { filter: invert(1) grayscale(100%) brightness(200%); }
+
+  @media (max-width: 992px){
+    .session-shell{ padding:1.35rem 1rem 1.8rem; border-radius:1.1rem; }
+  }
+  @media (max-width: 768px){
+    .session-header-stack{ flex-direction:column; align-items:flex-start !important; }
+    .session-header-actions{ width:100%; justify-content:flex-end; }
+    .session-card{ margin-bottom:.25rem; }
+  }
   @media print{
     .session-shell{ background:#fff; box-shadow:none; }
     .session-card{ box-shadow:none; border:1px solid #ccc; background:#fff; color:#000; }
@@ -263,192 +312,163 @@
   @endif
 
   {{-- HEADER --}}
-  <div class="d-flex align-items-center justify-content-between mb-4 session-header-stack">
+  <div class="d-flex align-items-center justify-content-between mb-3 session-header-stack">
     <div>
       <div class="d-flex align-items-center gap-2 mb-1">
         <span class="session-chip-icon"><i class="bi bi-controller"></i></span>
-        <h4 class="m-0 fw-bold text-white">Sesi Rental</h4>
+        <h4 class="m-0 fw-semibold session-title-text">Sesi PS (Durasi Tetap)</h4>
       </div>
-      <div class="session-subtitle">Management durasi sewa &amp; tagihan otomatis.</div>
+      <div class="session-subtitle">Buat sesi PS dengan durasi tetap, hitung tagihan otomatis, dan pantau riwayat sesi.</div>
     </div>
     <div class="d-flex align-items-center gap-2 d-print-none session-header-actions">
-      <button type="button" class="btn btn-soft-dark btn-sm px-3 py-2" onclick="location.reload()">
-        <i class="bi bi-arrow-clockwise me-1"></i> Refresh
-      </button>
+      <button type="button" class="btn btn-soft-dark" onclick="location.reload()"><i class="bi bi-arrow-clockwise me-1"></i> Refresh</button>
     </div>
   </div>
 
-  <div class="row g-4">
-    
-    {{-- KIRI: FORM BUAT SESI --}}
-    <div class="col-lg-5">
+  <div class="row g-3">
+    {{-- FORM BUAT SESI (Kiri) --}}
+    <div class="col-lg-6">
       <div class="card session-card h-100">
-        <div class="card-body p-4">
-          <h6 class="mb-4 fw-bold text-uppercase small text-secondary border-bottom border-secondary pb-2">
-            <i class="bi bi-plus-circle me-2"></i> Buat Sesi Baru
-          </h6>
-
+        <div class="card-body">
+          <h6 class="mb-3 fw-bold text-uppercase small text-gray-300">Buat sesi &amp; tagih</h6>
           <form method="post" action="{{ route('sessions.fixed') }}" id="fixedForm">
             @csrf
 
-            <div class="mb-3">
-              <label class="form-label">Pilih Unit PS</label>
-              <select class="form-select" name="ps_unit_id" id="unitSel" required>
-                <option value="">-- Pilih Unit --</option>
-                @foreach($units as $u)
-                  <option value="{{ $u->id }}" 
-                          data-rate="{{ $u->hourly_rate }}" 
-                          data-type="{{ $u->type ?? 'PS4' }}">
-                    {{ $u->name }} [{{ $u->type ?? 'PS4' }}]
-                  </option>
-                @endforeach
+            <label class="form-label">Pilih Unit PS</label>
+            <select class="form-select" name="ps_unit_id" id="unitSel" required>
+              <option value="">-- pilih --</option>
+              @foreach($units as $u)
+                <option value="{{ $u->id }}" 
+                        data-rate="{{ $u->hourly_rate }}" 
+                        data-type="{{ $u->type ?? 'PS4' }}">
+                  {{ $u->name }} [{{ $u->type ?? 'PS4' }}] — Rp {{ number_format($u->hourly_rate,0,',','.') }}/jam
+                </option>
+              @endforeach
+            </select>
+
+            {{-- ARCADE DIHAPUS, TINGGAL STIK TAMBAHAN --}}
+            <div class="mt-3">
+              <label class="form-label">Tambahan Stik</label>
+              <select class="form-select" id="extraSel" name="extra_controllers">
+                @for($n=0;$n<=4;$n++)<option value="{{ $n }}">{{ $n }}</option>@endfor
               </select>
             </div>
 
-            <div class="row g-3 mb-3">
-              <div class="col-6">
-                <label class="form-label">Stik Tambahan</label>
-                <select class="form-select" id="extraSel" name="extra_controllers">
-                  @for($n=0;$n<=4;$n++)<option value="{{ $n }}">{{ $n }}</option>@endfor
-                </select>
-              </div>
-              <div class="col-6">
-                <label class="form-label">Arcade Stick</label>
-                <select class="form-select" id="arcadeSel" name="arcade_controllers">
-                  @for($n=0;$n<=2;$n++)<option value="{{ $n }}">{{ $n }}</option>@endfor
-                </select>
-              </div>
-            </div>
+            <label class="form-label mt-3">Waktu Mulai</label>
+            <input type="datetime-local" class="form-control" name="start_time" id="startInput" value="{{ \Carbon\Carbon::now()->format('Y-m-d\TH:i') }}" required>
 
-            <div class="mb-3">
-                <label class="form-label">Durasi Main</label>
-                <div class="input-group">
-                    <select class="form-select" id="hoursSel" name="hours">
-                      <option value="0.5">30 Menit</option>
-                      @for($h=1;$h<=12;$h++)<option value="{{ $h }}">{{ $h }} Jam</option>@endfor
-                    </select>
-                    <span class="input-group-text bg-dark border-secondary text-light">
-                        <i class="bi bi-hourglass-split"></i>
-                    </span>
-                </div>
-            </div>
+            <label class="form-label mt-3">Durasi</label>
+            {{-- DURASI HANYA SAMPAI 6 JAM --}}
+            <select class="form-select" id="hoursSel" name="hours">
+              <option value="0.5">30 menit</option>
+              @for($h=1; $h<=6; $h++) 
+                <option value="{{ $h }}">{{ $h }} jam</option>
+              @endfor
+            </select>
 
-            <div class="mb-3">
-                <label class="form-label">Waktu Mulai</label>
-                <input type="datetime-local" class="form-control" name="start_time" id="startInput" value="{{ \Carbon\Carbon::now()->format('Y-m-d\TH:i') }}" required>
-            </div>
-
-            <div class="p-3 rounded-3 mb-3" style="background: rgba(0,0,0,0.2);">
-                <div class="calc-line">
-                    <span>Estimasi Selesai</span>
-                    <span id="endLbl" class="text-warning">—:—</span>
-                </div>
-                <div class="calc-line border-top border-secondary pt-2 mt-2">
-                    <span class="fs-5">Total Tagihan</span>
-                    <span id="billLbl" class="fs-4 text-success">Rp 0</span>
-                </div>
-            </div>
-
-            <div class="row g-3 mb-4">
-              <div class="col-6">
-                <label class="form-label small">Metode Bayar</label>
-                <select name="payment_method" id="payMethod" class="form-select form-select-sm">
+            <div class="row mt-3 g-2">
+              <div class="col-md-4">
+                <label class="form-label">Metode Bayar</label>
+                <select name="payment_method" id="payMethod" class="form-select">
                   <option value="Tunai">Tunai</option>
                   <option value="QRIS">QRIS</option>
                   <option value="Transfer">Transfer</option>
                 </select>
               </div>
-              <div class="col-6">
-                <label class="form-label small">Uang Diterima</label>
-                <input type="number" class="form-control form-control-sm" name="paid_amount" id="paidAmount" placeholder="0">
+              <div class="col-md-4">
+                <label class="form-label">Dibayar</label>
+                <input type="number" class="form-control" name="paid_amount" id="paidAmount" value="" min="0">
               </div>
-              <div class="col-12">
-                  <div class="d-flex justify-content-between align-items-center small text-muted">
-                      <span>Kembalian:</span>
-                      <input type="text" id="changeLbl" class="form-control form-control-sm text-end fw-bold text-info" style="width: 120px; border:none; background:transparent;" value="Rp 0" readonly>
-                  </div>
+              <div class="col-md-4">
+                <label class="form-label">Kembalian</label>
+                <input type="text" class="form-control" id="changeLbl" value="Rp 0" readonly>
               </div>
             </div>
 
-            <button class="btn-main-submit">
-              <i class="bi bi-check-lg me-2"></i> PROSES & TAGIH
-            </button>
+            <div class="mt-3 small">
+              <div class="calc-line">Selesai jam: <span id="endLbl">—:—</span></div>
+              <div class="calc-line">Total tagihan: <span id="billLbl" class="text-success fs-5">Rp 0</span></div>
+            </div>
+
+            <button class="btn btn-main-submit mt-3"><i class="bi bi-play-circle me-1"></i> Buat &amp; Tagih</button>
           </form>
         </div>
       </div>
     </div>
 
-    {{-- KANAN: RIWAYAT SESI --}}
-    <div class="col-lg-7">
+    {{-- RIWAYAT SESI (Kanan) --}}
+    <div class="col-lg-6">
       <div class="card session-card h-100">
         <div class="card-header session-card-header d-flex justify-content-between align-items-center">
-          <span><i class="bi bi-clock-history me-2"></i> Riwayat Sesi</span>
-          <span class="badge bg-dark border border-secondary">{{ $closed_sessions->count() }} Data</span>
+          <span>Riwayat Sesi (Terakhir 20)</span>
+          <span class="badge bg-secondary-subtle text-dark d-print-none">{{ $closed_sessions->count() }} sesi</span>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive session-history-scroll">
-            <table class="table table-neon">
+            <table class="table table-sm table-hover m-0 align-middle table-neon">
               <thead>
                 <tr>
-                  <th style="width: 30%;">Unit / Paket</th>
-                  <th>Waktu</th>
+                  <th>Unit / Paket</th>
+                  <th class="text-nowrap">Waktu</th>
                   <th class="text-center">Durasi</th>
                   <th class="text-end">Tagihan</th>
-                  <th class="text-end">Aksi</th>
+                  <th class="text-end d-print-none">Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 @forelse($closed_sessions as $s)
                   <tr>
-                    <td>
-                      <div class="d-flex align-items-center mb-1">
-                          <span class="unit-name">{{ $s->psUnit->name ?? '-' }}</span>
-                          {{-- Badge Tipe Unit Keren --}}
-                          <span class="badge-type">{{ $s->psUnit->type ?? 'PS4' }}</span>
-                      </div>
-                      
-                      <div class="d-flex flex-wrap gap-1">
-                          @if(!empty($s->extra_controllers) && $s->extra_controllers > 0)
-                            <span class="badge-addon"><i class="bi bi-controller"></i> +{{ $s->extra_controllers }}</span>
-                          @endif
-                          @if(!empty($s->arcade_controllers) && $s->arcade_controllers > 0)
-                            <span class="badge-addon"><i class="bi bi-joystick"></i> +{{ $s->arcade_controllers }}</span>
-                          @endif
-                      </div>
+                    <td class="text-white">
+                      <div class="fw-bold">{{ $s->psUnit->name ?? '-' }}</div>
+                      <span class="badge-type">{{ $s->psUnit->type ?? 'PS4' }}</span>
+
+                      @if(!empty($s->extra_controllers) && $s->extra_controllers > 0)
+                        <span class="badge badge-addon ms-1">+Stik {{ $s->extra_controllers }}</span>
+                      @endif
+                      {{-- Arcade tetap ditampilkan di history jika ada data lama, tapi inputnya sudah dihapus --}}
+                      @if(!empty($s->arcade_controllers) && $s->arcade_controllers > 0)
+                        <span class="badge badge-addon ms-1">Arcade {{ $s->arcade_controllers }}</span>
+                      @endif
                     </td>
-                    <td>
-                      <div class="d-flex flex-column small text-secondary">
-                          <span><i class="bi bi-play-fill me-1"></i> {{ \Carbon\Carbon::parse($s->start_time)->format('H:i') }}</span>
-                          <span><i class="bi bi-stop-fill me-1"></i> {{ $s->end_time ? \Carbon\Carbon::parse($s->end_time)->format('H:i') : '-' }}</span>
-                      </div>
+                    <td class="text-nowrap small text-secondary">
+                        <div><i class="bi bi-play-fill me-1"></i> {{ \Carbon\Carbon::parse($s->start_time)->format('H:i') }}</div>
+                        <div><i class="bi bi-stop-fill me-1"></i> {{ $s->end_time ? \Carbon\Carbon::parse($s->end_time)->format('H:i') : '-' }}</div>
                     </td>
                     <td class="text-center">
                       <span class="badge bg-secondary bg-opacity-25 text-light border border-secondary border-opacity-25">
-                        {{ intdiv($s->minutes ?? 0, 60) }} Jam
+                        {{ intdiv($s->minutes ?? 0, 60) }} jam
                         @if(($s->minutes % 60) > 0) {{ $s->minutes % 60 }} m @endif
                       </span>
                     </td>
-                    <td class="text-end amount-mono">
-                      Rp {{ number_format($s->bill ?? 0,0,',','.') }}
-                    </td>
-                    <td class="text-end">
-                      <form class="d-inline confirm-delete" method="post"
-                            action="{{ route('sessions.delete', ['sid' => $s->id]) }}"
-                            data-confirm="Hapus riwayat sesi ini? Laporan keuangan terkait juga akan dihapus.">
-                        @csrf @method('DELETE')
-                        <button class="btn-delete-xs">
-                          <i class="bi bi-trash3-fill"></i>
-                        </button>
-                      </form>
+                    <td class="text-end mono text-info">Rp {{ number_format($s->bill ?? 0,0,',','.') }}</td>
+                    <td class="text-end d-print-none">
+                      {{-- [UPDATED] Mengirim parameter rate, extra stik, dan arcade ke fungsi JS --}}
+                      <button class="btn-add-time" 
+                              onclick="openAddTimeModal(
+                                '{{ $s->id }}', 
+                                '{{ $s->psUnit->name ?? 'Unit' }}',
+                                {{ $s->psUnit->hourly_rate ?? 10000 }},
+                                {{ $s->extra_controllers ?? 0 }},
+                                {{ $s->arcade_controllers ?? 0 }}
+                              )">
+                        <i class="bi bi-plus-circle-fill"></i> Jam
+                      </button>
+
+                      {{-- TOMBOL HAPUS: HANYA UNTUK ADMIN/BOS --}}
+                      @if(auth()->user() && auth()->user()->role === 'admin')
+                          <form class="d-inline confirm-delete" method="post"
+                                action="{{ route('sessions.delete', ['sid' => $s->id]) }}"
+                                data-confirm="Hapus riwayat sesi ini? Pendapatan di laporan akan ikut terhapus.">
+                            @csrf @method('DELETE')
+                            <button class="btn-delete-xs">
+                                <i class="bi bi-trash3-fill"></i>
+                            </button>
+                          </form>
+                      @endif
                     </td>
                   </tr>
                 @empty
-                  <tr>
-                    <td colspan="5" class="text-center text-muted py-5">
-                      <i class="bi bi-inbox display-6 d-block mb-3 opacity-25"></i>
-                      Belum ada riwayat sesi hari ini.
-                    </td>
-                  </tr>
+                  <tr><td colspan="5" class="text-center text-muted p-3">Belum ada sesi.</td></tr>
                 @endforelse
               </tbody>
             </table>
@@ -456,112 +476,294 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>
+
+{{-- MODAL TAMBAH JAM (UPDATED) --}}
+<div class="modal fade modal-glass" id="addTimeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-white">Tambah Waktu Main</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pt-3">
+        <p class="text-muted small mb-3">
+            Menambahkan durasi pada sesi unit: <strong id="addTimeUnitName" class="text-white"></strong><br>
+            <span id="rateInfo" class="small fst-italic text-secondary"></span>
+        </p>
+        
+        <form id="addTimeForm" method="post" action="{{ route('sessions.add_time') }}">
+          @csrf
+          <input type="hidden" name="session_id" id="addTimeSessionId">
+          {{-- [BARU] Input Hidden untuk simpan tarif agar bisa dihitung JS --}}
+          <input type="hidden" id="rawHourlyRate" value="0">
+          <input type="hidden" id="rawExtraCtrl" value="0">
+          <input type="hidden" id="rawArcadeCtrl" value="0">
+          {{-- [BARU] Input Hidden untuk menyimpan total biaya tambahan hasil kalkulasi --}}
+          <input type="hidden" id="rawAddCost" value="0">
+          
+          <div class="mb-3">
+            <label class="form-label small text-muted">Durasi Tambahan</label>
+            <select name="hours" id="addTimeHours" class="form-select text-white" style="background: rgba(15,23,42,.6); border-color: rgba(148,163,184,.3);">
+              <option value="0.5">30 Menit</option>
+              @for($h=1; $h<=5; $h++)
+                <option value="{{ $h }}">{{ $h }} Jam</option>
+              @endfor
+            </select>
+          </div>
+
+          {{-- [BARU] ESTIMASI BIAYA --}}
+          <div class="price-display-box">
+             <div class="d-flex justify-content-between align-items-center">
+                 <span class="small text-success">Biaya Tambahan:</span>
+                 <span class="fw-bold fs-5 text-success" id="addTimeCostDisplay">Rp 0</span>
+             </div>
+             <div class="small text-muted text-end mt-1" style="font-size: 0.7rem;">
+                *Tarif paket berlaku (Misal 3 Jam = 25rb)
+             </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Metode Bayar Tambahan</label>
+            <select name="payment_method" class="form-select text-white" style="background: rgba(15,23,42,.6); border-color: rgba(148,163,184,.3);">
+               <option value="Tunai">Tunai</option>
+               <option value="QRIS">QRIS</option>
+               <option value="Transfer">Transfer</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+             <label class="form-label small text-muted">Uang Diterima (Wajib)</label>
+             <input type="number" id="addTimePaid" name="paid_amount" class="form-control text-white" placeholder="0" required style="background: rgba(15,23,42,.6); border-color: rgba(148,163,184,.3);">
+          </div>
+          
+          <div class="mb-3">
+             <label class="form-label small text-muted">Kembalian</label>
+             <input type="text" id="addTimeChange" class="form-control text-white" value="Rp 0" readonly style="background: rgba(15,23,42,.4); border-color: rgba(148,163,184,.15); color: #9ca3af;">
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-main-submit w-auto px-4 py-2">Simpan & Perbarui Tagihan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 @endsection
 
 @push('scripts')
 <script>
 (function(){
-  // Konstanta harga tambahan
+  // KONSTANTA HARGA (Arcade Dihapus dari UI, tapi tetap saya simpan konstanta jika ada data lama)
   const EX_RATE = 10000; 
-  const ARC_RATE = 15000;
-  
-  // Helper format rupiah
+  const KEY_TIMERS = 'fixplay.rental.timers';
   function fmtIDR(n){ return (n||0).toLocaleString('id-ID'); }
-
-  // Ambil nilai dari form
+  
+  // Fungsi Ambil Data Input (Tanpa Arcade)
   function getNumbers(){
     const unit = document.getElementById('unitSel');
     return {
       base: parseFloat(unit?.selectedOptions[0]?.dataset?.rate || '0'),
       type: unit?.selectedOptions[0]?.dataset?.type || 'PS4',
       extra: parseInt(document.getElementById('extraSel').value || '0', 10),
-      arcade: parseInt(document.getElementById('arcadeSel').value || '0', 10),
+      // arcade di-hardcode 0 karena inputnya sudah dihapus
+      arcade: 0, 
       hours: parseFloat(document.getElementById('hoursSel').value || '0'),
     };
   }
+  function getUnitName(){ return (document.getElementById('unitSel')?.selectedOptions?.[0]?.textContent || '').split(' [')[0].trim(); }
+  function getStartDT(){ const v=document.getElementById('startInput').value; return v?new Date(v):null; }
+  
+  // LocalStorage logic (Timer)
+  function loadTimers(){ try{return JSON.parse(localStorage.getItem(KEY_TIMERS)||'[]')}catch(e){return[]} }
+  function saveTimers(arr){ localStorage.setItem(KEY_TIMERS, JSON.stringify(arr)); }
+  function saveTimer(){
+    const unitName = getUnitName(), start = getStartDT(), hours = parseFloat(document.getElementById('hoursSel').value || '0');
+    if (!unitName || !start || !(hours>0)) return;
+    const endAt = new Date(start.getTime() + hours*60*60*1000).toISOString();
+    const timers = loadTimers();
+    timers.push({id:Date.now()+'-'+Math.random().toString(36).slice(2),unit:unitName,endAt:endAt,notified:false});
+    saveTimers(timers.filter(t=>(Date.now()-new Date(t.endAt).getTime())<24*3600*1000));
+  }
 
+  let currentBill = 0;
   function roundToThousandCeil(n){ return Math.ceil(n/1000)*1000; }
 
-  // Fungsi kalkulasi utama
   function updateCalc(){
-    const startInput = document.getElementById('startInput').value;
-    const {base, type, extra, arcade, hours} = getNumbers();
+    const start = document.getElementById('startInput').value;
+    const {base, type, extra, hours} = getNumbers();
     const endLbl = document.getElementById('endLbl');
-
-    // Hitung Jam Selesai
     try{
-      if(startInput && hours>0){
-        const dt = new Date(startInput);
+      if(start && hours>0){
+        const dt = new Date(document.getElementById('startInput').value);
         dt.setTime(dt.getTime() + Math.round(hours * 3600 * 1000));
         endLbl.textContent = String(dt.getHours()).padStart(2,'0') + ':' + String(dt.getMinutes()).padStart(2,'0');
       }else{ endLbl.textContent='—:—'; }
     }catch(e){ endLbl.textContent='—:—'; }
 
-    // Hitung Harga
-    const extrasCost = (extra * EX_RATE) + (arcade * ARC_RATE);
+    // LOGIKA HARGA BARU (Diskon Paket - Termasuk > 6 Jam)
+    const extrasCost = (extra * EX_RATE); 
     const totalExtras = extrasCost * hours;
     let unitBill = 0;
 
-    // LOGIKA HARGA PAKET
     if (type === 'PS4' && base === 10000) { 
         if (hours === 3) unitBill = 25000;
         else if (hours === 4) unitBill = 35000;
         else if (hours === 5) unitBill = 45000;
         else if (hours === 6) unitBill = 50000;
+        else if (hours > 6) {
+            // Logika > 6 Jam: Paket 6 Jam + Sisa Jam Normal
+            const extraHours = hours - 6;
+            unitBill = 50000 + (extraHours * 10000);
+        }
         else unitBill = base * hours;
     } else {
         unitBill = base * hours;
     }
 
     let rawBill = unitBill + totalExtras;
-    
-    // Pembulatan khusus 30 menit
     if (hours === 0.5) rawBill = roundToThousandCeil(rawBill);
     else rawBill = Math.round(rawBill);
 
-    // Update UI
-    document.getElementById('billLbl').textContent = 'Rp ' + fmtIDR(rawBill);
-    
-    // Update Kembalian
-    const paidInput = document.getElementById('paidAmount');
-    const paid = parseInt(paidInput.value || '0', 10);
-    const change = Math.max(0, paid - rawBill);
-    document.getElementById('changeLbl').value = 'Rp ' + fmtIDR(change);
-    
-    // Simpan tagihan saat ini untuk validasi submit
-    window.currentTotalBill = rawBill;
+    currentBill = rawBill || 0;
+    document.getElementById('billLbl').textContent = 'Rp ' + fmtIDR(currentBill);
+    updateChange();
   }
 
-  // Event Listeners
-  const inputs = ['unitSel','extraSel','arcadeSel','hoursSel','startInput','paidAmount'];
-  inputs.forEach(id => {
-    const el = document.getElementById(id);
-    if(el){
-      el.addEventListener('change', updateCalc);
-      el.addEventListener('input', updateCalc);
-    }
-  });
+  function updateChange(){
+    const method = (document.getElementById('payMethod')?.value||'Tunai').toLowerCase();
+    const paid = parseInt(document.getElementById('paidAmount')?.value||'0',10);
+    const change = method==='tunai' ? Math.max(0, paid-(currentBill||0)) : 0;
+    const out = document.getElementById('changeLbl');
+    if(out) out.value = 'Rp ' + fmtIDR(change);
+  }
 
-  // Validasi Submit
   const formEl = document.getElementById('fixedForm');
   if(formEl){
     formEl.addEventListener('submit', function(e){
-      const method = document.getElementById('payMethod').value;
-      const paid = parseInt(document.getElementById('paidAmount').value||'0', 10);
+      const method = (document.getElementById('payMethod')?.value||'Tunai').toLowerCase();
+      const paid = parseInt(document.getElementById('paidAmount')?.value||'0',10);
+      // Ambil bill langsung dari kalkulasi
+      const currentBill = parseInt(document.getElementById('billLbl').textContent.replace(/[^0-9]/g,''));
       
-      if (method === 'Tunai' && paid < window.currentTotalBill){
-        e.preventDefault();
-        alert('Uang pembayaran kurang dari total tagihan!');
-      }
-      // Tidak perlu blok try-catch saveTimer() jika tidak menggunakan fitur timer local storage
+      if (method==='tunai' && paid<currentBill){ e.preventDefault(); alert('Pembayaran tunai kurang.'); return; }
+      try { saveTimer(); } catch(err){}
     });
   }
 
-  // Init
+  // Arcade dihapus dari listener
+  ['unitSel','extraSel','hoursSel','startInput'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){ el.addEventListener('change', updateCalc); el.addEventListener('input', updateCalc); }
+  });
+  document.getElementById('payMethod')?.addEventListener('change', updateChange);
+  document.getElementById('paidAmount')?.addEventListener('input', updateChange);
   updateCalc();
 })();
+
+// === [UPDATED] LOGIKA BARU MODAL TAMBAH JAM ===
+function fmtIDRModal(n){ return (n||0).toLocaleString('id-ID'); }
+
+function openAddTimeModal(sessionId, unitName, hourlyRate, extraCtrl, arcadeCtrl) {
+    document.getElementById('addTimeSessionId').value = sessionId;
+    document.getElementById('addTimeUnitName').textContent = unitName;
+    
+    // Set variable hidden
+    document.getElementById('rawHourlyRate').value = hourlyRate;
+    document.getElementById('rawExtraCtrl').value = extraCtrl;
+    document.getElementById('rawArcadeCtrl').value = arcadeCtrl;
+
+    document.getElementById('rateInfo').textContent = `Rate: Rp ${fmtIDRModal(hourlyRate)}/jam`;
+
+    // Kalkulasi Realtime
+    const calcAddOn = () => {
+        const h = parseFloat(document.getElementById('addTimeHours').value || 0);
+        const rate = parseFloat(document.getElementById('rawHourlyRate').value || 0);
+        const ex = parseInt(document.getElementById('rawExtraCtrl').value || 0);
+        const arc = parseInt(document.getElementById('rawArcadeCtrl').value || 0);
+
+        // --- LOGIKA PAKET KHUSUS TAMBAH WAKTU ---
+        // Jika tarif unit 10.000 (Regular), gunakan skema paket untuk jam tambahan (mandiri)
+        let unitCost = 0;
+        
+        if (rate === 10000) {
+            if (h === 3) unitCost = 25000;
+            else if (h === 4) unitCost = 35000;
+            else if (h === 5) unitCost = 45000;
+            else if (h === 6) unitCost = 50000;
+            else if (h > 6) {
+                // Paket 6 jam (50k) + sisa jam dikali tarif normal
+                unitCost = 50000 + ((h - 6) * rate);
+            } else {
+                // Untuk durasi < 3 jam (0.5, 1, 2), tarif normal (flat)
+                // 1 jam = 10k, 2 jam = 20k
+                unitCost = h * rate;
+            }
+        } else {
+            // Untuk unit non-reguler (misal VIP), gunakan tarif flat per jam
+            unitCost = h * rate;
+        }
+
+        // Biaya tambahan alat (Stik/Arcade) selalu flat per jam
+        const extrasCost = (ex * 10000 * h) + (arc * 15000 * h);
+        
+        // Total Biaya Tambahan
+        let total = unitCost + extrasCost;
+
+        // Pembulatan 30 menit (jika hasil pecahan)
+        if(h === 0.5) total = Math.ceil(total/1000)*1000;
+        else total = Math.round(total);
+
+        // Update nilai ke input hidden untuk validasi
+        document.getElementById('rawAddCost').value = total;
+        document.getElementById('addTimeCostDisplay').textContent = 'Rp ' + fmtIDRModal(total);
+
+        // Hitung ulang kembalian setiap kali biaya berubah
+        calcChange();
+    };
+
+    // Fungsi Hitung Kembalian
+    const calcChange = () => {
+        const cost = parseFloat(document.getElementById('rawAddCost').value || 0);
+        const paid = parseFloat(document.getElementById('addTimePaid').value || 0);
+        
+        // Hitung kembalian, minimal 0
+        const change = Math.max(0, paid - cost);
+        
+        document.getElementById('addTimeChange').value = 'Rp ' + fmtIDRModal(change);
+    }
+
+    // Attach Listener
+    const sel = document.getElementById('addTimeHours');
+    sel.onchange = calcAddOn;
+    
+    // Attach Listener untuk input uang
+    const paidInput = document.getElementById('addTimePaid');
+    paidInput.oninput = calcChange;
+    
+    // Jalankan sekali saat buka
+    calcAddOn();
+
+    // VALIDASI PEMBAYARAN PADA SUBMIT
+    const form = document.getElementById('addTimeForm');
+    form.onsubmit = function(e) {
+        const cost = parseFloat(document.getElementById('rawAddCost').value || 0);
+        const paid = parseFloat(document.getElementById('addTimePaid').value || 0);
+
+        if (paid < cost) {
+            e.preventDefault();
+            alert('Pembayaran gagal: Uang diterima kurang dari biaya tambahan sebesar Rp ' + fmtIDRModal(cost));
+            return false;
+        }
+    };
+    
+    const modalEl = document.getElementById('addTimeModal');
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+}
 </script>
 @endpush

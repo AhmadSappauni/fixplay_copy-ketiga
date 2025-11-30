@@ -49,11 +49,11 @@
           </div>
 
           <div class="col-md-4 d-flex gap-2 justify-content-end">
-            <button type="submit"
+            {{-- <button type="submit"
                     class="fx-btn-outline flex-fill"
                     formaction="{{ route('presensi.checkout') }}">
               <i class="bi bi-box-arrow-right me-1"></i> Check-out
-            </button>
+            </button> --}}
 
             <button type="submit"
                     class="fx-btn-primary flex-fill"
@@ -97,7 +97,7 @@
 
                         <span>{{ $row->karyawan->nama }}</span>
                     </div>
-                    </td>
+                  </td>
 
                   <td>
                     @php
@@ -108,10 +108,33 @@
                     <span class="fx-badge-pill">
                         {{ $shiftLabel }}
                     </span>
-                    </td>
+                  </td>
 
-                    <td>{{ $row->check_in ? \Carbon\Carbon::parse($row->check_in)->format('H:i') : '-' }}</td>
-                    <td>{{ $row->check_out ? \Carbon\Carbon::parse($row->check_out)->format('H:i') : '-' }}</td>
+                  {{-- JAM MASUK --}}
+                  <td>{{ $row->check_in ? \Carbon\Carbon::parse($row->check_in)->format('H:i') : '-' }}</td>
+                  
+                  {{-- JAM KELUAR / TOMBOL KELUAR --}}
+                  <td>
+                    @if($row->check_out)
+                        {{ \Carbon\Carbon::parse($row->check_out)->format('H:i') }}
+                    @elseif($row->check_in)
+                        {{-- Jika sudah check-in tapi belum check-out, tampilkan tombol --}}
+                        <form action="{{ route('presensi.checkout') }}" method="POST" class="d-inline">
+                            @csrf
+                            <input type="hidden" name="karyawan_id" value="{{ $row->karyawan_id }}">
+                            <input type="hidden" name="shift" value="{{ $row->shift }}">
+                            
+                            <button type="submit" 
+                                    class="btn btn-sm btn-danger rounded-pill px-3 py-1 d-flex align-items-center gap-1" 
+                                    style="font-size: 0.75rem;">
+                                <i class="bi bi-box-arrow-right"></i> Keluar
+                            </button>
+                        </form>
+                    @else
+                        -
+                    @endif
+                  </td>
+
                   <td>
                     @if($row->status === 'telat')
                       <span class="fx-badge-status fx-badge-warning">Telat</span>

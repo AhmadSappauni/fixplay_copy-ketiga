@@ -277,11 +277,15 @@
                         <a href="{{ route('sales.edit', $t['id']) }}" class="btn btn-outline-warning me-1" title="Edit">
                           Edit
                         </a>
-                        {{-- Hapus --}}
-                        <form class="d-inline" method="POST" action="{{ route('sales.destroy', $t['id']) }}" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?');">
-                          @csrf @method('DELETE')
-                          <button type="submit" class="btn btn-outline-danger" title="Hapus">Hapus</button>
-                        </form>
+                        
+                        {{-- Hapus (HANYA BOS / ADMIN) --}}
+                        {{-- Pastikan di DB kolomnya 'role' dan isinya 'admin' (atau sesuaikan) --}}
+                        @if(auth()->user() && auth()->user()->role === 'boss')
+                            <form class="d-inline" method="POST" action="{{ route('sales.destroy', $t['id']) }}" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?');">
+                              @csrf @method('DELETE')
+                              <button type="submit" class="btn btn-outline-danger" title="Hapus">Hapus</button>
+                            </form>
+                        @endif
                     </div>
                   </td>
                 </tr>

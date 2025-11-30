@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Concerns\HasUuids; // 1. PENTING: Import ini
+use Illuminate\Database\Eloquent\Concerns\HasUuids; // PENTING: Ini harus ada
 
 class GameSession extends Model
 {
-    // 2. PENTING: Gunakan Trait HasUuids agar ID terisi otomatis
+    // PENTING: Ini harus ada agar sinkron dengan database yang pakai UUID
     use HasFactory, HasUuids; 
 
     // Pastikan nama tabel sesuai dengan database Anda

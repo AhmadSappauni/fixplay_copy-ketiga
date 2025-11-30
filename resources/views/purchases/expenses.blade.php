@@ -277,7 +277,7 @@
               <label class="form-label fx-form-label">Tanggal &amp; Waktu (opsional)</label>
               <input name="timestamp" type="datetime-local" class="form-control" value="{{ old('timestamp') }}">
             </div>
-            <small class="text-muted d-block mt-1 mb-4" style="font-size: 0.75rem;">
+            <small class="text-grey d-block mt-1 mb-4" style="font-size: 0.75rem;">
               * Jika dikosongkan, sistem akan memakai waktu saat ini.
             </small>
 
@@ -327,7 +327,7 @@
                             {{ $e->description ?: '-' }}
                         </div>
                     </td>
-                    <td class="text-end amount-mono">
+                    <td class="text-end amount-mono text-white fw-bold">
                       Rp {{ number_format($e->amount,0,',','.') }}
                     </td>
                     <td class="text-end d-print-none">

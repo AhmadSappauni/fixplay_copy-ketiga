@@ -132,3 +132,19 @@ Route::get('/buat-storage-link', function () {
     Artisan::call('storage:link');
     return 'Folder Storage berhasil di-link! Silakan kembali ke halaman karyawan.';
 });
+
+// ...
+// Sessions (rental)
+Route::get('/sessions', [SessionsController::class, 'index'])->name('sessions.index');
+Route::post('/sessions/fixed', [SessionsController::class, 'storeFixed'])->name('sessions.fixed');
+Route::delete('/sessions/{sid}', [SessionsController::class, 'destroy'])->name('sessions.delete');
+
+// --- TAMBAHAN ROUTE BARU ---
+Route::post('/sessions/add-time', [SessionsController::class, 'addTime'])->name('sessions.add_time');
+// ---------------------------
+
+
+// ... route lainnya ...
+Route::get('/jadwal/report/excel', [JadwalKaryawanController::class, 'exportExcel'])->name('jadwal.report.excel');
+Route::get('/jadwal/report/pdf', [JadwalKaryawanController::class, 'exportPdf'])->name('jadwal.report.pdf');
+// ...

@@ -248,6 +248,14 @@
     box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
   }
 
+  /* Style Tambahan untuk Pesan Error Validasi */
+  .invalid-feedback {
+      display: block;
+      font-size: 0.75rem;
+      color: #fca5a5;
+      margin-top: 0.25rem;
+  }
+
   /* ====== RESPONSIVE ====== */
   @media (max-width: 992px){
     .unit-shell{ padding:1.35rem 1.1rem 2rem; border-radius:1.1rem; }
@@ -303,6 +311,18 @@
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
   @endif
+  
+  {{-- TAMPILKAN ERROR VALIDASI UMUM (LIST JIKA BANYAK) --}}
+  @if($errors->any())
+    <div class="alert alert-danger alert-dismissible fade show d-print-none bg-danger-subtle border-danger text-danger-emphasis" role="alert">
+        <ul class="mb-0 ps-3">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  @endif
 
   <div class="row g-4">
     <!-- KIRI: FORM TAMBAH UNIT PS -->
@@ -316,7 +336,16 @@
           @csrf
           <div class="mb-3">
             <label class="form-label">Nama Unit</label>
-            <input name="name" class="form-control unit-input" required value="{{ old('name') }}" placeholder="Contoh: Box 1">
+            {{-- Tambahkan class is-invalid jika ada error --}}
+            <input name="name" class="form-control unit-input @error('name') is-invalid @enderror" 
+                   required value="{{ old('name') }}" placeholder="Contoh: Box 1">
+            
+            {{-- Pesan Error Spesifik untuk Nama (Misal: Nama sudah ada) --}}
+            @error('name')
+                <div class="invalid-feedback">
+                    {{ $message }}
+                </div>
+            @enderror
           </div>
 
           {{-- DROPDOWN TIPE UNIT --}}
