@@ -20,6 +20,7 @@ class Sale extends Model
         // field yang sebelumnya ada di fillable kedua
         'total',
         'paid_amount',
+        'change_amount',
         'payment_method',
         'note',
         'user_id',

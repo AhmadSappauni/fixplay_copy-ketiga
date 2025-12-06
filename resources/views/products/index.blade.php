@@ -22,7 +22,7 @@
       0 0 0 1px rgba(148,163,255,.25) inset;
   }
 
-  /* HEADER BAR SEPERTI SCREENSHOT */
+  /* HEADER */
   .fp-header{
     display:flex;
     align-items:center;
@@ -188,6 +188,79 @@
     flex-wrap:wrap;
   }
 
+  /* ===== MODAL DARK NEON ===== */
+  .modal-backdrop.show{
+    background:#020617;
+    opacity:.80;
+  }
+
+  .fp-modal .modal-content{
+    border-radius:22px;
+    border:1px solid rgba(148,163,255,.45);
+    background:
+      radial-gradient(120% 140% at 0% 0%, rgba(129,140,248,.25), transparent 45%),
+      radial-gradient(120% 160% at 100% 0%, rgba(56,189,248,.18), transparent 55%),
+      linear-gradient(180deg,#020617,#020617);
+    color:#e5e7ff;
+    box-shadow:0 24px 60px rgba(15,23,42,.9);
+  }
+  .fp-modal .modal-header{
+    border-bottom:1px solid rgba(148,163,255,.35);
+    background:rgba(15,23,42,.92);
+    color:#e5e7ff;
+  }
+  .fp-modal .modal-title{
+    font-weight:800;
+  }
+  .fp-modal .btn-close{
+    filter:invert(1);
+    opacity:.7;
+  }
+  .fp-modal .btn-close:hover{ opacity:1; }
+
+  .fp-modal .modal-body{
+    background:transparent;
+  }
+  .fp-modal .form-label{
+    font-size:.85rem;
+    color:#e5e7ff;
+  }
+  .fp-modal .form-control{
+    background:#020617;
+    border-color:rgba(148,163,255,.55);
+    color:#e5e7ff;
+  }
+  .fp-modal .form-control:focus{
+    border-color:#6366f1;
+    box-shadow:0 0 0 1px rgba(129,140,248,.85);
+    background:#020617;
+  }
+
+  .fp-modal .modal-footer{
+    border-top:1px solid rgba(148,163,255,.28);
+    background:rgba(15,23,42,.96);
+  }
+  .fp-modal .btn-cancel{
+    border-radius:999px;
+    border:1px solid rgba(148,163,255,.5);
+    background:transparent;
+    color:#e5e7ff;
+  }
+  .fp-modal .btn-cancel:hover{
+    background:rgba(15,23,42,1);
+  }
+  .fp-modal .btn-save{
+    border-radius:999px;
+    border:none;
+    background:linear-gradient(135deg,#22c55e,#16a34a);
+    color:#f9fafb;
+    font-weight:700;
+    box-shadow:0 10px 24px rgba(34,197,94,.55);
+  }
+  .fp-modal .btn-save:hover{
+    filter:brightness(1.07);
+  }
+
   /* RESPONSIVE */
   @media (max-width: 768px){
     .fp-card{
@@ -219,7 +292,7 @@
 <div class="fp-card-shell">
   <div class="fp-card">
 
-    {{-- HEADER SEPERTI GAMBAR --}}
+    {{-- HEADER --}}
     <div class="fp-header mb-2">
       <div class="fp-header-main">
         <div class="fp-header-icon">
@@ -243,7 +316,10 @@
           Total produk:
           <span class="fw-bold text-white">{{ $items->total() }}</span>
         </div>
-        <button type="button" class="fp-btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreate">
+        <button type="button"
+                class="fp-btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#modalCreate">
           <i class="bi bi-plus-lg me-1"></i> Tambah Produk
         </button>
       </div>
@@ -289,9 +365,7 @@
               <td class="text-end">{{ $p->stock }}</td>
               <td>{{ $p->unit ?: 'pcs' }}</td>
               <td>
-                @php
-                  $isActive = $p->active ?? true;
-                @endphp
+                @php $isActive = $p->active ?? true; @endphp
                 <span class="fp-status-pill {{ $isActive ? '' : 'inactive' }}">
                   {{ $isActive ? 'Aktif' : 'Nonaktif' }}
                 </span>
@@ -346,15 +420,18 @@
   </div>
 </div>
 
-{{-- MODAL TAMBAH PRODUK (INLINE, TANPA @include) --}}
-<div class="modal fade" id="modalCreate" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+{{-- MODAL TAMBAH PRODUK (DARK NEON) --}}
+<div class="modal fade fp-modal" id="modalCreate" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-md">
     <form class="modal-content" method="POST" action="{{ route('products.store') }}">
       @csrf
       <div class="modal-header">
-        <h5 class="modal-title fw-bold">Tambah Produk</h5>
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-plus-circle me-2"></i> Tambah Produk
+        </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
+
       <div class="modal-body">
         <div class="mb-3">
           <label class="form-label">Nama produk</label>
@@ -362,26 +439,35 @@
         </div>
         <div class="mb-3">
           <label class="form-label">Kategori</label>
-          <input type="text" name="category" class="form-control" placeholder="Makanan / Minuman / Cemilan ...">
+          <input type="text" name="category" class="form-control"
+                 placeholder="Makanan / Minuman / Cemilan ...">
         </div>
         <div class="row g-2">
           <div class="col-md-6">
             <label class="form-label">Harga (Rp)</label>
-            <input type="number" name="price" class="form-control" min="0" value="0">
+            <input type="number" name="price" class="form-control" placeholder="0">
           </div>
           <div class="col-md-6">
             <label class="form-label">Stok awal</label>
-            <input type="number" name="stock" class="form-control" min="0" value="0">
+            <input type="number" name="stock" class="form-control" placeholder="0">
           </div>
         </div>
         <div class="mt-3">
           <label class="form-label">Satuan</label>
-          <input type="text" name="unit" class="form-control" placeholder="pcs / cup / botol ..." value="pcs">
+          <input type="text" name="unit" class="form-control"
+                 placeholder="pcs / cup / botol ..." value="pcs">
         </div>
       </div>
+
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-        <button type="submit" class="btn btn-primary">Simpan</button>
+        <button type="button"
+                class="btn btn-cancel"
+                data-bs-dismiss="modal">
+          Batal
+        </button>
+        <button type="submit" class="btn btn-save">
+          Simpan
+        </button>
       </div>
     </form>
   </div>

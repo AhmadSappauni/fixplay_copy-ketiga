@@ -77,7 +77,7 @@ class SessionsController extends Controller
 
             // Create Sale Header
             $sale = Sale::create([
-                'sold_at'        => $end, 
+                'sold_at'        => now(), 
                 'total'          => $totalBill, 
                 'total_amount'   => $totalBill, 
                 'paid_amount'    => $request->paid_amount,

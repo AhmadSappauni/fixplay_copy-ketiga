@@ -199,7 +199,7 @@
               type="number"
               name="price"
               class="form-control"
-              min="0"
+              placeholder="0"
               value="{{ old('price', $product->price) }}"
               required
             >
@@ -210,7 +210,7 @@
               type="number"
               name="stock"
               class="form-control"
-              min="0"
+              placeholder="0"
               value="{{ old('stock', $product->stock) }}"
               required
             >

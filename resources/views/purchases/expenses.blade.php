@@ -27,47 +27,27 @@
     filter:blur(40px);
     pointer-events:none;
   }
-  .fx-shell > *{
-    position:relative;
-    z-index:1;
-  }
+  .fx-shell > *{ position:relative; z-index:1; }
 
   .fx-header-icon{
-    width:38px;
-    height:38px;
-    border-radius:999px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
+    width:38px;height:38px;border-radius:999px;
+    display:inline-flex;align-items:center;justify-content:center;
     background:linear-gradient(135deg,#f97316,#facc15);
-    color:#111827;
-    box-shadow:0 10px 24px rgba(248,250,252,.2);
-    font-size:18px;
+    color:#111827;box-shadow:0 10px 24px rgba(248,250,252,.2);font-size:18px;
   }
-  .fx-title{
-    color:#f9fafb;
-  }
-  .fx-subtitle{
-    color:#9ca3af;
-    font-size:.8rem;
-  }
+  .fx-title{ color:#f9fafb; }
+  .fx-subtitle{ color:#9ca3af;font-size:.8rem; }
 
   .btn-soft-dark{
-    border-radius:999px;
-    border:1px solid rgba(148,163,184,.5);
-    background:rgba(15,23,42,.85);
-    color:#e5e7eb;
+    border-radius:999px;border:1px solid rgba(148,163,184,.5);
+    background:rgba(15,23,42,.85);color:#e5e7eb;
   }
-  .btn-soft-dark:hover{
-    background:rgba(15,23,42,1);
-    color:#fff;
-  }
+  .btn-soft-dark:hover{ background:rgba(15,23,42,1);color:#fff; }
 
   /* ====== CARD FUTURISTIK ====== */
   .fx-card{
     border-radius:1.2rem;
     border:1px solid rgba(148,163,184,.25);
-    /* Background Gelap Transparan */
     background: linear-gradient(145deg, rgba(2,6,23,0.9), rgba(15,23,42,0.8));
     box-shadow:0 20px 38px rgba(0,0,0,.6);
     backdrop-filter:blur(12px);
@@ -78,18 +58,12 @@
   .fx-card-header{
     border-bottom:1px solid rgba(148,163,184,.2);
     background: rgba(30, 41, 59, 0.4);
-    font-size:.78rem;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    font-weight:700;
-    padding: 1rem 1.25rem;
-    color: #94a3b8;
+    font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;
+    font-weight:700;padding: 1rem 1.25rem;color: #94a3b8;
   }
 
   .fx-form-label{
-    font-size:.8rem;
-    font-weight:600;
-    color:#cbd5f5;
+    font-size:.8rem;font-weight:600;color:#cbd5f5;
   }
 
   /* Input Style */
@@ -97,26 +71,20 @@
     background:rgba(15,23,42,.6);
     border-radius:.6rem;
     border:1px solid rgba(148,163,184,.3);
-    color:#f3f4f6;
-    font-size:.9rem;
+    color:#f3f4f6;font-size:.9rem;
   }
   .form-control:focus, .form-select:focus{
     border-color:#6366f1;
     box-shadow:0 0 0 2px rgba(99,102,241,.25);
-    background:rgba(2,6,23,.8);
-    color:#fff;
+    background:rgba(2,6,23,.8);color:#fff;
   }
   .form-control::placeholder { color:#6b7280; }
 
   /* Tombol Simpan */
   .btn-main-submit{
-    width: 100%;
-    border-radius:.75rem;
-    padding:.7rem;
-    font-weight:700;
-    background:linear-gradient(135deg,#3b82f6,#2563eb); /* Biru */
-    border:none;
-    color:#fff;
+    width: 100%;border-radius:.75rem;padding:.7rem;font-weight:700;
+    background:linear-gradient(135deg,#3b82f6,#2563eb);
+    border:none;color:#fff;
     box-shadow:0 4px 12px rgba(59, 130, 246, 0.4);
     transition: all 0.2s;
   }
@@ -128,26 +96,19 @@
 
   /* ====== TABEL RIWAYAT (DARK MODE) ====== */
   .table-neon{
-    margin-bottom:0;
-    color:#cbd5e1;
-    width: 100%;
+    margin-bottom:0;color:#cbd5e1;width: 100%;
   }
   .table-neon thead th{
     background:rgba(15, 23, 42, 0.8);
     border-bottom:1px solid rgba(55,65,81,.9);
-    color:#94a3b8;
-    text-transform:uppercase;
-    letter-spacing:.07em;
-    font-size:.75rem;
-    padding: 0.85rem 1rem;
+    color:#94a3b8;text-transform:uppercase;letter-spacing:.07em;
+    font-size:.75rem;padding: 0.85rem 1rem;
   }
   .table-neon tbody tr{
     border-color:rgba(31,41,55,.9);
     transition:background .14s ease, transform .06s ease;
   }
-  .table-neon tbody tr:hover{
-    background:rgba(79,70,229,.15);
-  }
+  .table-neon tbody tr:hover{ background:rgba(79,70,229,.15); }
   .table-neon td{
     background: transparent;
     border-bottom:1px solid rgba(31,41,55,.9);
@@ -157,7 +118,7 @@
 
   .amount-mono{
     font-family: 'Consolas', 'Monaco', monospace;
-    color: #f87171; /* Merah muda untuk pengeluaran */
+    color: #f87171;
     font-weight: 600;
   }
 
@@ -169,7 +130,7 @@
     transition: all 0.2s; color: #94a3b8;
   }
   .btn-icon:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
-  
+
   .btn-icon-edit { border-color: #fbbf24; color: #fbbf24; }
   .btn-icon-edit:hover { background: #fbbf24; color: #000; }
 
@@ -267,7 +228,7 @@
               <input name="description" class="form-control" placeholder="Opsional, mis. bulan November" value="{{ old('description') }}">
             </div>
             <div class="mb-3">
-              <label class="form-label fx-form-label">Jumlah (Rp)</label>
+              <label class="form-label fx-form-label">Total Harga (Rp)</label>
               <div class="input-group">
                   <span class="input-group-text bg-dark border-secondary text-secondary" style="font-size: 0.8rem;">Rp</span>
                   <input name="amount" type="number" class="form-control mono" value="{{ old('amount') }}" required placeholder="0">
@@ -332,23 +293,22 @@
                     </td>
                     <td class="text-end d-print-none">
                       <div class="btn-icon-group">
+                        {{-- TOMBOL EDIT: PAKAI DATA-* UNTUK MODAL --}}
                         <button type="button"
-                                class="btn-icon btn-icon-edit"
+                                class="btn-icon btn-icon-edit btn-edit-expense"
                                 title="Edit"
-                                onclick="return editExpense(
-                                  {{ $e->id }},
-                                  '{{ addslashes($e->category) }}',
-                                  '{{ addslashes($e->description ?: '') }}',
-                                  {{ $e->amount }},
-                                  '{{ $e->timestamp ? $e->timestamp->format('Y-m-d\\TH:i') : '' }}'
-                                )">
+                                data-id="{{ $e->id }}"
+                                data-category="{{ $e->category }}"
+                                data-description="{{ $e->description }}"
+                                data-amount="{{ $e->amount }}"
+                                data-timestamp="{{ optional($e->timestamp)->format('Y-m-d\TH:i') }}">
                           <i class="bi bi-pencil"></i>
                         </button>
 
+                        {{-- HAPUS (masih pakai konfirmasi global dari layout via class confirm-delete) --}}
                         <form class="d-inline confirm-delete"
                               method="post"
-                              action="{{ route('purchases.expenses.destroy', $e->id) }}"
-                              onsubmit="return confirm('Hapus pengeluaran ini?');">
+                              action="{{ route('purchases.expenses.destroy', $e->id) }}">
                           @csrf
                           @method('DELETE')
                           <button class="btn-icon btn-icon-del" title="Hapus">
@@ -378,58 +338,85 @@
     </div>
   </div>
 </div>
+
+{{-- MODAL EDIT PENGELUARAN --}}
+<div class="modal fade" id="expenseEditModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content fx-card">
+      <div class="fx-card-header">
+        <span><i class="bi bi-pencil-square me-2"></i> Edit Pengeluaran</span>
+      </div>
+      <form id="expenseEditForm" method="POST">
+        @csrf
+        @method('PUT')
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label fx-form-label">Kategori</label>
+            <input id="editCategory" name="category" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fx-form-label">Deskripsi</label>
+            <input id="editDescription" name="description" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fx-form-label">Total Harga (Rp)</label>
+            <div class="input-group">
+              <span class="input-group-text bg-dark border-secondary text-secondary" style="font-size: 0.8rem;">Rp</span>
+              <input id="editAmount" name="amount" type="number" class="form-control mono" required>
+            </div>
+          </div>
+          <div class="mb-0">
+            <label class="form-label fx-form-label">Tanggal &amp; Waktu</label>
+            <input id="editTimestamp" name="timestamp" type="datetime-local" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-between px-4 pb-4 pt-2 border-0">
+          <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">
+            Batal
+          </button>
+          <button type="submit" class="btn btn-main-submit btn-sm px-4" style="width:auto;">
+            <i class="bi bi-save me-1"></i> Simpan Perubahan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
-function editExpense(id, category, description, amount, ts) {
-  const newCat  = prompt("Kategori:", category || "");
-  if (newCat === null) return false;
+document.addEventListener('DOMContentLoaded', function () {
+  const baseUrl   = "{{ url('/purchases/expenses') }}";
+  const modalEl   = document.getElementById('expenseEditModal');
+  const editModal = modalEl ? new bootstrap.Modal(modalEl) : null;
 
-  const newDesc = prompt("Deskripsi:", description || "");
-  if (newDesc === null) return false;
+  const form      = document.getElementById('expenseEditForm');
+  const inCat     = document.getElementById('editCategory');
+  const inDesc    = document.getElementById('editDescription');
+  const inAmount  = document.getElementById('editAmount');
+  const inTs      = document.getElementById('editTimestamp');
 
-  const newAmt  = prompt("Jumlah (Rp):", amount);
-  if (newAmt === null) return false;
+  if (!editModal || !form) return;
 
-  const newTs   = prompt("Waktu (YYYY-MM-DDTHH:MM):", ts || "");
-  if (newTs === null) return false;
+  document.querySelectorAll('.btn-edit-expense').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const id    = this.dataset.id;
+      const cat   = this.dataset.category || '';
+      const desc  = this.dataset.description || '';
+      const amt   = this.dataset.amount || '';
+      const ts    = this.dataset.timestamp || '';
 
-  const form = document.createElement('form');
-  form.method = 'post';
-  form.action = '/purchases/expenses/' + id;
+      inCat.value    = cat;
+      inDesc.value   = desc;
+      inAmount.value = amt;
+      inTs.value     = ts;
 
-  const tokenMeta = document.querySelector('meta[name="csrf-token"]');
-  if (!tokenMeta) {
-    alert('CSRF token tidak ditemukan di halaman.');
-    return false;
-  }
+      form.action = baseUrl + '/' + id;
 
-  const token = tokenMeta.getAttribute('content');
-  const _token = document.createElement("input");
-  _token.type="hidden";
-  _token.name="_token";
-  _token.value=token;
-  form.appendChild(_token);
-
-  const _method = document.createElement("input");
-  _method.type="hidden";
-  _method.name="_method";
-  _method.value="PUT";
-  form.appendChild(_method);
-
-  [['category', newCat], ['description', newDesc], ['amount', newAmt], ['timestamp', newTs]].forEach(function(pair){
-    const k = pair[0], v = pair[1];
-    const i = document.createElement('input');
-    i.type='hidden';
-    i.name=k;
-    i.value=v;
-    form.appendChild(i);
+      editModal.show();
+    });
   });
-
-  document.body.appendChild(form);
-  form.submit();
-  return false;
-}
+});
 </script>
 @endpush
