@@ -312,13 +312,13 @@
                     </td>
                   </tr>
                 @empty
-                  <tr><td colspan="4" class="text-center text-muted p-4">Belum ada penjualan.</td></tr>
+                  <tr><td colspan="4" class="text-center text-light p-4">Belum ada penjualan.</td></tr>
                 @endforelse
               </tbody>
               <tfoot>
                 <tr class="fw-bold bg-dark bg-opacity-50">
                   <td colspan="2" class="text-end text-secondary">TOTAL PERIODE</td>
-                  <td class="text-end text-white">Rp {{ number_format($sales_total,0,',','.') }}</td>
+                  <td class="text-end text-success">Rp {{ number_format($sales_total,0,',','.') }}</td>
                   <td></td>
                 </tr>
               </tfoot>
@@ -415,7 +415,7 @@
                       <td class="text-end amount-mono text-white fw-bold">{{ number_format($r->total ?? 0,0,',','.') }}</td>
                   </tr>
                 @empty
-                  <tr><td colspan="4" class="text-center text-muted py-3">Tidak ada data.</td></tr>
+                  <tr><td colspan="4" class="text-center text-light py-3">Tidak ada data.</td></tr>
                 @endforelse
               </tbody>
             </table>
@@ -429,7 +429,7 @@
                     @forelse($weekly_rows as $r)
                       <tr><td class="text-white ">{{ $r->label }}</td><td class="text-end amount-mono text-white">{{ number_format($r->ps ?? 0,0,',','.') }}</td><td class="text-end amount-mono text-white">{{ number_format($r->prod ?? 0,0,',','.') }}</td><td class="text-end amount-mono text-white fw-bold">{{ number_format($r->total ?? 0,0,',','.') }}</td></tr>
                     @empty
-                      <tr><td colspan="4" class="text-center text-muted py-3">Tidak ada data.</td></tr>
+                      <tr><td colspan="4" class="text-center text-light py-3">Tidak ada data.</td></tr>
                     @endforelse
                   </tbody>
                 </table>
@@ -443,7 +443,7 @@
                     @forelse($monthly_rows as $r)
                       <tr><td class="text-white ">{{ $r->label }}</td><td class="text-end amount-mono text-white">{{ number_format($r->ps ?? 0,0,',','.') }}</td><td class="text-end amount-mono text-white">{{ number_format($r->prod ?? 0,0,',','.') }}</td><td class="text-end amount-mono text-white fw-bold">{{ number_format($r->total ?? 0,0,',','.') }}</td></tr>
                     @empty
-                      <tr><td colspan="4" class="text-center text-muted py-3">Tidak ada data.</td></tr>
+                      <tr><td colspan="4" class="text-center text-light py-3">Tidak ada data.</td></tr>
                     @endforelse
                   </tbody>
                 </table>

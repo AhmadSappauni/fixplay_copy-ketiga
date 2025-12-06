@@ -117,7 +117,10 @@
 
   {{-- LOGOUT --}}
   @if(auth()->check())
-    <form action="{{ route('logout') }}" method="POST" class="mt-3">
+    <form action="{{ route('logout') }}"
+          method="POST"
+          class="mt-3"
+          data-confirm="Yakin ingin logout dari Fixplay?"> {{-- ✨ tambah data-confirm --}}
       @csrf
       <button type="submit"
               style="background:none;border:none;width:100%;text-align:left;padding:0.75rem 1rem;color:#fff;">
@@ -125,4 +128,5 @@
       </button>
     </form>
   @endif
+
 </nav>

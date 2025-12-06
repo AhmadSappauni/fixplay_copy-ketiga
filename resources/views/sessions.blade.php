@@ -455,16 +455,19 @@
                       </button>
 
                       {{-- TOMBOL HAPUS: HANYA UNTUK ADMIN/BOS --}}
-                      @if(auth()->user() && auth()->user()->role === 'admin')
-                          <form class="d-inline confirm-delete" method="post"
-                                action="{{ route('sessions.delete', ['sid' => $s->id]) }}"
-                                data-confirm="Hapus riwayat sesi ini? Pendapatan di laporan akan ikut terhapus.">
-                            @csrf @method('DELETE')
-                            <button class="btn-delete-xs">
-                                <i class="bi bi-trash3-fill"></i>
-                            </button>
-                          </form>
-                      @endif
+                        @if(auth()->user() && auth()->user()->role === 'admin')
+                            <form class="d-inline confirm-delete"
+                                  method="post"
+                                  action="{{ route('sessions.delete', ['sid' => $s->id]) }}"
+                                  data-confirm="Hapus riwayat sesi ini? Pendapatan di laporan akan ikut terhapus."
+                                  data-timer-unit="{{ $s->psUnit->name ?? '' }}">   {{-- <— TAMBAH INI --}}
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn-delete-xs">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </button>
+                            </form>
+                        @endif
                     </td>
                   </tr>
                 @empty

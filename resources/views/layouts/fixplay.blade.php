@@ -90,30 +90,32 @@
             <div class="title">@yield('page_title')</div>
 
             <div class="ms-auto d-flex align-items-center gap-2">
-                {{-- Tombol riwayat --}}
-                <button id="historyBtn" class="btn btn-outline-dark" type="button" title="Riwayat Notifikasi">
-                    <i class="bi bi-clock-history"></i>
-                </button>
-
-                {{-- Dropdown notifikasi --}}
-                <div class="dropdown">
-                    <button id="notifBtn" class="btn btn-outline-dark position-relative" type="button"
-                            data-bs-toggle="dropdown" aria-expanded="false" title="Notifikasi">
-                        <i class="bi bi-bell"></i>
-                        <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">0</span>
+                @if(request()->routeIs('sessions.index'))
+                    {{-- Tombol riwayat --}}
+                    <button id="historyBtn" class="btn btn-outline-dark" type="button" title="Riwayat Notifikasi">
+                        <i class="bi bi-clock-history"></i>
                     </button>
-                    <div class="dropdown-menu dropdown-menu-end p-0 shadow-lg notif-menu">
-                        <div class="p-2 border-bottom d-flex justify-content-between align-items-center">
-                            <strong>Notifikasi</strong>
-                            <button class="btn btn-sm btn-link text-decoration-none" id="notifClear">
-                                Tandai sudah dibaca
-                            </button>
-                        </div>
-                        <div id="notifList" class="list-group list-group-flush" style="max-height:320px;overflow:auto;">
-                            <div class="p-3 text-muted">Belum ada notifikasi.</div>
+
+                    {{-- Dropdown notifikasi --}}
+                    <div class="dropdown">
+                        <button id="notifBtn" class="btn btn-outline-dark position-relative" type="button"
+                                data-bs-toggle="dropdown" aria-expanded="false" title="Notifikasi">
+                            <i class="bi bi-bell"></i>
+                            <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">0</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end p-0 shadow-lg notif-menu">
+                            <div class="p-2 border-bottom d-flex justify-content-between align-items-center">
+                                <strong>Notifikasi</strong>
+                                <button class="btn btn-sm btn-link text-decoration-none" id="notifClear">
+                                    Tandai sudah dibaca
+                                </button>
+                            </div>
+                            <div id="notifList" class="list-group list-group-flush" style="max-height:320px;overflow:auto;">
+                                <div class="p-3 text-muted">Belum ada notifikasi.</div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endif
             </div>
         </div>
 
@@ -245,6 +247,7 @@
     const KEY_HISTORY = 'fixplay.rental.history';
     const POLL_MS     = 15000;
 
+    const isKasirPage = !!document.querySelector('.session-shell');
     const notifBadge   = document.getElementById('notifBadge');
     const notifList    = document.getElementById('notifList');
     const clearBtn     = document.getElementById('notifClear');
@@ -387,6 +390,9 @@
     }
 
     function pollTimers() {
+        // Kalau BUKAN halaman kasir, jangan cek timer sama sekali
+        if (!isKasirPage) return;
+
         const now = new Date();
         const timers = jget(KEY_TIMERS, []);
         let changed = false;
@@ -407,6 +413,7 @@
             jset(KEY_TIMERS, keep);
         }
     }
+
 
     // tombol "Tandai sudah dibaca" → pindah semua ke riwayat
     clearBtn?.addEventListener('click', e => {
@@ -470,6 +477,18 @@
 
         okBtn?.addEventListener('click', function () {
             if (pendingForm) {
+                // 🔥 Kalau form punya data-timer-unit, bersihkan timer di localStorage
+                const unitName = pendingForm.dataset.timerUnit;
+                if (unitName) {
+                    try {
+                        const timers = jget(KEY_TIMERS, []); // fungsi & konstanta ini sudah ada di atas
+                        const keep = timers.filter(t => t.unit !== unitName);
+                        jset(KEY_TIMERS, keep);
+                    } catch (e) {
+                        console.warn('Gagal membersihkan timer lokal:', e);
+                    }
+                }
+
                 pendingForm.submit();
                 pendingForm = null;
             }
@@ -477,10 +496,17 @@
         });
     })();
 
+
     // initial
-    renderInbox();
-    pollTimers();
-    setInterval(pollTimers, POLL_MS);
+    // initial
+    renderInbox();     // inbox & history tetap boleh kelihatan di semua halaman
+
+    // Timer "waktu habis" HANYA di halaman kasir
+    if (isKasirPage) {
+        pollTimers();
+        setInterval(pollTimers, POLL_MS);
+    }
+
 })();
 </script>
 

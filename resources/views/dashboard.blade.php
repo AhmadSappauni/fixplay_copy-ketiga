@@ -129,21 +129,48 @@
 
   .mono { font-family: 'Consolas', 'Monaco', monospace; color: #818cf8; font-weight: 600; }
 
-  /* Tombol Aksi Kecil */
+    /* Tombol Aksi Kecil */
+    /* Tombol Aksi Kecil – LEBIH RAPI DI TABEL */
+  .btn-action-group {
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;           /* jarak antar tombol */
+  }
+
   .btn-action-group .btn {
-    padding: 0.3rem 0.75rem;
-    font-size: 0.75rem;
-    border-radius: 8px;
+    padding: 0.25rem 0.7rem;
+    font-size: 0.7rem;
+    border-radius: 999px;
     font-weight: 600;
   }
-  .btn-outline-secondary { color: #cbd5e1; border-color: #475569; }
-  .btn-outline-secondary:hover { background: #475569; color: #fff; }
-  
-  .btn-outline-warning { color: #fcd34d; border-color: #b45309; }
-  .btn-outline-warning:hover { background: #b45309; color: #fff; }
 
-  .btn-outline-danger { color: #fca5a5; border-color: #991b1b; }
-  .btn-outline-danger:hover { background: #991b1b; color: #fff; }
+  /* warna disesuaikan biar konsisten */
+  .btn-action-detail{
+    color: #e2e8f0;
+    border-color: #475569;
+  }
+  .btn-action-detail:hover{
+    background:#475569;
+    color:#fff;
+  }
+
+  .btn-action-edit{
+    color:#fcd34d;
+    border-color:#b45309;
+  }
+  .btn-action-edit:hover{
+    background:#b45309;
+    color:#fff;
+  }
+
+  .btn-action-delete{
+    color:#fca5a5;
+    border-color:#991b1b;
+  }
+  .btn-action-delete:hover{
+    background:#991b1b;
+    color:#fff;
+  }
 
   /* Badge Hitungan */
   .badge-count {
@@ -162,6 +189,11 @@
     .dash-header-actions{ width:100%; justify-content:flex-end; }
     .stat-card{ margin-bottom:.5rem; }
     .chart-wrapper{ min-height:200px; max-height:260px; }
+  }
+  @media (max-width: 768px) {
+    .btn-action-group .btn span.label-text {
+      display: none;       /* sembunyikan tulisan, icon tetap */
+    }
   }
   @media print{
     .dash-shell{ background:#fff; box-shadow:none; }
@@ -267,27 +299,39 @@
                   <td class="text-secondary fw-semibold">{{ $t['date'] }}</td>
                   <td class="text-white fw-bold">{{ $t['title'] }}</td>
                   <td class="text-end mono text-info">Rp {{ number_format($t['total'],0,',','.') }}</td>
-                  <td class="text-end d-print-none">
+                  <td class="text-end d-print-none" style="width: 210px;">
                     <div class="btn-action-group">
-                        {{-- Detail --}}
-                        <a href="{{ route('sales.show', $t['id']) }}" class="btn btn-outline-secondary me-1" title="Detail">
-                          Detail
-                        </a>
-                        {{-- Edit --}}
-                        <a href="{{ route('sales.edit', $t['id']) }}" class="btn btn-outline-warning me-1" title="Edit">
-                          Edit
-                        </a>
-                        
-                        {{-- Hapus (HANYA BOS / ADMIN) --}}
-                        {{-- Pastikan di DB kolomnya 'role' dan isinya 'admin' (atau sesuaikan) --}}
-                        @if(auth()->user() && auth()->user()->role === 'boss')
-                            <form class="d-inline" method="POST" action="{{ route('sales.destroy', $t['id']) }}" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?');">
-                              @csrf @method('DELETE')
-                              <button type="submit" class="btn btn-outline-danger" title="Hapus">Hapus</button>
-                            </form>
-                        @endif
+                      {{-- Detail --}}
+                      <a href="{{ route('sales.show', $t['id']) }}"
+                        class="btn btn-outline-secondary me-1"
+                        title="Detail">
+                        <i class="bi bi-info-circle"></i>
+                        <span class="label-text">Detail</span>
+                      </a>
+
+                      {{-- Edit --}}
+                      <a href="{{ route('sales.edit', $t['id']) }}"
+                        class="btn btn-outline-warning me-1"
+                        title="Edit">
+                        <i class="bi bi-pencil-square"></i>
+                        <span class="label-text">Edit</span>
+                      </a>
+
+                      {{-- Hapus (bos saja) --}}
+                      @if(auth()->user() && auth()->user()->role === 'boss')
+                        <form class="d-inline confirm-delete"
+                              method="POST"
+                              action="{{ route('sales.destroy', $t['id']) }}"
+                              data-confirm="Yakin ingin menghapus transaksi ini? Pendapatan di laporan akan ikut terhapus.">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-outline-danger" title="Hapus">
+                                Hapus
+                            </button>
+                        </form>
+                    @endif
                     </div>
-                  </td>
+                </td>
                 </tr>
               @empty
                 <tr>
