@@ -1,38 +1,66 @@
-# Base PHP image dengan Composer
-FROM php:8.2-fpm
+# syntax=docker/dockerfile:1
 
-# Install dependencies sistem
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    unzip \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    libzip-dev \
-    libonig-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql zip gd
+#############################
+# 1) BUILD: install vendor  #
+#############################
+FROM composer:2 AS vendor
 
-# Install Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-# Set working directory
 WORKDIR /app
 
-# Copy semua file project
+# Copy file composer dulu
+COPY composer.json composer.lock ./
+
+# Install dependency (tanpa dev, tanpa script)
+RUN composer install \
+    --no-dev \
+    --prefer-dist \
+    --no-interaction \
+    --no-progress \
+    --no-scripts
+
+# Copy semua source code
 COPY . .
 
-# Install dependency Laravel (PRODUCTION MODE)
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+#############################
+# 2) RUNTIME: PHP-FPM + NGINX
+#############################
+FROM php:8.2-fpm-bullseye
 
-# Optimize Laravel
-RUN php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache
+# Install paket OS + Nginx + extension PHP
+RUN apt-get update && apt-get install -y \
+    nginx \
+    git \
+    unzip \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    zip \
+ && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Railway will set $PORT automatically
-EXPOSE 8080
+# Copy konfigurasi nginx
+COPY .docker/nginx.conf /etc/nginx/nginx.conf
+COPY .docker/default.conf /etc/nginx/conf.d/default.conf
 
-# Start Laravel menggunakan PHP built-in server
-CMD php artisan serve --host=0.0.0.0 --port=8080
+# Copy source Laravel dari stage vendor
+WORKDIR /var/www/html
+COPY --from=vendor /app ./
+
+# Permission untuk storage dan cache
+RUN chown -R www-data:www-data storage bootstrap/cache \
+ && chmod -R 775 storage bootstrap/cache
+
+# Environment default (bisa di‑override dari Railway)
+ENV APP_ENV=production \
+    APP_DEBUG=false \
+    LOG_CHANNEL=stderr
+
+# Port yang dipakai Nginx
+EXPOSE 80
+
+# Entry script untuk jalanin php-fpm + nginx
+COPY .docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]
