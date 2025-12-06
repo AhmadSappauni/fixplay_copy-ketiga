@@ -1,62 +1,38 @@
-# --- BASE IMAGE --------------------------------------------------
-FROM php:8.2-apache
+# Base PHP image dengan Composer
+FROM php:8.2-fpm
 
-# --- SYSTEM DEPENDENCIES (buat gd, zip, dll) ---------------------
+# Install dependencies sistem
 RUN apt-get update && apt-get install -y \
     git \
+    curl \
     unzip \
     libpng-dev \
     libjpeg62-turbo-dev \
     libfreetype6-dev \
     libzip-dev \
     libonig-dev \
-    libicu-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install \
-        pdo_mysql \
-        gd \
-        zip \
-        bcmath \
-        intl \
-    && a2enmod rewrite \
-    && rm -rf /var/lib/apt/lists/*
+    && docker-php-ext-install pdo pdo_mysql zip gd
 
-# --- ATUR DOCUMENT ROOT KE /public -------------------------------
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
-    /etc/apache2/sites-available/000-default.conf \
-    /etc/apache2/apache2.conf
-
-# --- PASANG COMPOSER ---------------------------------------------
+# Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# --- SET WORKDIR -------------------------------------------------
-WORKDIR /var/www/html
+# Set working directory
+WORKDIR /app
 
-# --- COPY FILE COMPOSER & INSTALL DEPENDENCY ---------------------
-# (copy dulu biar layer cache lebih irit)
-COPY composer.json composer.lock ./
-
-RUN composer install \
-    --no-dev \
-    --no-interaction \
-    --prefer-dist \
-    --optimize-autoloader
-
-# --- COPY SELURUH SOURCE LARAVEL --------------------------------
+# Copy semua file project
 COPY . .
 
-# Pastikan folder penting bisa ditulis web server
-RUN chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R ug+rwx storage bootstrap/cache
+# Install dependency Laravel (PRODUCTION MODE)
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# OPTIONAL: cache config/route (kalau error karena env/DB, boleh dihapus)
-RUN php artisan config:clear || true && \
-    php artisan route:clear  || true
+# Optimize Laravel
+RUN php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache
 
-# Expose port default Apache
-EXPOSE 80
+# Railway will set $PORT automatically
+EXPOSE 8080
 
-# Jalankan Apache
-CMD ["apache2-foreground"]
+# Start Laravel menggunakan PHP built-in server
+CMD php artisan serve --host=0.0.0.0 --port=8080
