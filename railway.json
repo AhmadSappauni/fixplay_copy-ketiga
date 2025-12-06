@@ -1,0 +1,11 @@
+{
+  "build": {
+    "builder": "DOCKERFILE"
+  },
+  "deploy": {
+    "numReplicas": 1,
+    "startCommand": "apache2-foreground",
+    "healthcheckPath": "/",
+    "healthcheckTimeout": 100
+  }
+}
