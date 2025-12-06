@@ -13,34 +13,39 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libicu-dev \
     zip \
-    && docker-php-ext-configure gd \
-        --with-freetype \
-        --with-jpeg \
-    && docker-php-ext-install \
-        pdo_mysql mbstring exif pcntl bcmath gd zip intl \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+ && docker-php-ext-configure gd \
+      --with-freetype \
+      --with-jpeg \
+ && docker-php-ext-install \
+      pdo_mysql mbstring exif pcntl bcmath gd zip intl \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Composer
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
-# Workdir
-WORKDIR /var/www
+# 📂 PENTING: project ada di /var/www/html
+WORKDIR /var/www/html
 
-# Copy source
+# Copy source Laravel
 COPY . .
 
-# Install PHP deps
+# Install dependency Laravel
 RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
 
-# Optimize Laravel
+# Permission untuk storage & cache
+RUN mkdir -p storage/logs \
+ && chown -R www-data:www-data storage bootstrap/cache
+
+# Optimasi Laravel
 RUN php artisan config:clear && \
     php artisan route:clear && \
     php artisan view:clear
 
-# Set Nginx config
+# Pakai config nginx custom
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Expose port dari Railway
+# Port yang dipakai Railway
 EXPOSE 8080
 
-CMD service nginx start && php-fpm
+# Jalankan php-fpm + nginx
+CMD sh -c "php-fpm & nginx -g 'daemon off;'"
