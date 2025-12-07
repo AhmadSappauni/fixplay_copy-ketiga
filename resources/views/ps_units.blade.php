@@ -446,7 +446,7 @@
                 </tr>
               @empty
                 <tr>
-                  <td colspan="4" class="text-center text-muted p-5">
+                  <td colspan="4" class="text-center text-light p-5">
                     <i class="bi bi-inbox display-6 d-block mb-2 opacity-25"></i>
                     Belum ada unit yang terdaftar.
                   </td>

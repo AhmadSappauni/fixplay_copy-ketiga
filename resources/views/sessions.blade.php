@@ -471,7 +471,7 @@
                     </td>
                   </tr>
                 @empty
-                  <tr><td colspan="5" class="text-center text-muted p-3">Belum ada sesi.</td></tr>
+                  <tr><td colspan="5" class="text-center text-light p-3">Belum ada sesi.</td></tr>
                 @endforelse
               </tbody>
             </table>
