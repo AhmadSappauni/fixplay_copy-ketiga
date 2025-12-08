@@ -14,7 +14,7 @@ class AdminUserSeeder extends Seeder
             ['email' => 'bos@fixplay.test'], // email unik
             [
                 'name'     => 'Bos Fixplay',
-                'password' => Hash::make('pw-bos'), // ganti ke password yang aman
+                'password' => Hash::make('bismillahfixplay123'), // ganti ke password yang aman
                 'role'     => 'boss', // sesuaikan dengan kolom role di project kamu
             ]
         );
