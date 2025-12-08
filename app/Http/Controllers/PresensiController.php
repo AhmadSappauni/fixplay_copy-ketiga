@@ -45,6 +45,7 @@ class PresensiController extends Controller
         $request->validate([
             'karyawan_id' => ['required', 'exists:karyawans,id'],
             'shift'       => ['required', 'in:' . implode(',', array_keys(Presensi::shiftOptions()))],
+            'catatan'     => ['nullable', 'string', 'max:255'],
         ]);
 
         $today      = Carbon::today();
@@ -64,10 +65,16 @@ class PresensiController extends Controller
 
         $presensi->status = Presensi::determineStatus($shift, $today, $presensi->check_in ?? $now);
 
+        // kalau izin atau sakit, simpan catatan dari form
+        if (in_array($shift, ['izin', 'sakit'], true)) {
+            $presensi->catatan = $request->input('catatan');
+        }
+
         $presensi->save();
 
         return back()->with('success', 'Check-in berhasil untuk shift ' . ucfirst(str_replace('_', ' ', $shift)));
     }
+
 
     /**
      * Check-out.

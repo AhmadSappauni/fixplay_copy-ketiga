@@ -30,38 +30,41 @@
           @csrf
 
           <div class="col-md-5">
-            <label class="fx-label">Karyawan</label>
-            <select name="karyawan_id" id="karyawan_id" class="fx-select" required>
-              <option value="">Pilih karyawan...</option>
-              @foreach($karyawans as $k)
-                <option value="{{ $k->id }}">{{ $k->nama }}</option>
-              @endforeach
-            </select>
+              <label class="fx-label">Karyawan</label>
+              <select name="karyawan_id" id="karyawan_id" class="fx-select" required>
+                  <option value="">Pilih karyawan...</option>
+                  @foreach($karyawans as $k)
+                      <option value="{{ $k->id }}">{{ $k->nama }}</option>
+                  @endforeach
+              </select>
           </div>
 
           <div class="col-md-3">
-            <label class="fx-label">Shift</label>
-            <select name="shift" id="shift" class="fx-select" required>
-              @foreach($shifts as $key => $label)
-                <option value="{{ $key }}">{{ $label }}</option>
-              @endforeach
-            </select>
+              <label class="fx-label">Shift</label>
+              <select name="shift" id="shift" class="fx-select" required>
+                  @foreach($shifts as $key => $label)
+                      <option value="{{ $key }}">{{ $label }}</option>
+                  @endforeach
+              </select>
+          </div>
+
+          {{-- CATATAN (muncul kalau izin/sakit) --}}
+          <div class="col-md-12 mt-2 d-none" id="catatanWrapper">
+              <label class="fx-label">Catatan (alasan izin / sakit)</label>
+              <textarea name="catatan" id="catatan"
+                        class="fx-select"
+                        rows="2"
+                        placeholder="Contoh: izin karena urusan keluarga"></textarea>
           </div>
 
           <div class="col-md-4 d-flex gap-2 justify-content-end">
-            {{-- <button type="submit"
-                    class="fx-btn-outline flex-fill"
-                    formaction="{{ route('presensi.checkout') }}">
-              <i class="bi bi-box-arrow-right me-1"></i> Check-out
-            </button> --}}
-
-            <button type="submit"
-                    class="fx-btn-primary flex-fill"
-                    formaction="{{ route('presensi.checkin') }}">
-              <i class="bi bi-box-arrow-in-right me-1"></i> Check-in
-            </button>
+              <button type="submit"
+                      class="fx-btn-primary flex-fill"
+                      formaction="{{ route('presensi.checkin') }}">
+                  <i class="bi bi-box-arrow-in-right me-1"></i> Check-in
+              </button>
           </div>
-        </form>
+      </form>
 
         {{-- TABEL PRESENSI HARI INI --}}
         <div class="fx-table-wrapper">
@@ -185,4 +188,31 @@
     </div>
   </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const shiftSelect    = document.getElementById('shift');
+    const catatanWrapper = document.getElementById('catatanWrapper');
+
+    function toggleCatatan() {
+        if (!shiftSelect || !catatanWrapper) return;
+
+        const v = shiftSelect.value;
+        // sesuaikan dengan key shift izin / sakit di database
+        if (v === 'izin' || v === 'sakit') {
+            catatanWrapper.classList.remove('d-none');
+        } else {
+            catatanWrapper.classList.add('d-none');
+        }
+    }
+
+    shiftSelect?.addEventListener('change', toggleCatatan);
+    toggleCatatan(); // panggil sekali saat load
+});
+</script>
+@endpush
+
+
+
 @endsection

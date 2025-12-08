@@ -84,6 +84,10 @@
     font-size: 0.85rem;
     border-radius: 0.75rem;
   }
+
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
 </style>
 @endpush
 

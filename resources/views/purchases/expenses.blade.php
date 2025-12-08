@@ -154,6 +154,11 @@
     color: #cbd5e1;
   }
 
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+
+
   /* ====== RESPONSIVE ====== */
   @media (max-width: 992px){
     .fx-shell{ padding:1.3rem 1rem 1.8rem; border-radius:1.1rem; }

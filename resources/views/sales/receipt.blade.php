@@ -56,6 +56,8 @@
   }
   .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
+  
+
   /* Print Mode */
   @media print {
     .card-receipt { box-shadow: none; border: 1px solid #000; background: #fff; color: #000; }

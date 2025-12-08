@@ -147,6 +147,10 @@
     background: linear-gradient(135deg, #7c3aed, #2563eb); color: white; transform: translateY(-1px);
   }
 
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+
   /* Responsive */
   @media (max-width: 768px){
     .report-shell{ padding:1.25rem 1rem 2rem; border-radius:1rem; }
@@ -272,7 +276,7 @@
     <div class="col-lg-6">
       <div class="card card-glass h-100">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <span>Penjualan ({{ $start_date->format('d M') }} — {{ $end_date->format('d M') }})</span>
+          <span>Penjualan {{ $start_date->format('d M') }}</span>
           <span class="badge badge-soft-primary d-print-none">{{ $sales->count() }} Data</span>
         </div>
         <div class="card-body p-0">
@@ -356,7 +360,7 @@
                   </td>
                   <td>
                       <div class="text-light fw-semibold">{{ $e->category }}</div>
-                      <div class="small text-muted text-truncate" style="max-width: 150px;">{{ $e->description }}</div>
+                      <div class="small text-secondary text-truncate" style="max-width: 150px;">{{ $e->description }}</div>
                   </td>
                   <td class="text-end amount-mono text-danger">Rp {{ number_format($e->amount ?? 0,0,',','.') }}</td>
                   <td class="text-end d-print-none">
@@ -510,18 +514,18 @@
           @csrf @method('PUT')
           
           <div class="mb-3">
-            <label class="form-label small text-muted">Waktu Transaksi</label>
+            <label class="form-label small text-mono">Waktu Transaksi</label>
             <input type="datetime-local" name="created_at" id="saleDate" class="form-control" required>
           </div>
 
           <div class="mb-3">
-            <label class="form-label small text-muted">Total Tagihan</label>
+            <label class="form-label small text-mono">Total Tagihan</label>
             <input type="number" name="total_bill" id="saleTotal" class="form-control" min="0" required>
           </div>
 
           <div class="row g-2 mb-3">
             <div class="col-6">
-              <label class="form-label small text-muted">Metode Bayar</label>
+              <label class="form-label small text-mono">Metode Bayar</label>
               <select name="payment_method" id="saleMethod" class="form-select">
                 <option value="Tunai">Tunai</option>
                 <option value="QRIS">QRIS</option>
@@ -529,15 +533,15 @@
               </select>
             </div>
             <div class="col-6">
-              <label class="form-label small text-muted">Dibayar</label>
+              <label class="form-label small text-mono">Dibayar</label>
               <input type="number" name="paid_amount" id="salePaid" class="form-control" min="0">
             </div>
           </div>
 
           <div class="mb-3">
-            <label class="form-label small text-muted">Catatan</label>
+            <label class="form-label small text-mono">Catatan</label>
             <textarea name="note" id="saleNote" class="form-control bg-secondary bg-opacity-25" rows="2" readonly style="cursor: not-allowed; color: #94a3b8;"></textarea>
-            <div class="form-text small text-muted">Catatan transaksi tidak dapat diubah manual.</div>
+            <div class="form-text small text-light">Catatan transaksi tidak dapat diubah manual.</div>
           </div>
 
           <div class="d-flex justify-content-end gap-2">

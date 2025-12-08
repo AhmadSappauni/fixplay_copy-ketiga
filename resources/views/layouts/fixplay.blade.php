@@ -133,6 +133,27 @@
             color:#cdd1ff;
         }
 
+        /* ==== SweetAlert – posisi & jarak tombol ==== */
+        .swal-actions-neon{
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;              /* jarak antar tombol */
+            margin-top: 1.25rem;
+        }
+
+        .swal-btn-confirm,
+        .swal-btn-cancel{
+            padding: 0.55rem 1.5rem;   /* bikin tombol lebih “napas” */
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .swal-btn-cancel{
+            border-width: 1px;
+        }
+
+
         /* ====== RESPONSIVE LAYOUT (TABLET & HP) ====== */
         @media (max-width: 992px){
             .fix-shell{
@@ -191,6 +212,7 @@
                 border-radius: 10px;
                 font-size: .9rem;
             }
+            
         }
 
         /* ====== HP kecil (≤576px) ====== */
@@ -292,7 +314,7 @@
                                 </button>
                             </div>
                             <div id="notifList" class="list-group list-group-flush" style="max-height:320px;overflow:auto;">
-                                <div class="p-3 text-muted">Belum ada notifikasi.</div>
+                                <div class="p-3 text-secondary">Belum ada notifikasi.</div>
                             </div>
                         </div>
                     </div>
@@ -525,7 +547,7 @@
 
         notifList.innerHTML = '';
         if (!inbox.length) {
-            notifList.innerHTML = '<div class="p-3 text-muted">Belum ada notifikasi.</div>';
+            notifList.innerHTML = '<div class="p-3 text-secondary">Belum ada notifikasi.</div>';
             return;
         }
 
@@ -663,11 +685,46 @@
     });
 
     clearHistBtn?.addEventListener('click', () => {
-        if (confirm('Yakin ingin menghapus semua riwayat notifikasi?')) {
-            jset(KEY_HISTORY, []);
-            renderHistory();
-        }
+        Swal.fire({
+            title: 'Hapus semua riwayat?',
+            text: 'Riwayat notifikasi yang dihapus tidak bisa dikembalikan.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            background: '#151528',
+            color: '#e5e7eb',
+            customClass: {
+                popup: 'fx-neon-card',
+                confirmButton: 'fx-btn-primary swal-btn-confirm',
+                cancelButton: 'btn btn-outline-light swal-btn-cancel',
+                actions: 'swal-actions-neon' // ⬅️ area tombol
+            },
+            buttonsStyling: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                jset(KEY_HISTORY, []);
+                renderHistory();
+
+                Swal.fire({
+                    title: 'Riwayat terhapus',
+                    text: 'Semua riwayat notifikasi sudah dibersihkan.',
+                    icon: 'success',
+                    timer: 1800,
+                    showConfirmButton: false,
+                    background: '#151528',
+                    color: '#e5e7eb',
+                    customClass: {
+                        popup: 'fx-neon-card'
+                    },
+                    buttonsStyling: false
+                });
+            }
+        });
     });
+
+
 
     window.addEventListener('storage', e => {
         if ([KEY_INBOX, KEY_TIMERS, KEY_HISTORY].includes(e.key)) {
@@ -731,5 +788,7 @@
 </script>
 
 @stack('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </body>
 </html>

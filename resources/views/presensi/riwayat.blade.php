@@ -64,85 +64,64 @@
           </div>
         </form>
 
-        {{-- TABEL RIWAYAT --}}
-        <div class="fx-table-wrapper">
-          <table class="table mb-0 fx-table">
-            <thead>
-              <tr>
-                <th>Tanggal</th>
-                <th>Nama</th>
-                <th>Shift</th>
-                <th>Masuk</th>
-                <th>Keluar</th>
-                <th>Status</th>
-                <th>Catatan</th>
-                <th class="text-end">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              @forelse($presensis as $row)
+        {{-- EMPTY STATE KHUSUS MOBILE & DESKTOP --}}
+        @if($presensis->isEmpty())
+          <div class="fx-empty-state mt-3">
+            <div class="fx-empty-icon">
+              <i class="bi bi-clipboard-x"></i>
+            </div>
+            <h6 class="fw-semibold mb-1">Belum ada presensi</h6>
+          </div>
+        @else
+
+          {{-- TABEL RIWAYAT --}}
+          <div class="fx-table-wrapper">
+            <table class="table mb-0 fx-table">
+              <thead>
                 <tr>
-                  <td>{{ \Carbon\Carbon::parse($row->tanggal)->format('d/m/Y') }}</td>
-                  <td>{{ $row->karyawan->nama }}</td>
+                  <th>Tanggal</th>
+                  <th>Nama</th>
+                  <th>Shift</th>
+                  <th>Masuk</th>
+                  <th>Keluar</th>
+                  <th>Status</th>
+                  <th>Catatan</th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach($presensis as $row)
+                  <tr>
+                    <td>{{ \Carbon\Carbon::parse($row->tanggal)->format('d/m/Y') }}</td>
+                    <td>{{ $row->karyawan->nama }}</td>
                     <td>
-                    @php
+                      @php
                         $shiftOptions = \App\Models\Presensi::shiftOptions();
                         $shiftLabel   = $shiftOptions[$row->shift] ?? ucfirst(str_replace('_',' ',$row->shift ?? '-'));
-                    @endphp
-
-                    <span class="fx-badge-pill">
-                        {{ $shiftLabel }}
-                    </span>
+                      @endphp
+                      <span class="fx-badge-pill">{{ $shiftLabel }}</span>
                     </td>
-
                     <td>{{ $row->check_in ? \Carbon\Carbon::parse($row->check_in)->format('H:i') : '-' }}</td>
                     <td>{{ $row->check_out ? \Carbon\Carbon::parse($row->check_out)->format('H:i') : '-' }}</td>
-                  <td>
-                    @if($row->status === 'telat')
-                      <span class="fx-badge-status fx-badge-warning">telat</span>
-                    @elseif($row->status === 'izin')
-                      <span class="fx-badge-status fx-badge-info">izin</span>
-                    @elseif($row->status === 'sakit')
-                      <span class="fx-badge-status fx-badge-info">sakit</span>
-                    @elseif($row->status === 'alpha')
-                      <span class="fx-badge-status fx-badge-danger">tidak hadir</span>
-                    @else
-                      <span class="fx-badge-status fx-badge-success">hadir</span>
-                    @endif
-                  </td>
-                  <td>{{ $row->catatan ?: '-' }}</td>
-                  <td class="text-end">
-                    <div class="btn-group btn-group-sm">
-                      <a href="{{ route('presensi.edit',$row->id) }}"
-                         class="btn btn-outline-light fx-btn-icon"
-                         title="Edit presensi">
-                        <i class="bi bi-pencil"></i>
-                      </a>
-                      <form action="{{ route('presensi.destroy',$row->id) }}"
-                            method="POST"
-                            class="d-inline confirm-delete"
-                            data-confirm="Hapus presensi ini?">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit"
-                                class="btn btn-outline-danger fx-btn-icon"
-                                title="Hapus">
-                          <i class="bi bi-trash"></i>
-                        </button>
-                      </form>
-                    </div>
-                  </td>
-                </tr>
-              @empty
-                <tr>
-                  <td colspan="8" class="text-center text-neon-sub py-4">
-                    Tidak ada data presensi pada rentang tanggal ini.
-                  </td>
-                </tr>
-              @endforelse
-            </tbody>
-          </table>
-        </div>
+                    <td>
+                      @if($row->status === 'telat')
+                        <span class="fx-badge-status fx-badge-warning">telat</span>
+                      @elseif($row->status === 'izin')
+                        <span class="fx-badge-status fx-badge-info">izin</span>
+                      @elseif($row->status === 'sakit')
+                        <span class="fx-badge-status fx-badge-info">sakit</span>
+                      @elseif($row->status === 'alpha')
+                        <span class="fx-badge-status fx-badge-danger">tidak hadir</span>
+                      @else
+                        <span class="fx-badge-status fx-badge-success">hadir</span>
+                      @endif
+                    </td>
+                    <td>{{ $row->catatan ?: '-' }}</td>
+                  </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div> {{-- /.fx-table-wrapper --}}
+        @endif  {{-- <— ini yang tadi kurang --}}
 
       </div>
     </div>

@@ -282,6 +282,10 @@
   }
   .modal-glass .btn-close-white { filter: invert(1) grayscale(100%) brightness(200%); }
 
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+
   @media (max-width: 992px){
     .session-shell{ padding:1.35rem 1rem 1.8rem; border-radius:1.1rem; }
   }
@@ -491,8 +495,8 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body pt-3">
-        <p class="text-muted small mb-3">
-            Menambahkan durasi pada sesi unit: <strong id="addTimeUnitName" class="text-white"></strong><br>
+        <p class="text-mono small mb-3">
+        <strong id="addTimeUnitName" class="text-white"></strong><br>
             <span id="rateInfo" class="small fst-italic text-secondary"></span>
         </p>
         
@@ -507,7 +511,7 @@
           <input type="hidden" id="rawAddCost" value="0">
           
           <div class="mb-3">
-            <label class="form-label small text-muted">Durasi Tambahan</label>
+            <label class="form-label small text-secondary">Durasi Tambahan</label>
             <select name="hours" id="addTimeHours" class="form-select text-white" style="background: rgba(15,23,42,.6); border-color: rgba(148,163,184,.3);">
               <option value="0.5">30 Menit</option>
               @for($h=1; $h<=5; $h++)
@@ -528,7 +532,7 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label small text-muted">Metode Bayar Tambahan</label>
+            <label class="form-label small text-secondary">Metode Bayar Tambahan</label>
             <select name="payment_method" class="form-select text-white" style="background: rgba(15,23,42,.6); border-color: rgba(148,163,184,.3);">
                <option value="Tunai">Tunai</option>
                <option value="QRIS">QRIS</option>
@@ -537,12 +541,12 @@
           </div>
           
           <div class="mb-3">
-             <label class="form-label small text-muted">Uang Diterima (Wajib)</label>
+             <label class="form-label small text-secondary">Uang Diterima (Wajib)</label>
              <input type="number" id="addTimePaid" name="paid_amount" class="form-control text-white" placeholder="0" required style="background: rgba(15,23,42,.6); border-color: rgba(148,163,184,.3);">
           </div>
           
           <div class="mb-3">
-             <label class="form-label small text-muted">Kembalian</label>
+             <label class="form-label small text-secondary">Kembalian</label>
              <input type="text" id="addTimeChange" class="form-control text-white" value="Rp 0" readonly style="background: rgba(15,23,42,.4); border-color: rgba(148,163,184,.15); color: #9ca3af;">
           </div>
 
@@ -650,13 +654,33 @@
     formEl.addEventListener('submit', function(e){
       const method = (document.getElementById('payMethod')?.value||'Tunai').toLowerCase();
       const paid = parseInt(document.getElementById('paidAmount')?.value||'0',10);
-      // Ambil bill langsung dari kalkulasi
       const currentBill = parseInt(document.getElementById('billLbl').textContent.replace(/[^0-9]/g,''));
-      
-      if (method==='tunai' && paid<currentBill){ e.preventDefault(); alert('Pembayaran tunai kurang.'); return; }
+
+      if (method === 'tunai' && paid < currentBill) {
+          e.preventDefault();
+
+          Swal.fire({
+              icon: 'error',
+              title: 'Pembayaran tunai kurang',
+              html: `
+                  Total tagihan:<br>
+                  <b>Rp ${fmtIDRModal(currentBill)}</b><br><br>
+                  Uang diterima:<br>
+                  <b>Rp ${fmtIDRModal(paid)}</b>
+              `,
+              confirmButtonText: 'Oke, saya perbaiki',
+              confirmButtonColor: '#ef4444',
+              background: '#0f172a',
+              color: '#e5e7eb'
+          });
+
+          return;
+      }
+
       try { saveTimer(); } catch(err){}
     });
   }
+
 
   // Arcade dihapus dari listener
   ['unitSel','extraSel','hoursSel','startInput'].forEach(id=>{
@@ -754,15 +778,31 @@ function openAddTimeModal(sessionId, unitName, hourlyRate, extraCtrl, arcadeCtrl
     // VALIDASI PEMBAYARAN PADA SUBMIT
     const form = document.getElementById('addTimeForm');
     form.onsubmit = function(e) {
-        const cost = parseFloat(document.getElementById('rawAddCost').value || 0);
-        const paid = parseFloat(document.getElementById('addTimePaid').value || 0);
+      const cost = parseFloat(document.getElementById('rawAddCost').value || 0);
+      const paid = parseFloat(document.getElementById('addTimePaid').value || 0);
 
-        if (paid < cost) {
-            e.preventDefault();
-            alert('Pembayaran gagal: Uang diterima kurang dari biaya tambahan sebesar Rp ' + fmtIDRModal(cost));
-            return false;
-        }
-    };
+      if (paid < cost) {
+          e.preventDefault();
+
+          Swal.fire({
+              icon: 'error',
+              title: 'Pembayaran tidak cukup',
+              html: `
+                  Biaya tambahan yang harus dibayar:<br>
+                  <b>Rp ${fmtIDRModal(cost)}</b><br><br>
+                  Uang yang diterima hanya:<br>
+                  <b>Rp ${fmtIDRModal(paid)}</b>
+              `,
+              confirmButtonText: 'Oke, saya perbaiki',
+              confirmButtonColor: '#ef4444',
+              background: '#0f172a',
+              color: '#e5e7eb'
+          });
+
+          return false;
+      }
+  };
+
     
     const modalEl = document.getElementById('addTimeModal');
     const modal = new bootstrap.Modal(modalEl);
