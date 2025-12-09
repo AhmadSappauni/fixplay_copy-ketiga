@@ -251,7 +251,7 @@
     <div class="col-lg-6">
       <div class="card session-card h-100">
         <div class="card-header session-card-header d-flex justify-content-between align-items-center">
-          <span>Riwayat Sesi (Terakhir 20)</span>
+          <span>Riwayat Sesi</span>
           <span class="badge bg-secondary-subtle text-dark d-print-none">{{ $closed_sessions->count() }} sesi</span>
         </div>
         <div class="card-body p-0">

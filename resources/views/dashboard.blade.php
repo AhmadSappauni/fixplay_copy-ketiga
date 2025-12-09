@@ -330,13 +330,24 @@
     <div class="col-12">
       <div class="card card-trans">
         <div class="card-header d-flex justify-content-between align-items-center" style="background: rgba(34, 197, 94, 0.15);">
-          <span class="text-white"><i class="bi bi-cup-straw me-2"></i>Penjualan Produk (F&B)</span>
-          <span class="badge-count d-print-none">{{ count($productTx) }} DATA</span>
+          <div class="d-flex align-items-center gap-2">
+             <span class="text-white"><i class="bi bi-cup-straw me-2"></i>Penjualan Produk (F&B)</span>
+             <span class="badge-count d-print-none">{{ count($productTx) }} DATA</span>
+          </div>
+
+          {{-- INPUT PENCARIAN DASHBOARD --}}
+          <div class="d-print-none">
+             <input type="text" id="dashSearchInput" 
+                    class="form-control form-control-sm text-white" 
+                    style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); width: 150px; font-size: 0.75rem;" 
+                    placeholder="Cari produk...">
+          </div>
         </div>
         
         <div class="card-body p-0">
           <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-            <table class="table table-sm align-middle table-neon mb-0">
+            {{-- Tambahkan ID 'dashProductTable' --}}
+            <table class="table table-sm align-middle table-neon mb-0" id="dashProductTable">
               <thead style="position: sticky; top: 0; z-index: 10;">
                 <tr>
                   <th style="width: 170px;">Tanggal</th>
@@ -347,9 +358,10 @@
               </thead>
               <tbody>
               @forelse ($productTx as $t)
-                <tr>
+                <tr class="dash-prod-row">
                   <td class="text-secondary fw-semibold" style="font-size: 0.85rem;">{{ $t['date'] }}</td>
-                  <td class="text-white">{{ $t['title'] }}</td>
+                  {{-- Tambahkan class 'searchable-dash' di kolom Nama Barang --}}
+                  <td class="text-white searchable-dash">{{ $t['title'] }}</td>
                   <td class="text-end mono text-success">Rp {{ number_format($t['total'],0,',','.') }}</td>
                   <td class="text-end d-print-none">
                     <div class="btn-action-group justify-content-end">
@@ -368,6 +380,13 @@
               @empty
                 <tr><td colspan="4" class="text-center text-secondary p-4">Belum ada penjualan produk.</td></tr>
               @endforelse
+              
+              {{-- Pesan jika pencarian nihil --}}
+              <tr id="dashNoResult" style="display: none;">
+                  <td colspan="4" class="text-center text-secondary py-3">
+                      <i class="bi bi-search me-1"></i> Produk tidak ditemukan.
+                  </td>
+              </tr>
               </tbody>
             </table>
           </div>
@@ -439,5 +458,25 @@
     }
   });
 })();
+
+// Script Pencarian Real-time Dashboard (Produk)
+document.getElementById('dashSearchInput')?.addEventListener('keyup', function() {
+    let filter = this.value.toLowerCase();
+    let rows = document.querySelectorAll('#dashProductTable .dash-prod-row');
+    let hasVisible = false;
+
+    rows.forEach(function(row) {
+        let text = row.querySelector('.searchable-dash').textContent.toLowerCase();
+        if (text.includes(filter)) {
+            row.style.display = '';
+            hasVisible = true;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    let noRes = document.getElementById('dashNoResult');
+    if (noRes) noRes.style.display = hasVisible ? 'none' : 'table-row';
+});
 </script>
 @endpush

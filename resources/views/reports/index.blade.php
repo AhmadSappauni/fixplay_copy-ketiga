@@ -328,12 +328,23 @@
     <div class="col-lg-6">
       <div class="card card-glass h-100">
         <div class="card-header d-flex justify-content-between align-items-center" style="background: rgba(34, 197, 94, 0.15);">
-          <span class="text-white"><i class="bi bi-basket3 me-2"></i>Laporan Produk (F&B)</span>
-          <span class="badge badge-soft-primary d-print-none">{{ $productSales->count() }} Data</span>
+          <div class="d-flex align-items-center gap-2">
+             <span class="text-white"><i class="bi bi-basket3 me-2"></i>Laporan Produk</span>
+             <span class="badge badge-soft-primary d-print-none">{{ $productSales->count() }} Data</span>
+          </div>
+          
+          {{-- INPUT PENCARIAN BARU --}}
+          <div class="d-print-none">
+             <input type="text" id="searchProductInput" 
+                    class="form-control form-control-sm text-white" 
+                    style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); width: 160px;" 
+                    placeholder="Cari menu...">
+          </div>
         </div>
+        
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-modern table-sm">
+            <table class="table table-modern table-sm" id="productTable">
               <thead>
                 <tr>
                   <th>Waktu</th>
@@ -344,15 +355,16 @@
               </thead>
               <tbody>
                 @forelse($productSales as $s)
-                  <tr>
+                  <tr class="product-row">
                     <td>
                         <div class="d-flex flex-column small text-secondary">
                             <span>{{ \Carbon\Carbon::parse($s->sold_at)->format('d-m-y') }}</span>
                             <span class="text-light fw-bold">{{ \Carbon\Carbon::parse($s->sold_at)->format('H:i') }}</span>
                         </div>
                     </td>
-                    <td>
-                        <div class="text-truncate text-light" style="max-width: 180px;" title="{{ $s->display_note }}">
+                    {{-- Tambahkan class 'searchable-text' untuk target pencarian --}}
+                    <td class="searchable-text">
+                        <div class="text-light" style="max-width: 180px;">
                             {{ $s->display_note }}
                         </div>
                     </td>
@@ -369,6 +381,13 @@
                 @empty
                   <tr><td colspan="4" class="text-center text-light p-4 opacity-50">Tidak ada penjualan produk.</td></tr>
                 @endforelse
+                
+                {{-- Pesan jika pencarian tidak ditemukan --}}
+                <tr id="noProductFound" style="display: none;">
+                    <td colspan="4" class="text-center text-secondary py-3">
+                        <i class="bi bi-search me-1"></i> Produk tidak ditemukan.
+                    </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -706,5 +725,29 @@ function editExpenseModal(id, category, description, amount, ts) {
   const modal = new bootstrap.Modal(document.getElementById('editExpenseModal'));
   modal.show();
 }
+
+// Script Pencarian Real-time untuk Tabel Produk
+document.getElementById('searchProductInput')?.addEventListener('keyup', function() {
+    let filter = this.value.toLowerCase();
+    let rows = document.querySelectorAll('#productTable .product-row');
+    let hasVisible = false;
+
+    rows.forEach(function(row) {
+        let text = row.querySelector('.searchable-text').textContent.toLowerCase();
+        if (text.includes(filter)) {
+            row.style.display = '';
+            hasVisible = true;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    // Tampilkan pesan jika tidak ada hasil
+    let noResultRow = document.getElementById('noProductFound');
+    if (noResultRow) {
+        noResultRow.style.display = hasVisible ? 'none' : 'table-row';
+    }
+});
+
 </script>
 @endpush
