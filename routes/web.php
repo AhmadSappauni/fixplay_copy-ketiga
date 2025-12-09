@@ -148,3 +148,5 @@ Route::post('/sessions/add-time', [SessionsController::class, 'addTime'])->name(
 Route::get('/jadwal/report/excel', [JadwalKaryawanController::class, 'exportExcel'])->name('jadwal.report.excel');
 Route::get('/jadwal/report/pdf', [JadwalKaryawanController::class, 'exportPdf'])->name('jadwal.report.pdf');
 // ...
+
+Route::post('/sessions/stop-open', [App\Http\Controllers\SessionsController::class, 'stopOpen'])->name('sessions.stop_open');

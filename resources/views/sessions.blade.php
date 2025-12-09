@@ -93,7 +93,6 @@
 
   .session-history-scroll{ max-height:580px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:#475569 #1e293b; }
 
-  /* Tombol Kecil */
   .btn-delete-xs{
     padding:4px 10px; font-size:0.75rem; border-radius:6px;
     background:rgba(239,68,68,0.15); color:#fca5a5; border:1px solid rgba(239,68,68,0.3); transition:all 0.2s;
@@ -119,6 +118,14 @@
   .modal-glass .btn-close-white{filter:invert(1) grayscale(100%) brightness(200%);}
 
   input[type="datetime-local"]::-webkit-calendar-picker-indicator{ filter:invert(1); }
+
+  /* Animasi Badge Open */
+  .badge-pulse { animation: pulse-animation 2s infinite; }
+  @keyframes pulse-animation {
+    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+  }
 
   @media (max-width: 992px){ .session-shell{ padding:1.35rem 1rem 1.8rem; border-radius:1.1rem; } }
   @media (max-width: 768px){
@@ -152,9 +159,9 @@
     <div>
       <div class="d-flex align-items-center gap-2 mb-1">
         <span class="session-chip-icon"><i class="bi bi-controller"></i></span>
-        <h4 class="m-0 fw-semibold session-title-text">Sesi PS (Durasi Tetap)</h4>
+        <h4 class="m-0 fw-semibold session-title-text">Sesi PS</h4>
       </div>
-      <div class="session-subtitle">Buat sesi PS, catat durasi, dan input tagihan secara manual (Borongan).</div>
+      <div class="session-subtitle">Kelola sesi durasi tetap atau open billing (Bayar Nanti).</div>
     </div>
     <div class="d-flex align-items-center gap-2 d-print-none session-header-actions">
       <button type="button" class="btn btn-soft-dark" onclick="location.reload()"><i class="bi bi-arrow-clockwise me-1"></i> Refresh</button>
@@ -163,25 +170,23 @@
 
   <div class="row g-3">
     {{-- FORM BUAT SESI (Kiri) --}}
-    <div class="col-lg-6">
+    <div class="col-lg-5">
       <div class="card session-card h-100">
         <div class="card-body">
-          <h6 class="mb-3 fw-bold text-uppercase small text-gray-300">Buat Sesi & Tagih</h6>
+          <h6 class="mb-3 fw-bold text-uppercase small text-gray-300">Buat Sesi Baru</h6>
           <form method="post" action="{{ route('sessions.fixed') }}" id="fixedForm">
             @csrf
 
-            {{-- PILIH UNIT --}}
             <label class="form-label">Pilih Unit PS</label>
             <select class="form-select" name="ps_unit_id" id="unitSel" required>
               <option value="">-- pilih --</option>
               @foreach($units as $u)
                 <option value="{{ $u->id }}">
-                  {{ $u->name }} [{{ $u->type ?? 'PS4' }}] — Rp {{ number_format($u->hourly_rate,0,',','.') }}/jam
+                  {{ $u->name }} [{{ $u->type ?? 'PS4' }}]
                 </option>
               @endforeach
             </select>
 
-            {{-- STIK TAMBAHAN (Hanya dicatat, tidak mempengaruhi harga otomatis) --}}
             <div class="mt-3">
               <label class="form-label">Tambahan Stik</label>
               <select class="form-select" id="extraSel" name="extra_controllers">
@@ -196,78 +201,118 @@
 
             <label class="form-label mt-3">Durasi Main</label>
             <select class="form-select" id="hoursSel" name="hours">
+              <option value="open" class="fw-bold text-warning">★ OPEN BILLING (Bayar Nanti)</option>
+              <option disabled>──────────────</option>
+              
+              {{-- 30 Menit Awal --}}
               <option value="0.5">30 menit</option>
-              @for($h=1; $h<=10; $h++)
+
+              {{-- Loop dari 1 sampai 10 --}}
+              @for($h = 1; $h <= 10; $h++)
+                {{-- Jam Pas (Contoh: 1 jam) --}}
                 <option value="{{ $h }}">{{ $h }} jam</option>
+                
+                {{-- Jam Setengah (Contoh: 1 jam 30 menit), value jadi 1.5 --}}
+                @if($h < 10) {{-- Batasi agar tidak muncul 10 jam 30 menit --}}
+                    <option value="{{ $h + 0.5 }}">{{ $h }} jam 30 menit</option>
+                @endif
               @endfor
             </select>
-            <div class="mt-1 small text-end text-secondary">
-               Selesai jam: <span id="endLbl" class="fw-bold text-light">—:—</span>
-            </div>
 
-            {{-- INPUT TOTAL TAGIHAN MANUAL --}}
-            <div class="mt-4 p-3 rounded-3" style="background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(148, 163, 184, 0.2);">
-                <label class="form-label text-success small text-uppercase fw-bold mb-1">Total Tagihan (Isi Manual)</label>
-                <div class="input-group">
-                   <span class="input-group-text bg-success border-success text-white">Rp</span>
-                   <input type="number" name="bill" id="manualBillInput" 
-                          class="form-control fs-5 fw-bold text-white" 
-                          style="background: rgba(22, 163, 74, 0.1); border-color: #16a34a;" 
-                          placeholder="0" required>
+            {{-- AREA PEMBAYARAN (Hanya muncul jika Fixed Duration) --}}
+            <div id="paymentArea">
+                <div class="mt-1 small text-end text-secondary">
+                   Selesai jam: <span id="endLbl" class="fw-bold text-light">—:—</span>
                 </div>
-                <div class="form-text text-secondary fst-italic" style="font-size: 0.75rem;">
-                   *Masukkan total harga kesepakatan (borongan).
+
+                <div class="mt-4 p-3 rounded-3" style="background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(148, 163, 184, 0.2);">
+                    <label class="form-label text-success small text-uppercase fw-bold mb-1">Total Tagihan (Manual)</label>
+                    <div class="input-group">
+                       <span class="input-group-text bg-success border-success text-white">Rp</span>
+                       <input type="number" name="bill" id="manualBillInput" class="form-control fs-5 fw-bold text-white" 
+                              style="background: rgba(22, 163, 74, 0.1); border-color: #16a34a;" placeholder="0">
+                    </div>
+                    <div class="form-text text-secondary fst-italic" style="font-size: 0.75rem;">
+                       *Masukkan harga borongan.
+                    </div>
+                </div>
+
+                <div class="row mt-3 g-2">
+                  <div class="col-md-4">
+                    <label class="form-label">Metode</label>
+                    <select name="payment_method" id="payMethod" class="form-select">
+                      <option value="Tunai">Tunai</option>
+                      <option value="QRIS">QRIS</option>
+                      <option value="Transfer">Transfer</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Dibayar</label>
+                    <input type="number" class="form-control" name="paid_amount" id="paidAmount" min="0">
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Kembalian</label>
+                    <input type="text" class="form-control" id="changeLbl" value="Rp 0" readonly>
+                  </div>
                 </div>
             </div>
 
-            <div class="row mt-3 g-2">
-              <div class="col-md-4">
-                <label class="form-label">Metode Bayar</label>
-                <select name="payment_method" id="payMethod" class="form-select">
-                  <option value="Tunai">Tunai</option>
-                  <option value="QRIS">QRIS</option>
-                  <option value="Transfer">Transfer</option>
-                </select>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Dibayar</label>
-                <input type="number" class="form-control" name="paid_amount" id="paidAmount" value="" min="0">
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Kembalian</label>
-                <input type="text" class="form-control" id="changeLbl" value="Rp 0" readonly>
-              </div>
-            </div>
-
-            <button class="btn btn-main-submit mt-4">
-              <i class="bi bi-play-circle me-1"></i> Simpan & Cetak Struk
+            <button class="btn btn-main-submit mt-4" id="submitBtn">
+              <i class="bi bi-play-circle me-1"></i> Mulai Sesi
             </button>
           </form>
         </div>
       </div>
     </div>
 
-    {{-- RIWAYAT SESI (Kanan) --}}
-    <div class="col-lg-6">
+    {{-- DAFTAR SESI (Kanan) --}}
+    <div class="col-lg-7">
       <div class="card session-card h-100">
         <div class="card-header session-card-header d-flex justify-content-between align-items-center">
-          <span>Riwayat Sesi</span>
-          <span class="badge bg-secondary-subtle text-dark d-print-none">{{ $closed_sessions->count() }} sesi</span>
+          <span>Daftar Sesi</span>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive session-history-scroll">
             <table class="table table-sm table-hover m-0 align-middle table-neon">
               <thead>
                 <tr>
-                  <th>Unit / Paket</th>
-                  <th class="text-nowrap">Waktu</th>
-                  <th class="text-center">Durasi</th>
+                  <th>Unit</th>
+                  <th>Mulai</th>
+                  <th class="text-center">Status</th>
                   <th class="text-end">Tagihan</th>
                   <th class="text-end d-print-none">Aksi</th>
                 </tr>
               </thead>
               <tbody>
-                @forelse($closed_sessions as $s)
+                {{-- 1. SESI OPEN BILLING (Running) --}}
+                @foreach($active_sessions as $as)
+                  <tr style="background: rgba(34, 197, 94, 0.05);">
+                    <td class="text-white">
+                      <div class="fw-bold">{{ $as->psUnit->name }}</div>
+                      <span class="badge-type">{{ $as->psUnit->type ?? 'PS' }}</span>
+                      @if($as->extra_controllers > 0)
+                        <span class="badge badge-addon ms-1">+{{ $as->extra_controllers }} Stik</span>
+                      @endif
+                    </td>
+                    <td class="small text-secondary">
+                      <div>{{ \Carbon\Carbon::parse($as->start_time)->format('H:i') }}</div>
+                      <div class="text-xs text-info update-timer" data-start="{{ $as->start_time }}">Running...</div>
+                    </td>
+                    <td class="text-center">
+                      <span class="badge bg-success badge-pulse">OPEN</span>
+                    </td>
+                    <td class="text-end text-secondary small fst-italic">Bayar nanti</td>
+                    <td class="text-end d-print-none">
+                      <button class="btn btn-sm btn-danger fw-bold shadow-sm" style="font-size: 0.7rem;"
+                              onclick="openStopModal('{{ $as->id }}', '{{ $as->psUnit->name }}', '{{ $as->start_time }}')">
+                          <i class="bi bi-stop-circle-fill me-1"></i> STOP
+                      </button>
+                    </td>
+                  </tr>
+                @endforeach
+
+                {{-- 2. SESI SELESAI (Riwayat) --}}
+                @foreach($closed_sessions as $s)
                   <tr>
                     <td class="text-white">
                       <div class="fw-bold">{{ $s->psUnit->name ?? '-' }}</div>
@@ -308,13 +353,71 @@
                       @endif
                     </td>
                   </tr>
-                @empty
-                  <tr><td colspan="5" class="text-center text-light p-3">Belum ada sesi.</td></tr>
-                @endforelse
+                @endforeach
               </tbody>
             </table>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{-- MODAL STOP OPEN BILLING (BARU) --}}
+<div class="modal fade modal-glass" id="stopOpenModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-white">Stop & Bayar Sesi</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body pt-3">
+        <p class="text-mono small mb-3">Unit: <strong id="stopUnitName" class="text-white"></strong></p>
+        <div class="alert alert-dark border-secondary d-flex justify-content-between">
+            <span>Durasi berjalan:</span>
+            <strong id="stopDurationTxt" class="text-warning">...</strong>
+        </div>
+
+        <form id="stopOpenForm" method="post" action="{{ route('sessions.stop_open') }}">
+          @csrf
+          <input type="hidden" name="session_id" id="stopSessionId">
+
+          <div class="mb-3">
+             <label class="form-label text-success small text-uppercase fw-bold">Total Tagihan (Manual)</label>
+             <div class="input-group">
+                <span class="input-group-text bg-success border-success text-white">Rp</span>
+                <input type="number" name="final_bill" id="stopBillInput" class="form-control fs-5 fw-bold text-white" 
+                       style="background: rgba(22, 163, 74, 0.1); border-color: #16a34a;" placeholder="0" required>
+             </div>
+          </div>
+
+          <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label small text-secondary">Metode Bayar</label>
+                <select name="payment_method" class="form-select text-white" style="background: rgba(15,23,42,.6); border-color: rgba(148,163,184,.3);">
+                   <option value="Tunai">Tunai</option>
+                   <option value="QRIS">QRIS</option>
+                   <option value="Transfer">Transfer</option>
+                </select>
+              </div>
+              <div class="col-6">
+                 <label class="form-label small text-secondary">Uang Diterima</label>
+                 <input type="number" id="stopPaid" name="paid_amount" class="form-control text-white" placeholder="0" required style="background: rgba(15,23,42,.6); border-color: rgba(148,163,184,.3);">
+              </div>
+          </div>
+          
+          <div class="mb-3">
+             <label class="form-label small text-secondary">Kembalian</label>
+             <input type="text" id="stopChange" class="form-control text-white" value="Rp 0" readonly style="background: rgba(15,23,42,.4); border-color: rgba(148,163,184,.15); color: #9ca3af;">
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-main-submit w-auto px-4 py-2 bg-danger border-danger shadow-none">
+                Stop & Cetak Struk
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -394,11 +497,35 @@
 (function(){
   function fmtIDR(n){ return (n||0).toLocaleString('id-ID'); }
 
-  // 1. UPDATE JAM SELESAI (Hanya hitung waktu, tidak sentuh harga)
+  // 1. TAMPILAN FORM (OPEN VS FIXED)
+  const hoursSel = document.getElementById('hoursSel');
+  const paymentArea = document.getElementById('paymentArea');
+  const manualBillInput = document.getElementById('manualBillInput');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function toggleForm(){
+      if(hoursSel.value === 'open'){
+          paymentArea.style.display = 'none';
+          manualBillInput.required = false; // Tidak wajib bayar sekarang
+          submitBtn.innerHTML = '<i class="bi bi-play-circle me-1"></i> Mulai Open Billing';
+          submitBtn.classList.replace('btn-main-submit', 'btn-success'); 
+      } else {
+          paymentArea.style.display = 'block';
+          manualBillInput.required = true; // Wajib bayar
+          submitBtn.innerHTML = '<i class="bi bi-play-circle me-1"></i> Simpan & Cetak Struk';
+          submitBtn.classList.replace('btn-success', 'btn-main-submit');
+          updateEndTime();
+      }
+  }
+  hoursSel.addEventListener('change', toggleForm);
+  toggleForm(); // init
+
+  // 2. JAM SELESAI (Hanya jika fixed duration)
   function updateEndTime(){
     const startVal = document.getElementById('startInput').value;
-    const hours = parseFloat(document.getElementById('hoursSel').value || '0');
+    const hours = parseFloat(hoursSel.value || '0');
     const endLbl = document.getElementById('endLbl');
+    if(hoursSel.value === 'open') return;
 
     try{
       if(startVal && hours > 0){
@@ -410,57 +537,66 @@
       }
     } catch(e){ endLbl.textContent='—:—'; }
   }
+  document.getElementById('startInput').addEventListener('change', updateEndTime);
 
-  // 2. UPDATE KEMBALIAN (Berdasarkan input manual bill & paid)
+  // 3. KEMBALIAN (Fixed)
   function updateChange(){
     const method = (document.getElementById('payMethod')?.value||'Tunai').toLowerCase();
-    const bill = parseInt(document.getElementById('manualBillInput')?.value || '0', 10);
+    const bill = parseInt(manualBillInput.value || '0', 10);
     const paid = parseInt(document.getElementById('paidAmount')?.value || '0', 10);
-    
     const change = method==='tunai' ? Math.max(0, paid - bill) : 0;
-    const out = document.getElementById('changeLbl');
-    if(out) out.value = 'Rp ' + fmtIDR(change);
+    document.getElementById('changeLbl').value = 'Rp ' + fmtIDR(change);
   }
-
-  // Validasi Form Submit
-  const formEl = document.getElementById('fixedForm');
-  if(formEl){
-    formEl.addEventListener('submit', function(e){
-      const method = (document.getElementById('payMethod')?.value||'Tunai').toLowerCase();
-      const paid = parseInt(document.getElementById('paidAmount')?.value||'0',10);
-      const bill = parseInt(document.getElementById('manualBillInput')?.value||'0',10);
-
-      if (bill <= 0) {
-         e.preventDefault();
-         Swal.fire({icon: 'warning', title: 'Tagihan Kosong', text: 'Mohon isi total tagihan secara manual.'});
-         return;
-      }
-
-      if (method === 'tunai' && paid < bill) {
-        e.preventDefault();
-        Swal.fire({
-          icon: 'error',
-          title: 'Pembayaran kurang',
-          html: `Tagihan: <b>Rp ${fmtIDR(bill)}</b><br>Diterima: <b>Rp ${fmtIDR(paid)}</b>`,
-          background: '#0f172a', color: '#e5e7eb'
-        });
-      }
-    });
-  }
-
-  // Listeners
-  ['hoursSel','startInput'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.addEventListener('change', updateEndTime);
-  });
-  
-  // Update Kembalian saat ngetik tagihan atau bayar
-  document.getElementById('manualBillInput')?.addEventListener('input', updateChange);
-  document.getElementById('paidAmount')?.addEventListener('input', updateChange);
+  manualBillInput.addEventListener('input', updateChange);
+  document.getElementById('paidAmount').addEventListener('input', updateChange);
   document.getElementById('payMethod')?.addEventListener('change', updateChange);
 
-  updateEndTime(); // Init
+  // 4. TIMER BERJALAN (Untuk sesi Open di tabel)
+  setInterval(() => {
+      document.querySelectorAll('.update-timer').forEach(el => {
+          const start = new Date(el.dataset.start);
+          const now = new Date();
+          const diffMs = now - start;
+          const diffHrs = Math.floor(diffMs / 3600000);
+          const diffMins = Math.floor((diffMs % 3600000) / 60000);
+          el.textContent = `${diffHrs}j ${diffMins}m berjalan`;
+      });
+  }, 60000); // Update tiap menit
+
 })();
+
+// === LOGIKA MODAL STOP OPEN BILLING ===
+function openStopModal(id, unitName, startTime){
+    document.getElementById('stopSessionId').value = id;
+    document.getElementById('stopUnitName').textContent = unitName;
+    
+    // Hitung durasi kasar
+    const start = new Date(startTime);
+    const now = new Date();
+    const diffMs = now - start;
+    const diffHrs = (diffMs / 3600000).toFixed(1);
+    document.getElementById('stopDurationTxt').textContent = `± ${diffHrs} Jam`;
+
+    // Reset Form
+    document.getElementById('stopBillInput').value = '';
+    document.getElementById('stopPaid').value = '';
+    document.getElementById('stopChange').value = 'Rp 0';
+
+    const modal = new bootstrap.Modal(document.getElementById('stopOpenModal'));
+    modal.show();
+}
+
+// Logic Kembalian di Modal Stop
+const stopBillInput = document.getElementById('stopBillInput');
+const stopPaidInput = document.getElementById('stopPaid');
+function calcStopChange(){
+    const bill = parseInt(stopBillInput.value || 0);
+    const paid = parseInt(stopPaidInput.value || 0);
+    const change = Math.max(0, paid - bill);
+    document.getElementById('stopChange').value = 'Rp ' + (change).toLocaleString('id-ID');
+}
+stopBillInput.addEventListener('input', calcStopChange);
+stopPaidInput.addEventListener('input', calcStopChange);
 
 // === LOGIKA MODAL TAMBAH JAM (MANUAL) ===
 function fmtIDRModal(n){ return (n||0).toLocaleString('id-ID'); }
