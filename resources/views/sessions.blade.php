@@ -375,7 +375,7 @@
         <p class="text-mono small mb-3">Unit: <strong id="stopUnitName" class="text-white"></strong></p>
         <div class="alert alert-dark border-secondary d-flex justify-content-between">
             <span>Durasi berjalan:</span>
-            <strong id="stopDurationTxt" class="text-warning">...</strong>
+            <strong id="stopDurationTxt" class="text-dark">...</strong>
         </div>
 
         <form id="stopOpenForm" method="post" action="{{ route('sessions.stop_open') }}">
