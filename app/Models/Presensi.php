@@ -89,7 +89,7 @@ class Presensi extends Model
         $startTime = Carbon::parse($tanggal->format('Y-m-d') . ' ' . $defs[$shift]['start']);
 
         // telat kalau > 10 menit dari jam mulai. 
-        $deadline = $startTime->copy()->addMinutes(15);
+        $deadline = $startTime->copy()->addMinutes(30);
 
         return $checkIn->greaterThan($deadline) ? 'telat' : 'hadir';
     }
