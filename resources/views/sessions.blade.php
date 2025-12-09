@@ -17,259 +17,110 @@
     color:#e5e7eb;
   }
   .session-shell::before{
-    content:"";
-    position:absolute;
-    inset:-40%;
-    background:
-      radial-gradient(circle at 10% 0,#a855f755,transparent 52%),
-      radial-gradient(circle at 90% 100%,#0ea5e955,transparent 60%);
-    opacity:.7;
-    filter: blur(40px);
-    pointer-events:none;
+    content:""; position:absolute; inset:-40%;
+    background: radial-gradient(circle at 10% 0,#a855f755,transparent 52%), radial-gradient(circle at 90% 100%,#0ea5e955,transparent 60%);
+    opacity:.7; filter: blur(40px); pointer-events:none;
   }
-  .session-shell > *{
-    position:relative;
-    z-index:1;
-  }
+  .session-shell > *{ position:relative; z-index:1; }
 
   .session-header-stack{ gap:.75rem; }
-
   .session-chip-icon{
-    width:36px;
-    height:36px;
-    border-radius:999px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    background:linear-gradient(135deg,#4f46e5,#a855f7);
-    color:#fff;
-    box-shadow:0 10px 24px rgba(79,70,229,.7);
-    font-size:18px;
+    width:36px; height:36px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg,#4f46e5,#a855f7); color:#fff; box-shadow:0 10px 24px rgba(79,70,229,.7); font-size:18px;
   }
-
   .session-title-text{ color:#f9fafb; }
   .session-subtitle{ color:#9ca3af; font-size:.8rem; }
 
   .btn-soft-dark{
-    border-radius:999px;
-    border:1px solid rgba(148,163,184,.4);
-    background:rgba(15,23,42,.75);
-    color:#e5e7eb;
+    border-radius:999px; border:1px solid rgba(148,163,184,.4); background:rgba(15,23,42,.75); color:#e5e7eb;
   }
-  .btn-soft-dark:hover{
-    background:rgba(15,23,42,.95);
-    color:#fff;
-  }
+  .btn-soft-dark:hover{ background:rgba(15,23,42,.95); color:#fff; }
 
   /* ====== CARD GLASSMORPHIC ====== */
   .session-card{
-    border-radius:1.25rem;
-    border:1px solid rgba(148,163,184,.25);
+    border-radius:1.25rem; border:1px solid rgba(148,163,184,.25);
     background: linear-gradient(145deg, rgba(2,6,23,0.9), rgba(15,23,42,0.8));
-    color:#e5e7eb;
-    box-shadow:0 20px 38px rgba(0,0,0,.6);
-    backdrop-filter:blur(12px);
-    overflow: hidden;
+    color:#e5e7eb; box-shadow:0 20px 38px rgba(0,0,0,.6); backdrop-filter:blur(12px); overflow: hidden;
   }
   .session-card-header{
-    border-bottom:1px solid rgba(148,163,184,.2);
-    background: rgba(30, 41, 59, 0.4);
-    color:#e5e7eb;
-    font-weight:700;
-    letter-spacing:.06em;
-    text-transform:uppercase;
-    font-size:.75rem;
-    padding: 1rem 1.25rem;
+    border-bottom:1px solid rgba(148,163,184,.2); background: rgba(30, 41, 59, 0.4);
+    color:#e5e7eb; font-weight:700; letter-spacing:.06em; text-transform:uppercase; font-size:.75rem; padding: 1rem 1.25rem;
   }
 
   /* ====== FORM INPUT STYLE ====== */
-  .session-shell .form-label{
-    font-size:.8rem;
-    font-weight:600;
-    color:#9ca3af;
+  .session-shell .form-label{ font-size:.8rem; font-weight:600; color:#9ca3af; }
+  .session-shell .form-select, .session-shell .form-control{
+    background:rgba(15,23,42,.6); border-radius:.6rem; border:1px solid rgba(148,163,184,.3); color:#f3f4f6; font-size:.9rem;
   }
-  .session-shell .form-select,
-  .session-shell .form-control{
-    background:rgba(15,23,42,.6);
-    border-radius:.6rem;
-    border:1px solid rgba(148,163,184,.3);
-    color:#f3f4f6;
-    font-size:.9rem;
-  }
-  .session-shell .form-control:focus,
-  .session-shell .form-select:focus{
-    border-color:#6366f1;
-    box-shadow:0 0 0 2px rgba(99,102,241,.25);
-    background:rgba(2,6,23,.8);
-    color:#fff;
+  .session-shell .form-control:focus, .session-shell .form-select:focus{
+    border-color:#6366f1; box-shadow:0 0 0 2px rgba(99,102,241,.25); background:rgba(2,6,23,.8); color:#fff;
   }
   .session-shell .form-control[readonly]{
-    background:rgba(15,23,42,.4);
-    color:#9ca3af;
-    border-color:rgba(148,163,184,.15);
-  }
-
-  .calc-line{
-    color:#9ca3af;
-    font-size:.85rem;
-    display:flex;
-    justify-content:space-between;
-    margin-bottom:4px;
-  }
-  .calc-line span{
-    font-weight:700;
-    color:#e5e7eb;
+    background:rgba(15,23,42,.4); color:#9ca3af; border-color:rgba(148,163,184,.15);
   }
 
   .btn-main-submit{
-    width: 100%;
-    border-radius:.75rem;
-    padding:.7rem;
-    font-weight:700;
-    background:linear-gradient(135deg,#22c55e,#16a34a);
-    border:none;
-    color:#fff;
-    box-shadow:0 4px 12px rgba(34,197,94,.4);
-    transition: all 0.2s;
+    width: 100%; border-radius:.75rem; padding:.7rem; font-weight:700;
+    background:linear-gradient(135deg,#22c55e,#16a34a); border:none; color:#fff;
+    box-shadow:0 4px 12px rgba(34,197,94,.4); transition: all 0.2s;
   }
-  .btn-main-submit:hover{
-    filter:brightness(1.1);
-    transform: translateY(-1px);
-    box-shadow:0 6px 15px rgba(34,197,94,.5);
-  }
+  .btn-main-submit:hover{ filter:brightness(1.1); transform: translateY(-1px); box-shadow:0 6px 15px rgba(34,197,94,.5); }
 
   /* ====== TABEL FUTURISTIK ====== */
-  .table-neon {
-    width: 100%;
-    margin-bottom: 0;
-    border-collapse: separate;
-    border-spacing: 0;
-    color: #cbd5e1;
-  }
+  .table-neon { width: 100%; margin-bottom: 0; border-collapse: separate; border-spacing: 0; color: #cbd5e1; }
   .table-neon thead th {
-    background: rgba(15, 23, 42, 0.8);
-    color: #94a3b8;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-    padding: 0.85rem 1rem;
-    white-space: nowrap;
+    background: rgba(15, 23, 42, 0.8); color: #94a3b8; font-size: 0.75rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    padding: 0.85rem 1rem; white-space: nowrap;
   }
   .table-neon tbody td {
-    background: transparent;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-    padding: 0.85rem 1rem;
-    vertical-align: middle;
-    font-size: 0.9rem;
+    background: transparent; border-bottom: 1px solid rgba(148, 163, 184, 0.1); padding: 0.85rem 1rem;
+    vertical-align: middle; font-size: 0.9rem;
   }
-  .table-neon tbody tr:hover td {
-    background: rgba(99, 102, 241, 0.08);
-  }
+  .table-neon tbody tr:hover td { background: rgba(99, 102, 241, 0.08); }
 
-  .amount-mono{
-    font-family:'Consolas','Monaco',monospace;
-    font-weight:600;
-    color:#818cf8;
-  }
-  .unit-name{
-    font-weight:700;
-    color:#fff;
-    font-size:.95rem;
-  }
+  .amount-mono{ font-family:'Consolas','Monaco',monospace; font-weight:600; color:#818cf8; }
+  .unit-name{ font-weight:700; color:#fff; font-size:.95rem; }
   .badge-type{
-    background:#fbbf24;
-    color:#1e293b;
-    font-weight:800;
-    font-size:.65rem;
-    padding:2px 6px;
-    border-radius:4px;
-    margin-left:6px;
-    vertical-align:middle;
-    text-transform:uppercase;
+    background:#fbbf24; color:#1e293b; font-weight:800; font-size:.65rem; padding:2px 6px;
+    border-radius:4px; margin-left:6px; vertical-align:middle; text-transform:uppercase;
     box-shadow:0 2px 5px rgba(251,191,36,.4);
   }
   .badge-addon{
-    font-size:0.7rem;
-    padding:2px 8px;
-    border-radius:99px;
-    background:rgba(255,255,255,0.1);
-    border:1px solid rgba(255,255,255,0.2);
-    color:#e2e8f0;
-    margin-right:4px;
+    font-size:0.7rem; padding:2px 8px; border-radius:99px;
+    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#e2e8f0; margin-right:4px;
   }
 
-  .session-history-scroll{
-    max-height:580px;
-    overflow-y:auto;
-    scrollbar-width:thin;
-    scrollbar-color:#475569 #1e293b;
-  }
+  .session-history-scroll{ max-height:580px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:#475569 #1e293b; }
 
+  /* Tombol Kecil */
   .btn-delete-xs{
-    padding:4px 10px;
-    font-size:0.75rem;
-    border-radius:6px;
-    background:rgba(239,68,68,0.15);
-    color:#fca5a5;
-    border:1px solid rgba(239,68,68,0.3);
-    transition:all 0.2s;
+    padding:4px 10px; font-size:0.75rem; border-radius:6px;
+    background:rgba(239,68,68,0.15); color:#fca5a5; border:1px solid rgba(239,68,68,0.3); transition:all 0.2s;
   }
-  .btn-delete-xs:hover{
-    background:rgba(239,68,68,0.9);
-    color:#fff;
-    border-color:transparent;
-  }
+  .btn-delete-xs:hover{ background:rgba(239,68,68,0.9); color:#fff; border-color:transparent; }
 
   .btn-add-time{
-    padding:4px 8px;
-    font-size:0.7rem;
-    border-radius:6px;
-    background:rgba(34,197,94,0.15);
-    color:#86efac;
-    border:1px solid rgba(34,197,94,0.3);
-    margin-right:4px;
-    transition:all 0.2s;
+    padding:4px 8px; font-size:0.7rem; border-radius:6px;
+    background:rgba(34,197,94,0.15); color:#86efac; border:1px solid rgba(34,197,94,0.3); margin-right:4px; transition:all 0.2s;
   }
-  .btn-add-time:hover{
-    background:rgba(34,197,94,0.9);
-    color:#022c22;
-    border-color:transparent;
-  }
+  .btn-add-time:hover{ background:rgba(34,197,94,0.9); color:#022c22; border-color:transparent; }
 
-  .price-display-box{
-    background:rgba(34,197,94,0.1);
-    border:1px solid rgba(34,197,94,0.2);
-    border-radius:8px;
-    padding:12px;
-    margin-bottom:15px;
-  }
-
+  /* Modal */
   .modal-glass .modal-content{
-    background:radial-gradient(circle at top left,#1e1e2f,#0f1020);
-    border:1px solid rgba(124,58,237,.3);
-    box-shadow:0 0 30px rgba(0,0,0,.8);
-    color:#e5e7eb;
-    border-radius:1.25rem;
+    background:radial-gradient(circle at top left,#1e1e2f,#0f1020); border:1px solid rgba(124,58,237,.3);
+    box-shadow:0 0 30px rgba(0,0,0,.8); color:#e5e7eb; border-radius:1.25rem;
   }
   .modal-glass .modal-header{border-bottom:1px solid rgba(255,255,255,.08);}
   .modal-glass .modal-footer{border-top:1px solid rgba(255,255,255,.08);}
-  .modal-glass .form-control,
-  .modal-glass .form-select{
-    background:rgba(15,23,42,.6);
-    border:1px solid rgba(148,163,184,.3);
-    color:#fff;
+  .modal-glass .form-control, .modal-glass .form-select{
+    background:rgba(15,23,42,.6); border:1px solid rgba(148,163,184,.3); color:#fff;
   }
   .modal-glass .btn-close-white{filter:invert(1) grayscale(100%) brightness(200%);}
 
-  input[type="datetime-local"]::-webkit-calendar-picker-indicator{
-    filter:invert(1);
-  }
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator{ filter:invert(1); }
 
-  @media (max-width: 992px){
-    .session-shell{ padding:1.35rem 1rem 1.8rem; border-radius:1.1rem; }
-  }
+  @media (max-width: 992px){ .session-shell{ padding:1.35rem 1rem 1.8rem; border-radius:1.1rem; } }
   @media (max-width: 768px){
     .session-header-stack{ flex-direction:column; align-items:flex-start !important; }
     .session-header-actions{ width:100%; justify-content:flex-end; }
@@ -303,7 +154,7 @@
         <span class="session-chip-icon"><i class="bi bi-controller"></i></span>
         <h4 class="m-0 fw-semibold session-title-text">Sesi PS (Durasi Tetap)</h4>
       </div>
-      <div class="session-subtitle">Buat sesi PS dengan durasi tetap, hitung tagihan otomatis, dan pantau riwayat sesi.</div>
+      <div class="session-subtitle">Buat sesi PS, catat durasi, dan input tagihan secara manual (Borongan).</div>
     </div>
     <div class="d-flex align-items-center gap-2 d-print-none session-header-actions">
       <button type="button" class="btn btn-soft-dark" onclick="location.reload()"><i class="bi bi-arrow-clockwise me-1"></i> Refresh</button>
@@ -315,7 +166,7 @@
     <div class="col-lg-6">
       <div class="card session-card h-100">
         <div class="card-body">
-          <h6 class="mb-3 fw-bold text-uppercase small text-gray-300">Buat sesi &amp; tagih</h6>
+          <h6 class="mb-3 fw-bold text-uppercase small text-gray-300">Buat Sesi & Tagih</h6>
           <form method="post" action="{{ route('sessions.fixed') }}" id="fixedForm">
             @csrf
 
@@ -324,42 +175,15 @@
             <select class="form-select" name="ps_unit_id" id="unitSel" required>
               <option value="">-- pilih --</option>
               @foreach($units as $u)
-                <option value="{{ $u->id }}"
-                        data-rate="{{ $u->hourly_rate }}"
-                        data-type="{{ $u->type ?? 'PS4' }}">
+                <option value="{{ $u->id }}">
                   {{ $u->name }} [{{ $u->type ?? 'PS4' }}] — Rp {{ number_format($u->hourly_rate,0,',','.') }}/jam
                 </option>
               @endforeach
             </select>
 
-            <label class="form-label mt-3">Durasi</label>
-            <select class="form-select" id="hoursSel" name="hours">
-              <option value="0.5">30 menit</option>
-              @for($h=1; $h<=6; $h++)
-                <option value="{{ $h }}">{{ $h }} jam</option>
-              @endfor
-            </select>
-
-            {{-- TARIF PER JAM (MANUAL) --}}
-            <label class="form-label mt-3">Tarif per Jam (boleh diubah)</label>
-            <div class="input-group">
-              <span class="input-group-text bg-dark border-secondary text-light">Rp</span>
-              <input type="number"
-                     class="form-control"
-                     name="custom_rate"
-                     id="rateInput"
-                     min="0"
-                     step="1000"
-                     placeholder="0">
-            </div>
-            <div class="form-text text-secondary small">
-              Default mengikuti tarif di menu <b>Unit PS</b>, tapi bisa diubah per sesi.
-            </div>
-
-            
-            {{-- STIK TAMBAHAN --}}
+            {{-- STIK TAMBAHAN (Hanya dicatat, tidak mempengaruhi harga otomatis) --}}
             <div class="mt-3">
-              <label class="form-label">Jumlah Stik Tambahan</label>
+              <label class="form-label">Tambahan Stik</label>
               <select class="form-select" id="extraSel" name="extra_controllers">
                 @for($n=0;$n<=4;$n++)
                 <option value="{{ $n }}">{{ $n }}</option>
@@ -367,25 +191,34 @@
               </select>
             </div>
 
-            {{-- HARGA STIK TAMBAHAN PER JAM (MANUAL) --}}
-            <label class="form-label mt-3">Harga Stik Tambahan / Jam</label>
-            <div class="input-group">
-              <span class="input-group-text bg-dark border-secondary text-light">Rp</span>
-              <input type="number"
-                     class="form-control"
-                     name="extra_rate"
-                     id="extraRateInput"
-                     min="0"
-                     step="1000"
-                     value="10000">
-            </div>
-            <div class="form-text text-secondary small">
-              Default Rp 10.000 per stik per jam, bisa diubah per sesi.
-            </div>
-            
             <label class="form-label mt-3">Waktu Mulai</label>
             <input type="datetime-local" class="form-control" name="start_time" id="startInput" value="{{ \Carbon\Carbon::now()->format('Y-m-d\TH:i') }}" required>
 
+            <label class="form-label mt-3">Durasi Main</label>
+            <select class="form-select" id="hoursSel" name="hours">
+              <option value="0.5">30 menit</option>
+              @for($h=1; $h<=10; $h++)
+                <option value="{{ $h }}">{{ $h }} jam</option>
+              @endfor
+            </select>
+            <div class="mt-1 small text-end text-secondary">
+               Selesai jam: <span id="endLbl" class="fw-bold text-light">—:—</span>
+            </div>
+
+            {{-- INPUT TOTAL TAGIHAN MANUAL --}}
+            <div class="mt-4 p-3 rounded-3" style="background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(148, 163, 184, 0.2);">
+                <label class="form-label text-success small text-uppercase fw-bold mb-1">Total Tagihan (Isi Manual)</label>
+                <div class="input-group">
+                   <span class="input-group-text bg-success border-success text-white">Rp</span>
+                   <input type="number" name="bill" id="manualBillInput" 
+                          class="form-control fs-5 fw-bold text-white" 
+                          style="background: rgba(22, 163, 74, 0.1); border-color: #16a34a;" 
+                          placeholder="0" required>
+                </div>
+                <div class="form-text text-secondary fst-italic" style="font-size: 0.75rem;">
+                   *Masukkan total harga kesepakatan (borongan).
+                </div>
+            </div>
 
             <div class="row mt-3 g-2">
               <div class="col-md-4">
@@ -406,13 +239,8 @@
               </div>
             </div>
 
-            <div class="mt-3 small">
-              <div class="calc-line">Selesai jam: <span id="endLbl">—:—</span></div>
-              <div class="calc-line">Total tagihan: <span id="billLbl" class="text-success fs-5">Rp 0</span></div>
-            </div>
-
-            <button class="btn btn-main-submit mt-3">
-              <i class="bi bi-play-circle me-1"></i> Buat &amp; Tagih
+            <button class="btn btn-main-submit mt-4">
+              <i class="bi bi-play-circle me-1"></i> Simpan & Cetak Struk
             </button>
           </form>
         </div>
@@ -444,7 +272,6 @@
                     <td class="text-white">
                       <div class="fw-bold">{{ $s->psUnit->name ?? '-' }}</div>
                       <span class="badge-type">{{ $s->psUnit->type ?? 'PS4' }}</span>
-
                       @if(!empty($s->extra_controllers) && $s->extra_controllers > 0)
                         <span class="badge badge-addon ms-1">+Stik {{ $s->extra_controllers }}</span>
                       @endif
@@ -458,8 +285,7 @@
                     </td>
                     <td class="text-center">
                       <span class="badge bg-secondary bg-opacity-25 text-light border border-secondary border-opacity-25">
-                        {{ intdiv($s->minutes ?? 0, 60) }} jam
-                        @if(($s->minutes % 60) > 0) {{ $s->minutes % 60 }} m @endif
+                        {{ intdiv($s->minutes ?? 0, 60) }}h @if(($s->minutes % 60) > 0) {{ $s->minutes % 60 }}m @endif
                       </span>
                     </td>
                     <td class="text-end mono text-info">Rp {{ number_format($s->bill ?? 0,0,',','.') }}</td>
@@ -467,33 +293,23 @@
                       <button class="btn-add-time"
                               onclick="openAddTimeModal(
                                 '{{ $s->id }}',
-                                '{{ $s->psUnit->name ?? 'Unit' }}',
-                                {{ $s->psUnit->hourly_rate ?? 10000 }},
-                                {{ $s->extra_controllers ?? 0 }},
-                                {{ $s->arcade_controllers ?? 0 }}
+                                '{{ $s->psUnit->name ?? 'Unit' }}'
                               )">
-                        <i class="bi bi-plus-circle-fill"></i> Jam
+                        <i class="bi bi-plus-circle-fill"></i> Add
                       </button>
 
                       @if(auth()->user() && auth()->user()->role === 'admin')
-                        <form class="d-inline confirm-delete"
-                              method="post"
+                        <form class="d-inline confirm-delete" method="post"
                               action="{{ route('sessions.delete', ['sid' => $s->id]) }}"
-                              data-confirm="Hapus riwayat sesi ini? Pendapatan di laporan akan ikut terhapus."
-                              data-timer-unit="{{ $s->psUnit->name ?? '' }}">
-                          @csrf
-                          @method('DELETE')
-                          <button class="btn-delete-xs">
-                            <i class="bi bi-trash3-fill"></i>
-                          </button>
+                              data-confirm="Hapus riwayat sesi ini? Pendapatan di laporan akan ikut terhapus.">
+                          @csrf @method('DELETE')
+                          <button class="btn-delete-xs"><i class="bi bi-trash3-fill"></i></button>
                         </form>
                       @endif
                     </td>
                   </tr>
                 @empty
-                  <tr>
-                    <td colspan="5" class="text-center text-light p-3">Belum ada sesi.</td>
-                  </tr>
+                  <tr><td colspan="5" class="text-center text-light p-3">Belum ada sesi.</td></tr>
                 @endforelse
               </tbody>
             </table>
@@ -504,7 +320,7 @@
   </div>
 </div>
 
-{{-- MODAL TAMBAH JAM --}}
+{{-- MODAL TAMBAH JAM (MANUAL) --}}
 <div class="modal fade modal-glass" id="addTimeModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -514,17 +330,12 @@
       </div>
       <div class="modal-body pt-3">
         <p class="text-mono small mb-3">
-          <strong id="addTimeUnitName" class="text-white"></strong><br>
-          <span id="rateInfo" class="small fst-italic text-secondary"></span>
+          Unit: <strong id="addTimeUnitName" class="text-white"></strong>
         </p>
 
         <form id="addTimeForm" method="post" action="{{ route('sessions.add_time') }}">
           @csrf
           <input type="hidden" name="session_id" id="addTimeSessionId">
-          <input type="hidden" id="rawHourlyRate" value="0">
-          <input type="hidden" id="rawExtraCtrl" value="0">
-          <input type="hidden" id="rawArcadeCtrl" value="0">
-          <input type="hidden" id="rawAddCost" value="0">
 
           <div class="mb-3">
             <label class="form-label small text-secondary">Durasi Tambahan</label>
@@ -536,38 +347,39 @@
             </select>
           </div>
 
-          <div class="price-display-box">
-            <div class="d-flex justify-content-between align-items-center">
-              <span class="small text-success">Biaya Tambahan:</span>
-              <span class="fw-bold fs-5 text-success" id="addTimeCostDisplay">Rp 0</span>
-            </div>
-            <div class="small text-muted text-end mt-1" style="font-size: 0.7rem;">
-              *Tarif paket berlaku (Misal 3 Jam = 25rb)
-            </div>
+          <div class="mb-3">
+             <label class="form-label text-success small text-uppercase fw-bold">Biaya Tambahan (Manual)</label>
+             <div class="input-group">
+                <span class="input-group-text bg-success border-success text-white">Rp</span>
+                <input type="number" name="add_bill" id="addTimeBillInput" 
+                       class="form-control text-white fw-bold" 
+                       style="background: rgba(22, 163, 74, 0.1); border-color: #16a34a;" 
+                       placeholder="0" required>
+             </div>
           </div>
 
           <div class="mb-3">
             <label class="form-label small text-secondary">Metode Bayar Tambahan</label>
             <select name="payment_method" class="form-select text-white" style="background: rgba(15,23,42,.6); border-color: rgba(148,163,184,.3);">
-              <option value="Tunai">Tunai</option>
-              <option value="QRIS">QRIS</option>
-              <option value="Transfer">Transfer</option>
+               <option value="Tunai">Tunai</option>
+               <option value="QRIS">QRIS</option>
+               <option value="Transfer">Transfer</option>
             </select>
           </div>
-
+          
           <div class="mb-3">
-            <label class="form-label small text-secondary">Uang Diterima (Wajib)</label>
-            <input type="number" id="addTimePaid" name="paid_amount" class="form-control text-white" placeholder="0" required style="background: rgba(15,23,42,.6); border-color: rgba(148,163,184,.3);">
+             <label class="form-label small text-secondary">Uang Diterima</label>
+             <input type="number" id="addTimePaid" name="paid_amount" class="form-control text-white" placeholder="0" style="background: rgba(15,23,42,.6); border-color: rgba(148,163,184,.3);">
           </div>
-
+          
           <div class="mb-3">
-            <label class="form-label small text-secondary">Kembalian</label>
-            <input type="text" id="addTimeChange" class="form-control text-white" value="Rp 0" readonly style="background: rgba(15,23,42,.4); border-color: rgba(148,163,184,.15); color: #9ca3af;">
+             <label class="form-label small text-secondary">Kembalian</label>
+             <input type="text" id="addTimeChange" class="form-control text-white" value="Rp 0" readonly style="background: rgba(15,23,42,.4); border-color: rgba(148,163,184,.15); color: #9ca3af;">
           </div>
 
           <div class="d-flex justify-content-end gap-2 mt-4">
             <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
-            <button type="submit" class="btn btn-main-submit w-auto px-4 py-2">Simpan & Perbarui Tagihan</button>
+            <button type="submit" class="btn btn-main-submit w-auto px-4 py-2">Simpan Tambahan</button>
           </div>
         </form>
       </div>
@@ -580,247 +392,115 @@
 @push('scripts')
 <script>
 (function(){
-  const KEY_TIMERS = 'fixplay.rental.timers';
   function fmtIDR(n){ return (n||0).toLocaleString('id-ID'); }
 
-  function getNumbers(){
-    const unit = document.getElementById('unitSel');
-    return {
-      base: parseFloat(document.getElementById('rateInput').value || '0'),
-      extraRate: parseFloat(document.getElementById('extraRateInput').value || '0'),
-      type: unit?.selectedOptions[0]?.dataset?.type || 'PS4',
-      extra: parseInt(document.getElementById('extraSel').value || '0', 10),
-      arcade: 0,
-      hours: parseFloat(document.getElementById('hoursSel').value || '0'),
-    };
-  }
-
-  function getUnitName(){
-    return (document.getElementById('unitSel')?.selectedOptions?.[0]?.textContent || '').split(' [')[0].trim();
-  }
-  function getStartDT(){
-    const v=document.getElementById('startInput').value;
-    return v ? new Date(v) : null;
-  }
-
-  function loadTimers(){ try{return JSON.parse(localStorage.getItem(KEY_TIMERS)||'[]')}catch(e){return[]} }
-  function saveTimers(arr){ localStorage.setItem(KEY_TIMERS, JSON.stringify(arr)); }
-  function saveTimer(){
-    const unitName = getUnitName();
-    const start = getStartDT();
+  // 1. UPDATE JAM SELESAI (Hanya hitung waktu, tidak sentuh harga)
+  function updateEndTime(){
+    const startVal = document.getElementById('startInput').value;
     const hours = parseFloat(document.getElementById('hoursSel').value || '0');
-    if (!unitName || !start || !(hours>0)) return;
-    const endAt = new Date(start.getTime() + hours*60*60*1000).toISOString();
-    const timers = loadTimers();
-    timers.push({id:Date.now()+'-'+Math.random().toString(36).slice(2),unit:unitName,endAt:endAt,notified:false});
-    saveTimers(timers.filter(t=>(Date.now()-new Date(t.endAt).getTime())<24*3600*1000));
-  }
-
-  let currentBill = 0;
-  function roundToThousandCeil(n){ return Math.ceil(n/1000)*1000; }
-
-  function updateCalc(){
-    const start = document.getElementById('startInput').value;
-    const {base, extraRate, type, extra, hours} = getNumbers();
     const endLbl = document.getElementById('endLbl');
 
     try{
-      if(start && hours>0){
-        const dt = new Date(start);
+      if(startVal && hours > 0){
+        const dt = new Date(startVal);
         dt.setTime(dt.getTime() + Math.round(hours * 3600 * 1000));
         endLbl.textContent = String(dt.getHours()).padStart(2,'0') + ':' + String(dt.getMinutes()).padStart(2,'0');
-      }else{
+      } else {
         endLbl.textContent='—:—';
       }
-    }catch(e){
-      endLbl.textContent='—:—';
-    }
-
-    // Logika harga: paket PS4 reguler hanya jika rate = 10k
-    const extrasPerJam = extra * extraRate;
-    const totalExtras   = extrasPerJam * hours;
-    let unitBill = 0;
-
-    if (type === 'PS4' && base === 10000) {
-      if (hours === 3)      unitBill = 25000;
-      else if (hours === 4) unitBill = 35000;
-      else if (hours === 5) unitBill = 45000;
-      else if (hours === 6) unitBill = 50000;
-      else if (hours > 6) {
-        const extraHours = hours - 6;
-        unitBill = 50000 + (extraHours * base);
-      } else {
-        unitBill = base * hours;
-      }
-    } else {
-      unitBill = base * hours;
-    }
-
-    let rawBill = unitBill + totalExtras;
-    if (hours === 0.5) rawBill = roundToThousandCeil(rawBill);
-    else rawBill = Math.round(rawBill);
-
-    currentBill = rawBill || 0;
-    document.getElementById('billLbl').textContent = 'Rp ' + fmtIDR(currentBill);
-    updateChange();
+    } catch(e){ endLbl.textContent='—:—'; }
   }
 
+  // 2. UPDATE KEMBALIAN (Berdasarkan input manual bill & paid)
   function updateChange(){
     const method = (document.getElementById('payMethod')?.value||'Tunai').toLowerCase();
-    const paid = parseInt(document.getElementById('paidAmount')?.value||'0',10);
-    const change = method==='tunai' ? Math.max(0, paid-(currentBill||0)) : 0;
+    const bill = parseInt(document.getElementById('manualBillInput')?.value || '0', 10);
+    const paid = parseInt(document.getElementById('paidAmount')?.value || '0', 10);
+    
+    const change = method==='tunai' ? Math.max(0, paid - bill) : 0;
     const out = document.getElementById('changeLbl');
     if(out) out.value = 'Rp ' + fmtIDR(change);
   }
 
+  // Validasi Form Submit
   const formEl = document.getElementById('fixedForm');
   if(formEl){
     formEl.addEventListener('submit', function(e){
       const method = (document.getElementById('payMethod')?.value||'Tunai').toLowerCase();
       const paid = parseInt(document.getElementById('paidAmount')?.value||'0',10);
-      const currentBill = parseInt(document.getElementById('billLbl').textContent.replace(/[^0-9]/g,''));
+      const bill = parseInt(document.getElementById('manualBillInput')?.value||'0',10);
 
-      if (method === 'tunai' && paid < currentBill) {
+      if (bill <= 0) {
+         e.preventDefault();
+         Swal.fire({icon: 'warning', title: 'Tagihan Kosong', text: 'Mohon isi total tagihan secara manual.'});
+         return;
+      }
+
+      if (method === 'tunai' && paid < bill) {
         e.preventDefault();
-
         Swal.fire({
           icon: 'error',
-          title: 'Pembayaran tunai kurang',
-          html: `
-            Total tagihan:<br>
-            <b>Rp ${fmtIDRModal(currentBill)}</b><br><br>
-            Uang diterima:<br>
-            <b>Rp ${fmtIDRModal(paid)}</b>
-          `,
-          confirmButtonText: 'Oke, saya perbaiki',
-          confirmButtonColor: '#ef4444',
-          background: '#0f172a',
-          color: '#e5e7eb'
+          title: 'Pembayaran kurang',
+          html: `Tagihan: <b>Rp ${fmtIDR(bill)}</b><br>Diterima: <b>Rp ${fmtIDR(paid)}</b>`,
+          background: '#0f172a', color: '#e5e7eb'
         });
-
-        return;
       }
-
-      try { saveTimer(); } catch(err){}
     });
   }
 
-  // Saat pilih unit, isi default rate & default harga stik kalau kosong
-  const unitSel = document.getElementById('unitSel');
-  const rateInput = document.getElementById('rateInput');
-  const extraRateInput = document.getElementById('extraRateInput');
-
-  if(unitSel){
-    unitSel.addEventListener('change', function(){
-      const opt = unitSel.selectedOptions[0];
-      if(opt){
-        const defaultRate = opt.dataset.rate || '0';
-        if(!rateInput.value || rateInput.value === '0'){
-          rateInput.value = defaultRate;
-        }
-      }
-      if(!extraRateInput.value){
-        extraRateInput.value = 10000;
-      }
-      updateCalc();
-    });
-  }
-
-  // Listener lain
-  ['extraSel','hoursSel','startInput','rateInput','extraRateInput'].forEach(id=>{
+  // Listeners
+  ['hoursSel','startInput'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el){
-      el.addEventListener('change', updateCalc);
-      el.addEventListener('input', updateCalc);
-    }
+    if(el) el.addEventListener('change', updateEndTime);
   });
-  document.getElementById('payMethod')?.addEventListener('change', updateChange);
+  
+  // Update Kembalian saat ngetik tagihan atau bayar
+  document.getElementById('manualBillInput')?.addEventListener('input', updateChange);
   document.getElementById('paidAmount')?.addEventListener('input', updateChange);
+  document.getElementById('payMethod')?.addEventListener('change', updateChange);
 
-  updateCalc();
+  updateEndTime(); // Init
 })();
 
-// === LOGIKA MODAL TAMBAH JAM (tidak diubah kecuali helper) ===
+// === LOGIKA MODAL TAMBAH JAM (MANUAL) ===
 function fmtIDRModal(n){ return (n||0).toLocaleString('id-ID'); }
 
-function openAddTimeModal(sessionId, unitName, hourlyRate, extraCtrl, arcadeCtrl) {
+function openAddTimeModal(sessionId, unitName) {
   document.getElementById('addTimeSessionId').value = sessionId;
   document.getElementById('addTimeUnitName').textContent = unitName;
+  
+  // Reset
+  document.getElementById('addTimeBillInput').value = '';
+  document.getElementById('addTimePaid').value = '';
+  document.getElementById('addTimeChange').value = 'Rp 0';
 
-  document.getElementById('rawHourlyRate').value = hourlyRate;
-  document.getElementById('rawExtraCtrl').value = extraCtrl;
-  document.getElementById('rawArcadeCtrl').value = arcadeCtrl;
-
-  document.getElementById('rateInfo').textContent = `Rate: Rp ${fmtIDRModal(hourlyRate)}/jam`;
-
-  const calcAddOn = () => {
-    const h   = parseFloat(document.getElementById('addTimeHours').value || 0);
-    const rate= parseFloat(document.getElementById('rawHourlyRate').value || 0);
-    const ex  = parseInt(document.getElementById('rawExtraCtrl').value || 0);
-    const arc = parseInt(document.getElementById('rawArcadeCtrl').value || 0);
-
-    let unitCost = 0;
-    if (rate === 10000) {
-      if (h === 3)      unitCost = 25000;
-      else if (h === 4) unitCost = 35000;
-      else if (h === 5) unitCost = 45000;
-      else if (h === 6) unitCost = 50000;
-      else if (h > 6)   unitCost = 50000 + ((h - 6) * rate);
-      else              unitCost = h * rate;
-    } else {
-      unitCost = h * rate;
-    }
-
-    const extrasCost = (ex * 10000 * h) + (arc * 15000 * h);
-    let total = unitCost + extrasCost;
-
-    if(h === 0.5) total = Math.ceil(total/1000)*1000;
-    else total = Math.round(total);
-
-    document.getElementById('rawAddCost').value = total;
-    document.getElementById('addTimeCostDisplay').textContent = 'Rp ' + fmtIDRModal(total);
-
-    calcChange();
-  };
-
-  const calcChange = () => {
-    const cost = parseFloat(document.getElementById('rawAddCost').value || 0);
+  const calcChangeAdd = () => {
+    const cost = parseFloat(document.getElementById('addTimeBillInput').value || 0);
     const paid = parseFloat(document.getElementById('addTimePaid').value || 0);
     const change = Math.max(0, paid - cost);
     document.getElementById('addTimeChange').value = 'Rp ' + fmtIDRModal(change);
   }
 
-  const sel = document.getElementById('addTimeHours');
-  sel.onchange = calcAddOn;
-
-  const paidInput = document.getElementById('addTimePaid');
-  paidInput.oninput = calcChange;
-
-  calcAddOn();
+  document.getElementById('addTimeBillInput').oninput = calcChangeAdd;
+  document.getElementById('addTimePaid').oninput = calcChangeAdd;
 
   const form = document.getElementById('addTimeForm');
   form.onsubmit = function(e) {
-    const cost = parseFloat(document.getElementById('rawAddCost').value || 0);
+    const cost = parseFloat(document.getElementById('addTimeBillInput').value || 0);
     const paid = parseFloat(document.getElementById('addTimePaid').value || 0);
 
+    if (cost <= 0) {
+        e.preventDefault();
+        alert("Isi biaya tambahan.");
+        return false;
+    }
     if (paid < cost) {
       e.preventDefault();
-
       Swal.fire({
         icon: 'error',
-        title: 'Pembayaran tidak cukup',
-        html: `
-          Biaya tambahan yang harus dibayar:<br>
-          <b>Rp ${fmtIDRModal(cost)}</b><br><br>
-          Uang yang diterima hanya:<br>
-          <b>Rp ${fmtIDRModal(paid)}</b>
-        `,
-        confirmButtonText: 'Oke, saya perbaiki',
-        confirmButtonColor: '#ef4444',
-        background: '#0f172a',
-        color: '#e5e7eb'
+        title: 'Pembayaran kurang',
+        background: '#0f172a', color: '#e5e7eb'
       });
-
       return false;
     }
   };

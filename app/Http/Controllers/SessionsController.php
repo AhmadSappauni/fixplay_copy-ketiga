@@ -33,9 +33,8 @@ class SessionsController extends Controller
             'hours'          => 'required|numeric|min:0.5',
             'paid_amount'    => 'required|numeric|min:0',
             'payment_method' => 'required|string',
-            // BARU: tarif manual
-            'custom_rate'    => 'nullable|numeric|min:0',
-            'extra_rate'     => 'nullable|numeric|min:0',
+            // WAJIB: Input manual total tagihan dari form
+            'bill'           => 'required|numeric|min:0', 
         ]);
 
         // Menggunakan DB transaction dan me-return ID Sale untuk redirect
@@ -45,57 +44,15 @@ class SessionsController extends Controller
             $hours = (float) $request->hours;
             $end   = $start->copy()->addMinutes($hours * 60);
 
-            // Tarif dasar: jika ada input manual, pakai itu, kalau tidak pakai tarif di Unit
-            $baseRate = $request->filled('custom_rate')
-                ? (float) $request->custom_rate
-                : (float) $unit->hourly_rate;
+            // --- LOGIKA UTAMA: TARIF MURNI MANUAL ---
+            // Kita abaikan rate unit, extra rate, dll. Kita percaya penuh pada input 'bill'.
+            $totalBill = (float) $request->bill;
 
-            // Tarif stik tambahan per jam (manual, default 10.000)
-            $extraRate = $request->filled('extra_rate')
-                ? (float) $request->extra_rate
-                : 10000;
-
-            // Tarif arcade tetap (untuk data lama)
-            $arcadeRate = 15000;
-
+            // Ambil data stik/arcade hanya untuk catatan, bukan untuk hitung harga
             $extraControllers  = (int) ($request->extra_controllers ?? 0);
             $arcadeControllers = (int) ($request->arcade_controllers ?? 0);
 
-            // PS4 REGULER dengan paket diskon hanya jika tipenya PS4 dan rate = 10.000
-            $isReguler = (($unit->type ?? '') === 'PS4') && ($baseRate == 10000);
-
-            $unitBill = 0;
-            if ($isReguler) {
-                if ($hours == 3)      $unitBill = 25000;
-                elseif ($hours == 4) $unitBill = 35000;
-                elseif ($hours == 5) $unitBill = 45000;
-                elseif ($hours == 6) $unitBill = 50000;
-                elseif ($hours > 6) {
-                    // Paket 6 jam 50k + jam sisanya sesuai tarif normal
-                    $extraHours = $hours - 6;
-                    $unitBill   = 50000 + ($extraHours * $baseRate);
-                } else {
-                    $unitBill = $baseRate * $hours;
-                }
-            } else {
-                // Semua tipe lain dihitung flat per jam
-                $unitBill = $baseRate * $hours;
-            }
-
-            // Biaya stik & arcade (per jam)
-            $extraTotal  = $extraControllers * $extraRate  * $hours;
-            $arcadeTotal = $arcadeControllers * $arcadeRate * $hours;
-
-            $totalBill = $unitBill + $extraTotal + $arcadeTotal;
-
-            // Pembulatan khusus 30 menit
-            if ($hours == 0.5) {
-                $totalBill = ceil($totalBill / 1000) * 1000;
-            } else {
-                $totalBill = round($totalBill);
-            }
-
-            // Validasi tunai harus cukup
+            // Validasi pembayaran (harus lunas/lebih karena tunai)
             if ($request->payment_method === 'Tunai' && $request->paid_amount < $totalBill) {
                 throw new \Exception('Pembayaran kurang dari total tagihan.');
             }
@@ -113,59 +70,42 @@ class SessionsController extends Controller
                 'updated_at'     => now(),
             ]);
 
-            // Create Sale Items - sewa unit
+            // --- SALE ITEMS (STRUK) ---
+            // Karena harga manual (global), kita jadikan 1 item saja agar tidak bingung membagi harganya.
+            // Contoh Deskripsi: "Sewa PS3 (2 jam) + 2 Stik"
+            
+            $itemDesc = "Sewa {$unit->name} ({$hours} jam)";
+            if ($extraControllers > 0) {
+                $itemDesc .= " + {$extraControllers} Stik";
+            }
+            if ($arcadeControllers > 0) {
+                $itemDesc .= " + {$arcadeControllers} Arcade";
+            }
+
             DB::table('sale_items')->insert([
                 'sale_id'     => $sale->id,
                 'product_id'  => null,
-                'description' => "Sewa {$unit->name} ({$hours} jam)",
+                'description' => $itemDesc,
                 'qty'         => 1,
-                'unit_price'  => $unitBill,
-                'subtotal'    => $unitBill,
+                'unit_price'  => $totalBill, // Harga sesuai input manual
+                'subtotal'    => $totalBill,
                 'created_at'  => now(),
                 'updated_at'  => now(),
             ]);
 
-            // Item stik tambahan (jika ada)
-            if ($extraControllers > 0) {
-                DB::table('sale_items')->insert([
-                    'sale_id'     => $sale->id,
-                    'product_id'  => null,
-                    'description' => "Tambahan Stik x{$extraControllers}",
-                    'qty'         => 1,
-                    'unit_price'  => $extraTotal,
-                    'subtotal'    => $extraTotal,
-                    'created_at'  => now(),
-                    'updated_at'  => now(),
-                ]);
-            }
-
-            // Item arcade (data lama)
-            if ($arcadeControllers > 0) {
-                DB::table('sale_items')->insert([
-                    'sale_id'     => $sale->id,
-                    'product_id'  => null,
-                    'description' => "Arcade Controller x{$arcadeControllers}",
-                    'qty'         => 1,
-                    'unit_price'  => $arcadeTotal,
-                    'subtotal'    => $arcadeTotal,
-                    'created_at'  => now(),
-                    'updated_at'  => now(),
-                ]);
-            }
-
             // Create Session
             $session = new GameSession();
-            $session->ps_unit_id         = $unit->id;
-            $session->sale_id            = $sale->id;
-            $session->start_time         = $start;
-            $session->end_time           = $end;
-            $session->minutes            = (int) ($hours * 60);
-            $session->extra_controllers  = $extraControllers;
+            $session->ps_unit_id       = $unit->id;
+            $session->sale_id          = $sale->id;
+            $session->start_time       = $start;
+            $session->end_time         = $end;
+            $session->minutes          = (int) ($hours * 60);
+            $session->extra_controllers = $extraControllers;
             $session->arcade_controllers = $arcadeControllers;
-            $session->bill               = $totalBill;
-            $session->payment_method     = $request->payment_method;
-            $session->paid_amount        = $request->paid_amount;
-            $session->status             = 'closed';
+            $session->bill             = $totalBill; // Simpan tagihan manual
+            $session->payment_method   = $request->payment_method;
+            $session->paid_amount      = $request->paid_amount;
+            $session->status           = 'closed';
             $session->save();
 
             return $sale->id; // Return ID untuk redirect
@@ -197,8 +137,7 @@ class SessionsController extends Controller
     }
 
     /**
-     * FITUR TAMBAH JAM (ADD TIME)
-     * Masih menggunakan tarif default dari Unit (belum pakai tarif manual per sesi).
+     * FITUR TAMBAH JAM (ADD TIME) - MANUAL
      */
     public function addTime(Request $request)
     {
@@ -207,6 +146,8 @@ class SessionsController extends Controller
             'hours'          => 'required|numeric|min:0.5',
             'paid_amount'    => 'nullable|numeric|min:0',
             'payment_method' => 'required|string',
+            // WAJIB: Input manual biaya tambahan dari form modal
+            'add_bill'       => 'required|numeric|min:0',
         ]);
 
         $saleId = DB::transaction(function () use ($request) {
@@ -215,48 +156,17 @@ class SessionsController extends Controller
 
             $addedHours = (float) $request->hours;
 
-            // 1. HITUNG BIAYA TAMBAHAN (LOGIKA PAKET MANDIRI)
-            $rate = $unit->hourly_rate;
-            $unitCost = 0;
+            // --- LOGIKA UTAMA: BIAYA TAMBAHAN MURNI MANUAL ---
+            $totalAddOnCost = (float) $request->add_bill;
 
-            if ($rate == 10000) {
-                // Logika Paket Regular untuk Jam Tambahan
-                if ($addedHours == 3)      $unitCost = 25000;
-                elseif ($addedHours == 4) $unitCost = 35000;
-                elseif ($addedHours == 5) $unitCost = 45000;
-                elseif ($addedHours == 6) $unitCost = 50000;
-                elseif ($addedHours > 6) {
-                    $unitCost = 50000 + (($addedHours - 6) * 10000);
-                } else {
-                    $unitCost = $addedHours * 10000;
-                }
-            } else {
-                // Non-reguler (Flat)
-                $unitCost = $addedHours * $rate;
-            }
-
-            // Tambahan Alat (Stik/Arcade) Flat
-            $extraCtrlCost  = ($session->extra_controllers  * 10000 * $addedHours);
-            $arcadeCtrlCost = ($session->arcade_controllers * 15000 * $addedHours);
-
-            // Total Biaya Tambahan
-            $totalAddOnCost = $unitCost + $extraCtrlCost + $arcadeCtrlCost;
-
-            // Pembulatan jika 30 menit
-            if ($addedHours == 0.5) {
-                $totalAddOnCost = ceil($totalAddOnCost / 1000) * 1000;
-            } else {
-                $totalAddOnCost = round($totalAddOnCost);
-            }
-
-            // 2. Update Waktu Selesai & Durasi Total
+            // 2. Update Waktu Selesai & Durasi Total (Tetap dihitung untuk record)
             $currentEnd = Carbon::parse($session->end_time);
             $newEnd = $currentEnd->copy()->addMinutes($addedHours * 60);
             $session->end_time = $newEnd;
             $session->minutes += ($addedHours * 60);
             $totalHours = $session->minutes / 60;
 
-            // 3. Update Tagihan Sesi (Tambahkan biaya baru ke total lama)
+            // 3. Update Tagihan Sesi (Tambahkan biaya manual ke total lama)
             $session->bill += $totalAddOnCost;
 
             // Update Pembayaran
@@ -279,7 +189,7 @@ class SessionsController extends Controller
                     $sale->paid_amount += $addedPaid;
                     $sale->change_amount = max(0, $sale->paid_amount - $sale->total);
 
-                    // Update Note agar kasir tahu ada penambahan
+                    // Update Note agar kasir tahu ada penambahan durasi
                     $sale->note = "Sesi: {$unit->name} ({$totalHours} jam) [Add +{$addedHours}h]";
                     $sale->save();
 
@@ -289,8 +199,8 @@ class SessionsController extends Controller
                         'product_id'  => null,
                         'description' => "Tambahan Waktu (+{$addedHours} jam)",
                         'qty'         => 1,
-                        'unit_price'  => $totalAddOnCost,
-                        'subtotal'    => $totalAddOnCost,
+                        'unit_price'  => $totalAddOnCost, // Harga Manual
+                        'subtotal'    => $totalAddOnCost, // Subtotal Manual
                         'created_at'  => now(),
                         'updated_at'  => now(),
                     ]);

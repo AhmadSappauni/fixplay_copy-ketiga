@@ -294,31 +294,30 @@
             <div class="title">@yield('page_title')</div>
 
             <div class="ms-auto d-flex align-items-center gap-2">
-                @if(request()->routeIs('sessions.index'))
-                    {{-- Tombol riwayat & notif hanya di halaman kasir --}}
-                    <button id="historyBtn" class="btn btn-outline-dark" type="button" title="Riwayat Notifikasi">
-                        <i class="bi bi-clock-history"></i>
-                    </button>
+                {{-- Tombol Riwayat --}}
+                <button id="historyBtn" class="btn btn-outline-dark" type="button" title="Riwayat Notifikasi">
+                    <i class="bi bi-clock-history"></i>
+                </button>
 
-                    <div class="dropdown">
-                        <button id="notifBtn" class="btn btn-outline-dark position-relative" type="button"
-                                data-bs-toggle="dropdown" aria-expanded="false" title="Notifikasi">
-                            <i class="bi bi-bell"></i>
-                            <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">0</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-end p-0 shadow-lg notif-menu">
-                            <div class="p-2 border-bottom d-flex justify-content-between align-items-center">
-                                <strong>Notifikasi</strong>
-                                <button class="btn btn-sm btn-link text-decoration-none" id="notifClear">
-                                    Tandai sudah dibaca
-                                </button>
-                            </div>
-                            <div id="notifList" class="list-group list-group-flush" style="max-height:320px;overflow:auto;">
-                                <div class="p-3 text-secondary">Belum ada notifikasi.</div>
-                            </div>
+                {{-- Dropdown Notifikasi --}}
+                <div class="dropdown">
+                    <button id="notifBtn" class="btn btn-outline-dark position-relative" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false" title="Notifikasi">
+                        <i class="bi bi-bell"></i>
+                        <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">0</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end p-0 shadow-lg notif-menu">
+                        <div class="p-2 border-bottom d-flex justify-content-between align-items-center">
+                            <strong>Notifikasi</strong>
+                            <button class="btn btn-sm btn-link text-decoration-none" id="notifClear">
+                                Tandai sudah dibaca
+                            </button>
+                        </div>
+                        <div id="notifList" class="list-group list-group-flush" style="max-height:320px;overflow:auto;">
+                            <div class="p-3 text-secondary">Belum ada notifikasi.</div>
                         </div>
                     </div>
-                @endif
+                </div>
             </div>
         </div>
 

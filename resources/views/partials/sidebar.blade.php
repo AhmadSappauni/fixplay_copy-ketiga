@@ -4,7 +4,7 @@
         background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
         min-height: 100vh;
         padding: 20px 15px;
-        font-family: 'Poppins', sans-serif; /* Pastikan font ini ada, atau fallback ke sans-serif */
+        font-family: 'Poppins', sans-serif;
     }
 
     /* Brand Logo Styling */
@@ -45,11 +45,11 @@
         color: #94a3b8;
         text-decoration: none;
         border-radius: 12px;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efek membal halus */
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         position: relative;
         border: 1px solid transparent;
         background: transparent;
-        width: 100%; /* Untuk button logout */
+        width: 100%;
         font-size: 0.95rem;
     }
 
@@ -59,37 +59,36 @@
         transition: transform 0.3s ease;
     }
 
-    /* --- HOVER EFFECT (MELAYANG) --- */
+    /* --- HOVER EFFECT --- */
     .nav-item-custom:hover {
         background: rgba(255, 255, 255, 0.05);
         color: #fff;
-        transform: translateY(-5px) scale(1.02); /* Melayang ke atas & sedikit membesar */
-        box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3); /* Bayangan di bawah agar terlihat terbang */
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3);
         border-color: rgba(255, 255, 255, 0.1);
     }
 
     .nav-item-custom:hover i {
-        transform: scale(1.2) rotate(-5deg); /* Ikon sedikit bergoyang */
-        color: #38bdf8; /* Warna ikon berubah saat hover */
+        transform: scale(1.2) rotate(-5deg);
+        color: #38bdf8;
     }
 
-    /* --- ACTIVE STATE (Glow Neon) --- */
+    /* --- ACTIVE STATE --- */
     .nav-item-custom.active {
         background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
         color: #fff;
-        box-shadow: 0 8px 15px -3px rgba(37, 99, 235, 0.5); /* Glow biru */
+        box-shadow: 0 8px 15px -3px rgba(37, 99, 235, 0.5);
         transform: translateY(-2px);
         font-weight: 500;
     }
 
-    /* Logout Button Specific Reset */
+    /* Logout Button */
     form button.nav-item-custom {
         text-align: left;
         border: none;
         cursor: pointer;
     }
     
-    /* Warna khusus logout saat hover */
     .logout-btn:hover {
         background: rgba(239, 68, 68, 0.15) !important;
         color: #ef4444 !important;
@@ -98,7 +97,6 @@
     .logout-btn:hover i {
         color: #ef4444 !important;
     }
-
 </style>
 
 <div class="sidebar-futuristic">
@@ -110,7 +108,7 @@
 
     <nav class="menu d-flex flex-column">
         
-        {{-- 1. BERANDA --}}
+        {{-- 1. BERANDA (Semua User) --}}
         <a href="{{ route('dashboard') }}"
            class="nav-item-custom {{ request()->routeIs('dashboard') ? 'active' : '' }}">
             <i class="bi bi-house-door-fill"></i> <span>Beranda</span>
@@ -133,7 +131,7 @@
                 <i class="bi bi-hdd-network"></i> <span>Unit PS</span>
             </a>
 
-            {{-- Produk --}}
+            {{-- [DIKEMBALIKAN] Produk & Stok (Karyawan Bisa Lihat) --}}
             <a href="{{ route('products.index') }}"
                class="nav-item-custom {{ request()->is('products*') ? 'active' : '' }}">
                 <i class="bi bi-box-seam"></i> <span>Produk &amp; Stok</span>
@@ -186,11 +184,17 @@
 
 
         {{-- ============================================================
-             MENU KHUSUS BOS
+             MENU KHUSUS BOS (OWNER AREA)
              ============================================================ --}}
         @if(auth()->check() && auth()->user()->role === 'boss')
             
             <div class="sidebar-label">Owner Area</div>
+
+            {{-- Produk & Stok (Akses Full Bos) --}}
+            <a href="{{ route('products.index') }}"
+               class="nav-item-custom {{ request()->is('products*') ? 'active' : '' }}">
+                <i class="bi bi-box-seam"></i> <span>Produk &amp; Stok</span>
+            </a>
 
             {{-- Laporan Keuangan --}}
             <a href="{{ route('reports.index') }}"
