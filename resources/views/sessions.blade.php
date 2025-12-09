@@ -32,9 +32,7 @@
     z-index:1;
   }
 
-  .session-header-stack{
-    gap:.75rem;
-  }
+  .session-header-stack{ gap:.75rem; }
 
   .session-chip-icon{
     width:36px;
@@ -49,13 +47,8 @@
     font-size:18px;
   }
 
-  .session-title-text{
-    color:#f9fafb;
-  }
-  .session-subtitle{
-    color:#9ca3af;
-    font-size:.8rem;
-  }
+  .session-title-text{ color:#f9fafb; }
+  .session-subtitle{ color:#9ca3af; font-size:.8rem; }
 
   .btn-soft-dark{
     border-radius:999px;
@@ -68,16 +61,15 @@
     color:#fff;
   }
 
-  /* ====== CARD GLASSMORPHIC (Untuk Form & Tabel) ====== */
+  /* ====== CARD GLASSMORPHIC ====== */
   .session-card{
     border-radius:1.25rem;
     border:1px solid rgba(148,163,184,.25);
-    /* Background Gelap Transparan */
     background: linear-gradient(145deg, rgba(2,6,23,0.9), rgba(15,23,42,0.8));
     color:#e5e7eb;
     box-shadow:0 20px 38px rgba(0,0,0,.6);
     backdrop-filter:blur(12px);
-    overflow: hidden; /* Agar border radius tabel aman */
+    overflow: hidden;
   }
   .session-card-header{
     border-bottom:1px solid rgba(148,163,184,.2);
@@ -120,8 +112,9 @@
   .calc-line{
     color:#9ca3af;
     font-size:.85rem;
-    display: flex; justify-content: space-between;
-    margin-bottom: 4px;
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:4px;
   }
   .calc-line span{
     font-weight:700;
@@ -145,16 +138,14 @@
     box-shadow:0 6px 15px rgba(34,197,94,.5);
   }
 
-  /* ====== TABEL FUTURISTIK (DARK MODE) ====== */
+  /* ====== TABEL FUTURISTIK ====== */
   .table-neon {
     width: 100%;
     margin-bottom: 0;
     border-collapse: separate;
     border-spacing: 0;
-    color: #cbd5e1; /* Text abu terang */
+    color: #cbd5e1;
   }
-  
-  /* Header Tabel */
   .table-neon thead th {
     background: rgba(15, 23, 42, 0.8);
     color: #94a3b8;
@@ -166,124 +157,114 @@
     padding: 0.85rem 1rem;
     white-space: nowrap;
   }
-
-  /* Body Tabel */
   .table-neon tbody td {
-    background: transparent; /* Agar warna card tembus */
+    background: transparent;
     border-bottom: 1px solid rgba(148, 163, 184, 0.1);
     padding: 0.85rem 1rem;
     vertical-align: middle;
     font-size: 0.9rem;
   }
-
-  /* Efek Hover Baris */
   .table-neon tbody tr:hover td {
-    background: rgba(99, 102, 241, 0.08); /* Highlight Ungu Tipis */
+    background: rgba(99, 102, 241, 0.08);
   }
 
-  /* Typo & Badge */
-  .amount-mono {
-    font-family: 'Consolas', 'Monaco', monospace;
-    font-weight: 600;
-    color: #818cf8; /* Ungu muda untuk harga */
+  .amount-mono{
+    font-family:'Consolas','Monaco',monospace;
+    font-weight:600;
+    color:#818cf8;
   }
-  
-  /* Badge untuk Unit & Tipe */
-  .unit-name {
-    font-weight: 700;
-    color: #fff;
-    font-size: 0.95rem;
+  .unit-name{
+    font-weight:700;
+    color:#fff;
+    font-size:.95rem;
   }
-  .badge-type {
-    background: #fbbf24; /* Kuning/Emas */
-    color: #1e293b; /* Teks Hitam */
-    font-weight: 800;
-    font-size: 0.65rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-left: 6px;
-    vertical-align: middle;
-    text-transform: uppercase;
-    box-shadow: 0 2px 5px rgba(251, 191, 36, 0.4);
+  .badge-type{
+    background:#fbbf24;
+    color:#1e293b;
+    font-weight:800;
+    font-size:.65rem;
+    padding:2px 6px;
+    border-radius:4px;
+    margin-left:6px;
+    vertical-align:middle;
+    text-transform:uppercase;
+    box-shadow:0 2px 5px rgba(251,191,36,.4);
   }
-
-  .badge-addon {
-    font-size: 0.7rem;
-    padding: 2px 8px;
-    border-radius: 99px;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: #e2e8f0;
-    margin-right: 4px;
+  .badge-addon{
+    font-size:0.7rem;
+    padding:2px 8px;
+    border-radius:99px;
+    background:rgba(255,255,255,0.1);
+    border:1px solid rgba(255,255,255,0.2);
+    color:#e2e8f0;
+    margin-right:4px;
   }
 
   .session-history-scroll{
-    max-height: 580px;
+    max-height:580px;
     overflow-y:auto;
-    /* Scrollbar custom tipis */
-    scrollbar-width: thin;
-    scrollbar-color: #475569 #1e293b;
-  }
-  
-  /* Tombol Hapus Kecil */
-  .btn-delete-xs {
-    padding: 4px 10px;
-    font-size: 0.75rem;
-    border-radius: 6px;
-    background: rgba(239, 68, 68, 0.15);
-    color: #fca5a5;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    transition: all 0.2s;
-  }
-  .btn-delete-xs:hover {
-    background: rgba(239, 68, 68, 0.9);
-    color: white;
-    border-color: transparent;
+    scrollbar-width:thin;
+    scrollbar-color:#475569 #1e293b;
   }
 
-  /* Style Tombol Tambah Jam Kecil (Fitur Baru) */
-  .btn-add-time {
-    padding: 4px 8px;
-    font-size: 0.7rem;
-    border-radius: 6px;
-    background: rgba(34, 197, 94, 0.15);
-    color: #86efac;
-    border: 1px solid rgba(34, 197, 94, 0.3);
-    margin-right: 4px;
-    transition: all 0.2s;
+  .btn-delete-xs{
+    padding:4px 10px;
+    font-size:0.75rem;
+    border-radius:6px;
+    background:rgba(239,68,68,0.15);
+    color:#fca5a5;
+    border:1px solid rgba(239,68,68,0.3);
+    transition:all 0.2s;
   }
-  .btn-add-time:hover {
-    background: rgba(34, 197, 94, 0.9);
-    color: #022c22;
-    border-color: transparent;
+  .btn-delete-xs:hover{
+    background:rgba(239,68,68,0.9);
+    color:#fff;
+    border-color:transparent;
   }
 
-  /* [BARU] Style untuk kotak estimasi harga di modal */
-  .price-display-box {
-    background: rgba(34, 197, 94, 0.1); 
-    border: 1px solid rgba(34, 197, 94, 0.2);
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 15px;
+  .btn-add-time{
+    padding:4px 8px;
+    font-size:0.7rem;
+    border-radius:6px;
+    background:rgba(34,197,94,0.15);
+    color:#86efac;
+    border:1px solid rgba(34,197,94,0.3);
+    margin-right:4px;
+    transition:all 0.2s;
+  }
+  .btn-add-time:hover{
+    background:rgba(34,197,94,0.9);
+    color:#022c22;
+    border-color:transparent;
   }
 
-  /* MODAL DARK GLASS STYLE (Untuk Modal Tambah Jam) */
-  .modal-glass .modal-content {
-    background: radial-gradient(circle at top left, #1e1e2f, #0f1020);
-    border: 1px solid rgba(124,58,237,.3);
-    box-shadow: 0 0 30px rgba(0,0,0,.8);
-    color: #e5e7eb;
-    border-radius: 1.25rem;
+  .price-display-box{
+    background:rgba(34,197,94,0.1);
+    border:1px solid rgba(34,197,94,0.2);
+    border-radius:8px;
+    padding:12px;
+    margin-bottom:15px;
   }
-  .modal-glass .modal-header { border-bottom: 1px solid rgba(255,255,255,.08); }
-  .modal-glass .modal-footer { border-top: 1px solid rgba(255,255,255,.08); }
-  .modal-glass .form-control, .modal-glass .form-select {
-    background: rgba(15,23,42,.6); border: 1px solid rgba(148,163,184,.3); color: #fff;
-  }
-  .modal-glass .btn-close-white { filter: invert(1) grayscale(100%) brightness(200%); }
 
-  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
+  .modal-glass .modal-content{
+    background:radial-gradient(circle at top left,#1e1e2f,#0f1020);
+    border:1px solid rgba(124,58,237,.3);
+    box-shadow:0 0 30px rgba(0,0,0,.8);
+    color:#e5e7eb;
+    border-radius:1.25rem;
+  }
+  .modal-glass .modal-header{border-bottom:1px solid rgba(255,255,255,.08);}
+  .modal-glass .modal-footer{border-top:1px solid rgba(255,255,255,.08);}
+  .modal-glass .form-control,
+  .modal-glass .form-select{
+    background:rgba(15,23,42,.6);
+    border:1px solid rgba(148,163,184,.3);
+    color:#fff;
+  }
+  .modal-glass .btn-close-white{filter:invert(1) grayscale(100%) brightness(200%);}
+
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator{
+    filter:invert(1);
   }
 
   @media (max-width: 992px){
@@ -338,23 +319,58 @@
           <form method="post" action="{{ route('sessions.fixed') }}" id="fixedForm">
             @csrf
 
+            {{-- PILIH UNIT --}}
             <label class="form-label">Pilih Unit PS</label>
             <select class="form-select" name="ps_unit_id" id="unitSel" required>
               <option value="">-- pilih --</option>
               @foreach($units as $u)
-                <option value="{{ $u->id }}" 
-                        data-rate="{{ $u->hourly_rate }}" 
+                <option value="{{ $u->id }}"
+                        data-rate="{{ $u->hourly_rate }}"
                         data-type="{{ $u->type ?? 'PS4' }}">
                   {{ $u->name }} [{{ $u->type ?? 'PS4' }}] — Rp {{ number_format($u->hourly_rate,0,',','.') }}/jam
                 </option>
               @endforeach
             </select>
 
-            {{-- ARCADE DIHAPUS, TINGGAL STIK TAMBAHAN --}}
+            {{-- TARIF PER JAM (MANUAL) --}}
+            <label class="form-label mt-3">Tarif per Jam (boleh diubah)</label>
+            <div class="input-group">
+              <span class="input-group-text bg-dark border-secondary text-light">Rp</span>
+              <input type="number"
+                     class="form-control"
+                     name="custom_rate"
+                     id="rateInput"
+                     min="0"
+                     step="1000"
+                     placeholder="0">
+            </div>
+            <div class="form-text text-secondary small">
+              Default mengikuti tarif di menu <b>Unit PS</b>, tapi bisa diubah per sesi.
+            </div>
+
+            {{-- HARGA STIK TAMBAHAN PER JAM (MANUAL) --}}
+            <label class="form-label mt-3">Harga Stik Tambahan / Jam</label>
+            <div class="input-group">
+              <span class="input-group-text bg-dark border-secondary text-light">Rp</span>
+              <input type="number"
+                     class="form-control"
+                     name="extra_rate"
+                     id="extraRateInput"
+                     min="0"
+                     step="1000"
+                     value="10000">
+            </div>
+            <div class="form-text text-secondary small">
+              Default Rp 10.000 per stik per jam, bisa diubah per sesi.
+            </div>
+
+            {{-- STIK TAMBAHAN --}}
             <div class="mt-3">
-              <label class="form-label">Tambahan Stik</label>
+              <label class="form-label">Jumlah Stik Tambahan</label>
               <select class="form-select" id="extraSel" name="extra_controllers">
-                @for($n=0;$n<=4;$n++)<option value="{{ $n }}">{{ $n }}</option>@endfor
+                @for($n=0;$n<=4;$n++)
+                  <option value="{{ $n }}">{{ $n }}</option>
+                @endfor
               </select>
             </div>
 
@@ -362,10 +378,9 @@
             <input type="datetime-local" class="form-control" name="start_time" id="startInput" value="{{ \Carbon\Carbon::now()->format('Y-m-d\TH:i') }}" required>
 
             <label class="form-label mt-3">Durasi</label>
-            {{-- DURASI HANYA SAMPAI 6 JAM --}}
             <select class="form-select" id="hoursSel" name="hours">
               <option value="0.5">30 menit</option>
-              @for($h=1; $h<=6; $h++) 
+              @for($h=1; $h<=6; $h++)
                 <option value="{{ $h }}">{{ $h }} jam</option>
               @endfor
             </select>
@@ -394,7 +409,9 @@
               <div class="calc-line">Total tagihan: <span id="billLbl" class="text-success fs-5">Rp 0</span></div>
             </div>
 
-            <button class="btn btn-main-submit mt-3"><i class="bi bi-play-circle me-1"></i> Buat &amp; Tagih</button>
+            <button class="btn btn-main-submit mt-3">
+              <i class="bi bi-play-circle me-1"></i> Buat &amp; Tagih
+            </button>
           </form>
         </div>
       </div>
@@ -429,14 +446,13 @@
                       @if(!empty($s->extra_controllers) && $s->extra_controllers > 0)
                         <span class="badge badge-addon ms-1">+Stik {{ $s->extra_controllers }}</span>
                       @endif
-                      {{-- Arcade tetap ditampilkan di history jika ada data lama, tapi inputnya sudah dihapus --}}
                       @if(!empty($s->arcade_controllers) && $s->arcade_controllers > 0)
                         <span class="badge badge-addon ms-1">Arcade {{ $s->arcade_controllers }}</span>
                       @endif
                     </td>
                     <td class="text-nowrap small text-secondary">
-                        <div><i class="bi bi-play-fill me-1"></i> {{ \Carbon\Carbon::parse($s->start_time)->format('H:i') }}</div>
-                        <div><i class="bi bi-stop-fill me-1"></i> {{ $s->end_time ? \Carbon\Carbon::parse($s->end_time)->format('H:i') : '-' }}</div>
+                      <div><i class="bi bi-play-fill me-1"></i> {{ \Carbon\Carbon::parse($s->start_time)->format('H:i') }}</div>
+                      <div><i class="bi bi-stop-fill me-1"></i> {{ $s->end_time ? \Carbon\Carbon::parse($s->end_time)->format('H:i') : '-' }}</div>
                     </td>
                     <td class="text-center">
                       <span class="badge bg-secondary bg-opacity-25 text-light border border-secondary border-opacity-25">
@@ -446,10 +462,9 @@
                     </td>
                     <td class="text-end mono text-info">Rp {{ number_format($s->bill ?? 0,0,',','.') }}</td>
                     <td class="text-end d-print-none">
-                      {{-- [UPDATED] Mengirim parameter rate, extra stik, dan arcade ke fungsi JS --}}
-                      <button class="btn-add-time" 
+                      <button class="btn-add-time"
                               onclick="openAddTimeModal(
-                                '{{ $s->id }}', 
+                                '{{ $s->id }}',
                                 '{{ $s->psUnit->name ?? 'Unit' }}',
                                 {{ $s->psUnit->hourly_rate ?? 10000 }},
                                 {{ $s->extra_controllers ?? 0 }},
@@ -458,24 +473,25 @@
                         <i class="bi bi-plus-circle-fill"></i> Jam
                       </button>
 
-                      {{-- TOMBOL HAPUS: HANYA UNTUK ADMIN/BOS --}}
-                        @if(auth()->user() && auth()->user()->role === 'admin')
-                            <form class="d-inline confirm-delete"
-                                  method="post"
-                                  action="{{ route('sessions.delete', ['sid' => $s->id]) }}"
-                                  data-confirm="Hapus riwayat sesi ini? Pendapatan di laporan akan ikut terhapus."
-                                  data-timer-unit="{{ $s->psUnit->name ?? '' }}">   {{-- <— TAMBAH INI --}}
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn-delete-xs">
-                                    <i class="bi bi-trash3-fill"></i>
-                                </button>
-                            </form>
-                        @endif
+                      @if(auth()->user() && auth()->user()->role === 'admin')
+                        <form class="d-inline confirm-delete"
+                              method="post"
+                              action="{{ route('sessions.delete', ['sid' => $s->id]) }}"
+                              data-confirm="Hapus riwayat sesi ini? Pendapatan di laporan akan ikut terhapus."
+                              data-timer-unit="{{ $s->psUnit->name ?? '' }}">
+                          @csrf
+                          @method('DELETE')
+                          <button class="btn-delete-xs">
+                            <i class="bi bi-trash3-fill"></i>
+                          </button>
+                        </form>
+                      @endif
                     </td>
                   </tr>
                 @empty
-                  <tr><td colspan="5" class="text-center text-light p-3">Belum ada sesi.</td></tr>
+                  <tr>
+                    <td colspan="5" class="text-center text-light p-3">Belum ada sesi.</td>
+                  </tr>
                 @endforelse
               </tbody>
             </table>
@@ -486,7 +502,7 @@
   </div>
 </div>
 
-{{-- MODAL TAMBAH JAM (UPDATED) --}}
+{{-- MODAL TAMBAH JAM --}}
 <div class="modal fade modal-glass" id="addTimeModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -496,20 +512,18 @@
       </div>
       <div class="modal-body pt-3">
         <p class="text-mono small mb-3">
-        <strong id="addTimeUnitName" class="text-white"></strong><br>
-            <span id="rateInfo" class="small fst-italic text-secondary"></span>
+          <strong id="addTimeUnitName" class="text-white"></strong><br>
+          <span id="rateInfo" class="small fst-italic text-secondary"></span>
         </p>
-        
+
         <form id="addTimeForm" method="post" action="{{ route('sessions.add_time') }}">
           @csrf
           <input type="hidden" name="session_id" id="addTimeSessionId">
-          {{-- [BARU] Input Hidden untuk simpan tarif agar bisa dihitung JS --}}
           <input type="hidden" id="rawHourlyRate" value="0">
           <input type="hidden" id="rawExtraCtrl" value="0">
           <input type="hidden" id="rawArcadeCtrl" value="0">
-          {{-- [BARU] Input Hidden untuk menyimpan total biaya tambahan hasil kalkulasi --}}
           <input type="hidden" id="rawAddCost" value="0">
-          
+
           <div class="mb-3">
             <label class="form-label small text-secondary">Durasi Tambahan</label>
             <select name="hours" id="addTimeHours" class="form-select text-white" style="background: rgba(15,23,42,.6); border-color: rgba(148,163,184,.3);">
@@ -520,34 +534,33 @@
             </select>
           </div>
 
-          {{-- [BARU] ESTIMASI BIAYA --}}
           <div class="price-display-box">
-             <div class="d-flex justify-content-between align-items-center">
-                 <span class="small text-success">Biaya Tambahan:</span>
-                 <span class="fw-bold fs-5 text-success" id="addTimeCostDisplay">Rp 0</span>
-             </div>
-             <div class="small text-muted text-end mt-1" style="font-size: 0.7rem;">
-                *Tarif paket berlaku (Misal 3 Jam = 25rb)
-             </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="small text-success">Biaya Tambahan:</span>
+              <span class="fw-bold fs-5 text-success" id="addTimeCostDisplay">Rp 0</span>
+            </div>
+            <div class="small text-muted text-end mt-1" style="font-size: 0.7rem;">
+              *Tarif paket berlaku (Misal 3 Jam = 25rb)
+            </div>
           </div>
 
           <div class="mb-3">
             <label class="form-label small text-secondary">Metode Bayar Tambahan</label>
             <select name="payment_method" class="form-select text-white" style="background: rgba(15,23,42,.6); border-color: rgba(148,163,184,.3);">
-               <option value="Tunai">Tunai</option>
-               <option value="QRIS">QRIS</option>
-               <option value="Transfer">Transfer</option>
+              <option value="Tunai">Tunai</option>
+              <option value="QRIS">QRIS</option>
+              <option value="Transfer">Transfer</option>
             </select>
           </div>
-          
+
           <div class="mb-3">
-             <label class="form-label small text-secondary">Uang Diterima (Wajib)</label>
-             <input type="number" id="addTimePaid" name="paid_amount" class="form-control text-white" placeholder="0" required style="background: rgba(15,23,42,.6); border-color: rgba(148,163,184,.3);">
+            <label class="form-label small text-secondary">Uang Diterima (Wajib)</label>
+            <input type="number" id="addTimePaid" name="paid_amount" class="form-control text-white" placeholder="0" required style="background: rgba(15,23,42,.6); border-color: rgba(148,163,184,.3);">
           </div>
-          
+
           <div class="mb-3">
-             <label class="form-label small text-secondary">Kembalian</label>
-             <input type="text" id="addTimeChange" class="form-control text-white" value="Rp 0" readonly style="background: rgba(15,23,42,.4); border-color: rgba(148,163,184,.15); color: #9ca3af;">
+            <label class="form-label small text-secondary">Kembalian</label>
+            <input type="text" id="addTimeChange" class="form-control text-white" value="Rp 0" readonly style="background: rgba(15,23,42,.4); border-color: rgba(148,163,184,.15); color: #9ca3af;">
           </div>
 
           <div class="d-flex justify-content-end gap-2 mt-4">
@@ -565,31 +578,35 @@
 @push('scripts')
 <script>
 (function(){
-  // KONSTANTA HARGA (Arcade Dihapus dari UI, tapi tetap saya simpan konstanta jika ada data lama)
-  const EX_RATE = 10000; 
   const KEY_TIMERS = 'fixplay.rental.timers';
   function fmtIDR(n){ return (n||0).toLocaleString('id-ID'); }
-  
-  // Fungsi Ambil Data Input (Tanpa Arcade)
+
   function getNumbers(){
     const unit = document.getElementById('unitSel');
     return {
-      base: parseFloat(unit?.selectedOptions[0]?.dataset?.rate || '0'),
+      base: parseFloat(document.getElementById('rateInput').value || '0'),
+      extraRate: parseFloat(document.getElementById('extraRateInput').value || '0'),
       type: unit?.selectedOptions[0]?.dataset?.type || 'PS4',
       extra: parseInt(document.getElementById('extraSel').value || '0', 10),
-      // arcade di-hardcode 0 karena inputnya sudah dihapus
-      arcade: 0, 
+      arcade: 0,
       hours: parseFloat(document.getElementById('hoursSel').value || '0'),
     };
   }
-  function getUnitName(){ return (document.getElementById('unitSel')?.selectedOptions?.[0]?.textContent || '').split(' [')[0].trim(); }
-  function getStartDT(){ const v=document.getElementById('startInput').value; return v?new Date(v):null; }
-  
-  // LocalStorage logic (Timer)
+
+  function getUnitName(){
+    return (document.getElementById('unitSel')?.selectedOptions?.[0]?.textContent || '').split(' [')[0].trim();
+  }
+  function getStartDT(){
+    const v=document.getElementById('startInput').value;
+    return v ? new Date(v) : null;
+  }
+
   function loadTimers(){ try{return JSON.parse(localStorage.getItem(KEY_TIMERS)||'[]')}catch(e){return[]} }
   function saveTimers(arr){ localStorage.setItem(KEY_TIMERS, JSON.stringify(arr)); }
   function saveTimer(){
-    const unitName = getUnitName(), start = getStartDT(), hours = parseFloat(document.getElementById('hoursSel').value || '0');
+    const unitName = getUnitName();
+    const start = getStartDT();
+    const hours = parseFloat(document.getElementById('hoursSel').value || '0');
     if (!unitName || !start || !(hours>0)) return;
     const endAt = new Date(start.getTime() + hours*60*60*1000).toISOString();
     const timers = loadTimers();
@@ -602,34 +619,39 @@
 
   function updateCalc(){
     const start = document.getElementById('startInput').value;
-    const {base, type, extra, hours} = getNumbers();
+    const {base, extraRate, type, extra, hours} = getNumbers();
     const endLbl = document.getElementById('endLbl');
+
     try{
       if(start && hours>0){
-        const dt = new Date(document.getElementById('startInput').value);
+        const dt = new Date(start);
         dt.setTime(dt.getTime() + Math.round(hours * 3600 * 1000));
         endLbl.textContent = String(dt.getHours()).padStart(2,'0') + ':' + String(dt.getMinutes()).padStart(2,'0');
-      }else{ endLbl.textContent='—:—'; }
-    }catch(e){ endLbl.textContent='—:—'; }
+      }else{
+        endLbl.textContent='—:—';
+      }
+    }catch(e){
+      endLbl.textContent='—:—';
+    }
 
-    // LOGIKA HARGA BARU (Diskon Paket - Termasuk > 6 Jam)
-    const extrasCost = (extra * EX_RATE); 
-    const totalExtras = extrasCost * hours;
+    // Logika harga: paket PS4 reguler hanya jika rate = 10k
+    const extrasPerJam = extra * extraRate;
+    const totalExtras   = extrasPerJam * hours;
     let unitBill = 0;
 
-    if (type === 'PS4' && base === 10000) { 
-        if (hours === 3) unitBill = 25000;
-        else if (hours === 4) unitBill = 35000;
-        else if (hours === 5) unitBill = 45000;
-        else if (hours === 6) unitBill = 50000;
-        else if (hours > 6) {
-            // Logika > 6 Jam: Paket 6 Jam + Sisa Jam Normal
-            const extraHours = hours - 6;
-            unitBill = 50000 + (extraHours * 10000);
-        }
-        else unitBill = base * hours;
-    } else {
+    if (type === 'PS4' && base === 10000) {
+      if (hours === 3)      unitBill = 25000;
+      else if (hours === 4) unitBill = 35000;
+      else if (hours === 5) unitBill = 45000;
+      else if (hours === 6) unitBill = 50000;
+      else if (hours > 6) {
+        const extraHours = hours - 6;
+        unitBill = 50000 + (extraHours * base);
+      } else {
         unitBill = base * hours;
+      }
+    } else {
+      unitBill = base * hours;
     }
 
     let rawBill = unitBill + totalExtras;
@@ -657,156 +679,153 @@
       const currentBill = parseInt(document.getElementById('billLbl').textContent.replace(/[^0-9]/g,''));
 
       if (method === 'tunai' && paid < currentBill) {
-          e.preventDefault();
+        e.preventDefault();
 
-          Swal.fire({
-              icon: 'error',
-              title: 'Pembayaran tunai kurang',
-              html: `
-                  Total tagihan:<br>
-                  <b>Rp ${fmtIDRModal(currentBill)}</b><br><br>
-                  Uang diterima:<br>
-                  <b>Rp ${fmtIDRModal(paid)}</b>
-              `,
-              confirmButtonText: 'Oke, saya perbaiki',
-              confirmButtonColor: '#ef4444',
-              background: '#0f172a',
-              color: '#e5e7eb'
-          });
+        Swal.fire({
+          icon: 'error',
+          title: 'Pembayaran tunai kurang',
+          html: `
+            Total tagihan:<br>
+            <b>Rp ${fmtIDRModal(currentBill)}</b><br><br>
+            Uang diterima:<br>
+            <b>Rp ${fmtIDRModal(paid)}</b>
+          `,
+          confirmButtonText: 'Oke, saya perbaiki',
+          confirmButtonColor: '#ef4444',
+          background: '#0f172a',
+          color: '#e5e7eb'
+        });
 
-          return;
+        return;
       }
 
       try { saveTimer(); } catch(err){}
     });
   }
 
+  // Saat pilih unit, isi default rate & default harga stik kalau kosong
+  const unitSel = document.getElementById('unitSel');
+  const rateInput = document.getElementById('rateInput');
+  const extraRateInput = document.getElementById('extraRateInput');
 
-  // Arcade dihapus dari listener
-  ['unitSel','extraSel','hoursSel','startInput'].forEach(id=>{
+  if(unitSel){
+    unitSel.addEventListener('change', function(){
+      const opt = unitSel.selectedOptions[0];
+      if(opt){
+        const defaultRate = opt.dataset.rate || '0';
+        if(!rateInput.value || rateInput.value === '0'){
+          rateInput.value = defaultRate;
+        }
+      }
+      if(!extraRateInput.value){
+        extraRateInput.value = 10000;
+      }
+      updateCalc();
+    });
+  }
+
+  // Listener lain
+  ['extraSel','hoursSel','startInput','rateInput','extraRateInput'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el){ el.addEventListener('change', updateCalc); el.addEventListener('input', updateCalc); }
+    if(el){
+      el.addEventListener('change', updateCalc);
+      el.addEventListener('input', updateCalc);
+    }
   });
   document.getElementById('payMethod')?.addEventListener('change', updateChange);
   document.getElementById('paidAmount')?.addEventListener('input', updateChange);
+
   updateCalc();
 })();
 
-// === [UPDATED] LOGIKA BARU MODAL TAMBAH JAM ===
+// === LOGIKA MODAL TAMBAH JAM (tidak diubah kecuali helper) ===
 function fmtIDRModal(n){ return (n||0).toLocaleString('id-ID'); }
 
 function openAddTimeModal(sessionId, unitName, hourlyRate, extraCtrl, arcadeCtrl) {
-    document.getElementById('addTimeSessionId').value = sessionId;
-    document.getElementById('addTimeUnitName').textContent = unitName;
-    
-    // Set variable hidden
-    document.getElementById('rawHourlyRate').value = hourlyRate;
-    document.getElementById('rawExtraCtrl').value = extraCtrl;
-    document.getElementById('rawArcadeCtrl').value = arcadeCtrl;
+  document.getElementById('addTimeSessionId').value = sessionId;
+  document.getElementById('addTimeUnitName').textContent = unitName;
 
-    document.getElementById('rateInfo').textContent = `Rate: Rp ${fmtIDRModal(hourlyRate)}/jam`;
+  document.getElementById('rawHourlyRate').value = hourlyRate;
+  document.getElementById('rawExtraCtrl').value = extraCtrl;
+  document.getElementById('rawArcadeCtrl').value = arcadeCtrl;
 
-    // Kalkulasi Realtime
-    const calcAddOn = () => {
-        const h = parseFloat(document.getElementById('addTimeHours').value || 0);
-        const rate = parseFloat(document.getElementById('rawHourlyRate').value || 0);
-        const ex = parseInt(document.getElementById('rawExtraCtrl').value || 0);
-        const arc = parseInt(document.getElementById('rawArcadeCtrl').value || 0);
+  document.getElementById('rateInfo').textContent = `Rate: Rp ${fmtIDRModal(hourlyRate)}/jam`;
 
-        // --- LOGIKA PAKET KHUSUS TAMBAH WAKTU ---
-        // Jika tarif unit 10.000 (Regular), gunakan skema paket untuk jam tambahan (mandiri)
-        let unitCost = 0;
-        
-        if (rate === 10000) {
-            if (h === 3) unitCost = 25000;
-            else if (h === 4) unitCost = 35000;
-            else if (h === 5) unitCost = 45000;
-            else if (h === 6) unitCost = 50000;
-            else if (h > 6) {
-                // Paket 6 jam (50k) + sisa jam dikali tarif normal
-                unitCost = 50000 + ((h - 6) * rate);
-            } else {
-                // Untuk durasi < 3 jam (0.5, 1, 2), tarif normal (flat)
-                // 1 jam = 10k, 2 jam = 20k
-                unitCost = h * rate;
-            }
-        } else {
-            // Untuk unit non-reguler (misal VIP), gunakan tarif flat per jam
-            unitCost = h * rate;
-        }
+  const calcAddOn = () => {
+    const h   = parseFloat(document.getElementById('addTimeHours').value || 0);
+    const rate= parseFloat(document.getElementById('rawHourlyRate').value || 0);
+    const ex  = parseInt(document.getElementById('rawExtraCtrl').value || 0);
+    const arc = parseInt(document.getElementById('rawArcadeCtrl').value || 0);
 
-        // Biaya tambahan alat (Stik/Arcade) selalu flat per jam
-        const extrasCost = (ex * 10000 * h) + (arc * 15000 * h);
-        
-        // Total Biaya Tambahan
-        let total = unitCost + extrasCost;
-
-        // Pembulatan 30 menit (jika hasil pecahan)
-        if(h === 0.5) total = Math.ceil(total/1000)*1000;
-        else total = Math.round(total);
-
-        // Update nilai ke input hidden untuk validasi
-        document.getElementById('rawAddCost').value = total;
-        document.getElementById('addTimeCostDisplay').textContent = 'Rp ' + fmtIDRModal(total);
-
-        // Hitung ulang kembalian setiap kali biaya berubah
-        calcChange();
-    };
-
-    // Fungsi Hitung Kembalian
-    const calcChange = () => {
-        const cost = parseFloat(document.getElementById('rawAddCost').value || 0);
-        const paid = parseFloat(document.getElementById('addTimePaid').value || 0);
-        
-        // Hitung kembalian, minimal 0
-        const change = Math.max(0, paid - cost);
-        
-        document.getElementById('addTimeChange').value = 'Rp ' + fmtIDRModal(change);
+    let unitCost = 0;
+    if (rate === 10000) {
+      if (h === 3)      unitCost = 25000;
+      else if (h === 4) unitCost = 35000;
+      else if (h === 5) unitCost = 45000;
+      else if (h === 6) unitCost = 50000;
+      else if (h > 6)   unitCost = 50000 + ((h - 6) * rate);
+      else              unitCost = h * rate;
+    } else {
+      unitCost = h * rate;
     }
 
-    // Attach Listener
-    const sel = document.getElementById('addTimeHours');
-    sel.onchange = calcAddOn;
-    
-    // Attach Listener untuk input uang
-    const paidInput = document.getElementById('addTimePaid');
-    paidInput.oninput = calcChange;
-    
-    // Jalankan sekali saat buka
-    calcAddOn();
+    const extrasCost = (ex * 10000 * h) + (arc * 15000 * h);
+    let total = unitCost + extrasCost;
 
-    // VALIDASI PEMBAYARAN PADA SUBMIT
-    const form = document.getElementById('addTimeForm');
-    form.onsubmit = function(e) {
-      const cost = parseFloat(document.getElementById('rawAddCost').value || 0);
-      const paid = parseFloat(document.getElementById('addTimePaid').value || 0);
+    if(h === 0.5) total = Math.ceil(total/1000)*1000;
+    else total = Math.round(total);
 
-      if (paid < cost) {
-          e.preventDefault();
+    document.getElementById('rawAddCost').value = total;
+    document.getElementById('addTimeCostDisplay').textContent = 'Rp ' + fmtIDRModal(total);
 
-          Swal.fire({
-              icon: 'error',
-              title: 'Pembayaran tidak cukup',
-              html: `
-                  Biaya tambahan yang harus dibayar:<br>
-                  <b>Rp ${fmtIDRModal(cost)}</b><br><br>
-                  Uang yang diterima hanya:<br>
-                  <b>Rp ${fmtIDRModal(paid)}</b>
-              `,
-              confirmButtonText: 'Oke, saya perbaiki',
-              confirmButtonColor: '#ef4444',
-              background: '#0f172a',
-              color: '#e5e7eb'
-          });
-
-          return false;
-      }
+    calcChange();
   };
 
-    
-    const modalEl = document.getElementById('addTimeModal');
-    const modal = new bootstrap.Modal(modalEl);
-    modal.show();
+  const calcChange = () => {
+    const cost = parseFloat(document.getElementById('rawAddCost').value || 0);
+    const paid = parseFloat(document.getElementById('addTimePaid').value || 0);
+    const change = Math.max(0, paid - cost);
+    document.getElementById('addTimeChange').value = 'Rp ' + fmtIDRModal(change);
+  }
+
+  const sel = document.getElementById('addTimeHours');
+  sel.onchange = calcAddOn;
+
+  const paidInput = document.getElementById('addTimePaid');
+  paidInput.oninput = calcChange;
+
+  calcAddOn();
+
+  const form = document.getElementById('addTimeForm');
+  form.onsubmit = function(e) {
+    const cost = parseFloat(document.getElementById('rawAddCost').value || 0);
+    const paid = parseFloat(document.getElementById('addTimePaid').value || 0);
+
+    if (paid < cost) {
+      e.preventDefault();
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Pembayaran tidak cukup',
+        html: `
+          Biaya tambahan yang harus dibayar:<br>
+          <b>Rp ${fmtIDRModal(cost)}</b><br><br>
+          Uang yang diterima hanya:<br>
+          <b>Rp ${fmtIDRModal(paid)}</b>
+        `,
+        confirmButtonText: 'Oke, saya perbaiki',
+        confirmButtonColor: '#ef4444',
+        background: '#0f172a',
+        color: '#e5e7eb'
+      });
+
+      return false;
+    }
+  };
+
+  const modalEl = document.getElementById('addTimeModal');
+  const modal = new bootstrap.Modal(modalEl);
+  modal.show();
 }
 </script>
 @endpush
