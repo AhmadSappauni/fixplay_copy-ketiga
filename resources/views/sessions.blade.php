@@ -208,12 +208,12 @@
               <option value="0.5">30 menit</option>
 
               {{-- Loop dari 1 sampai 10 --}}
-              @for($h = 1; $h <= 10; $h++)
+              @for($h = 1; $h <= 24; $h++)
                 {{-- Jam Pas (Contoh: 1 jam) --}}
                 <option value="{{ $h }}">{{ $h }} jam</option>
                 
                 {{-- Jam Setengah (Contoh: 1 jam 30 menit), value jadi 1.5 --}}
-                @if($h < 10) {{-- Batasi agar tidak muncul 10 jam 30 menit --}}
+                @if($h < 24) {{-- Batasi agar tidak muncul 10 jam 30 menit --}}
                     <option value="{{ $h + 0.5 }}">{{ $h }} jam 30 menit</option>
                 @endif
               @endfor
