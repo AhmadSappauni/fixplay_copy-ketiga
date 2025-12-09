@@ -58,43 +58,49 @@ class ReportController extends Controller
             ->selectRaw('COALESCE(SUM(amount),0) as total')
             ->value('total');
 
-        // --- PERBAIKAN 1: LIST PENJUALAN (Agar muncul nama produk POS) ---
-        $sales = Sale::with(['items.product']) // Load items beserta produknya
+        // --- PERBAIKAN 1: LIST PENJUALAN ---
+        // Hapus ->limit(100) agar laporan menampilkan SELURUH data di tanggal tsb
+        $sales = Sale::with(['items.product']) 
             ->whereBetween('sold_at', [$start, $end])
             ->orderBy('sold_at','desc')
-            ->limit(100)
             ->get()
             ->map(function($s){
-                // 1. Fix Total (jika header 0, hitung dari items)
+                // 1. Fix Total
                 $totalFix = $s->total ?? $s->total_amount ?? 0;
                 if ($totalFix == 0) {
                     $totalFix = $s->items->sum('subtotal');
                 }
                 $s->total = $totalFix;
 
-                // 2. Fix Judul/Catatan (Ambil nama produk jika ada)
+                // 2. Fix Judul/Catatan
                 $names = [];
                 foreach($s->items as $it) {
                     if($it->product) {
-                        // Format: "Mie (2)", "Rosta (1)"
                         $names[] = $it->product->name . ' (' . $it->qty . ')';
                     }
                 }
-                
-                // Jika ada produk, gabungkan namanya. Jika tidak, pakai note asli.
                 $displayTitle = !empty($names) ? implode(', ', $names) : $s->note;
-                
-                // Simpan ke properti baru untuk ditampilkan di view
                 $s->display_note = $displayTitle ?: 'Item'; 
 
                 return $s;
             });
 
+        // --- BARU: MEMISAHKAN RENTAL & PRODUK ---
+        // Logic: Jika dalam transaksi ada item yg product_id-nya NULL, itu Rental.
+        $rentalSales = $sales->filter(function ($s) {
+            return $s->items->contains(function ($item) {
+                return $item->product_id === null;
+            });
+        });
+
+        // Sisanya adalah transaksi Produk (F&B)
+        $productSales = $sales->diff($rentalSales);
+
         // --- Expenses list ---
         $expenses = DB::table('expenses')
             ->whereBetween('timestamp', [$start, $end])
             ->orderBy('timestamp','desc')
-            ->limit(100)
+            // ->limit(100)
             ->get()
             ->map(function($e){
                 $e->timestamp = isset($e->timestamp) ? Carbon::parse($e->timestamp) : null;
@@ -205,7 +211,11 @@ class ReportController extends Controller
             'prod_total'     => (int)$prod_total,
             'sales_total'    => (int)$sales_total,
             'expenses_total' => (int)$expenses_total,
-            'sales'          => $sales,
+            
+            'sales'          => $sales,        // Tetap dikirim (opsional)
+            'rentalSales'    => $rentalSales,  // <--- TAMBAHKAN INI
+            'productSales'   => $productSales, // <--- TAMBAHKAN INI
+            
             'expenses'       => $expenses,
             'daily_rows'     => $daily_rows,
             'weekly_rows'    => $weekly_rows,

@@ -274,72 +274,99 @@
     </div>
   </div>
 
-  {{-- TRANSAKSI TERAKHIR --}}
+  {{-- CARD 1: RIWAYAT RENTAL PS --}}
   <div class="row g-4 mt-2">
     <div class="col-12">
       <div class="card card-trans">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <span>Transaksi Terakhir</span>
-          <span class="badge-count d-print-none">{{ count($lastTx) }} DATA</span>
+        <div class="card-header d-flex justify-content-between align-items-center" style="background: rgba(99, 102, 241, 0.2);">
+          <span class="text-white"><i class="bi bi-controller me-2"></i>Riwayat Rental PS</span>
+          <span class="badge-count d-print-none">{{ count($rentalTx) }} DATA</span>
         </div>
+        
         <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="table table-sm align-middle table-neon">
-              <thead>
+          <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+            <table class="table table-sm align-middle table-neon mb-0">
+              <thead style="position: sticky; top: 0; z-index: 10;">
                 <tr>
-                  <th style="width: 180px;">Tanggal</th>
-                  <th>Keterangan Transaksi</th>
-                  <th class="text-end" style="width: 180px;">Total</th>
-                  <th class="text-end d-print-none" style="width: 220px;">Aksi</th>
+                  <th style="width: 170px;">Tanggal</th>
+                  <th>Detail Rental</th>
+                  <th class="text-end" style="width: 150px;">Total</th>
+                  <th class="text-end d-print-none" style="width: 180px;">Aksi</th>
                 </tr>
               </thead>
               <tbody>
-              @forelse ($lastTx as $t)
+              @forelse ($rentalTx as $t)
                 <tr>
-                  <td class="text-secondary fw-semibold">{{ $t['date'] }}</td>
+                  <td class="text-secondary fw-semibold" style="font-size: 0.85rem;">{{ $t['date'] }}</td>
                   <td class="text-white fw-bold">{{ $t['title'] }}</td>
                   <td class="text-end mono text-info">Rp {{ number_format($t['total'],0,',','.') }}</td>
-                  <td class="text-end d-print-none" style="width: 210px;">
-                    <div class="btn-action-group">
-                      {{-- Detail --}}
-                      <a href="{{ route('sales.show', $t['id']) }}"
-                        class="btn btn-outline-secondary me-1"
-                        title="Detail">
-                        <i class="bi bi-info-circle"></i>
-                        <span class="label-text">Detail</span>
-                      </a>
-
-                      {{-- Edit --}}
-                      <a href="{{ route('sales.edit', $t['id']) }}"
-                        class="btn btn-outline-warning me-1"
-                        title="Edit">
-                        <i class="bi bi-pencil-square"></i>
-                        <span class="label-text">Edit</span>
-                      </a>
-
-                      {{-- Hapus (bos saja) --}}
+                  <td class="text-end d-print-none">
+                    <div class="btn-action-group justify-content-end">
+                      <a href="{{ route('sales.show', $t['id']) }}" class="btn btn-action-detail" title="Detail"><i class="bi bi-info-circle"></i></a>
+                      <a href="{{ route('sales.edit', $t['id']) }}" class="btn btn-action-edit" title="Edit"><i class="bi bi-pencil-square"></i></a>
+                      
                       @if(auth()->user() && auth()->user()->role === 'boss')
-                        <form class="d-inline confirm-delete"
-                              method="POST"
-                              action="{{ route('sales.destroy', $t['id']) }}"
-                              data-confirm="Yakin ingin menghapus transaksi ini? Pendapatan di laporan akan ikut terhapus.">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-outline-danger" title="Hapus">
-                                Hapus
-                            </button>
+                        <form class="d-inline confirm-delete" method="POST" action="{{ route('sales.destroy', $t['id']) }}">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="btn btn-action-delete" title="Hapus"><i class="bi bi-trash"></i></button>
                         </form>
-                    @endif
+                      @endif
                     </div>
-                </td>
-                </tr>
-              @empty
-                <tr>
-                  <td colspan="4" class="text-center text-secondary p-5">
-                    <i class="bi bi-inbox display-4 d-block mb-3 opacity-25"></i>
-                    Belum ada transaksi hari ini.
                   </td>
                 </tr>
+              @empty
+                <tr><td colspan="4" class="text-center text-secondary p-4">Belum ada transaksi rental.</td></tr>
+              @endforelse
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{-- CARD 2: RIWAYAT PENJUALAN PRODUK (MAKANAN/MINUMAN) --}}
+  <div class="row g-4 mt-2">
+    <div class="col-12">
+      <div class="card card-trans">
+        <div class="card-header d-flex justify-content-between align-items-center" style="background: rgba(34, 197, 94, 0.15);">
+          <span class="text-white"><i class="bi bi-cup-straw me-2"></i>Penjualan Produk (F&B)</span>
+          <span class="badge-count d-print-none">{{ count($productTx) }} DATA</span>
+        </div>
+        
+        <div class="card-body p-0">
+          <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+            <table class="table table-sm align-middle table-neon mb-0">
+              <thead style="position: sticky; top: 0; z-index: 10;">
+                <tr>
+                  <th style="width: 170px;">Tanggal</th>
+                  <th>Barang Terjual</th>
+                  <th class="text-end" style="width: 150px;">Total</th>
+                  <th class="text-end d-print-none" style="width: 180px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+              @forelse ($productTx as $t)
+                <tr>
+                  <td class="text-secondary fw-semibold" style="font-size: 0.85rem;">{{ $t['date'] }}</td>
+                  <td class="text-white">{{ $t['title'] }}</td>
+                  <td class="text-end mono text-success">Rp {{ number_format($t['total'],0,',','.') }}</td>
+                  <td class="text-end d-print-none">
+                    <div class="btn-action-group justify-content-end">
+                      <a href="{{ route('sales.show', $t['id']) }}" class="btn btn-action-detail" title="Detail"><i class="bi bi-info-circle"></i></a>
+                      <a href="{{ route('sales.edit', $t['id']) }}" class="btn btn-action-edit" title="Edit"><i class="bi bi-pencil-square"></i></a>
+                      
+                      @if(auth()->user() && auth()->user()->role === 'boss')
+                        <form class="d-inline confirm-delete" method="POST" action="{{ route('sales.destroy', $t['id']) }}">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="btn btn-action-delete" title="Hapus"><i class="bi bi-trash"></i></button>
+                        </form>
+                      @endif
+                    </div>
+                  </td>
+                </tr>
+              @empty
+                <tr><td colspan="4" class="text-center text-secondary p-4">Belum ada penjualan produk.</td></tr>
               @endforelse
               </tbody>
             </table>

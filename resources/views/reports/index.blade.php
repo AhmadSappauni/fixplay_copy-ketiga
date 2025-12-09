@@ -269,15 +269,15 @@
     </div>
   </div>
 
-  {{-- Detail transaksi & pengeluaran --}}
+  {{-- Detail transaksi (DIPISAH: RENTAL & PRODUK) --}}
   <div class="row g-4 mt-2">
     
-    {{-- TABEL PENJUALAN --}}
+    {{-- 1. TABEL RIWAYAT RENTAL --}}
     <div class="col-lg-6">
       <div class="card card-glass h-100">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <span>Penjualan {{ $start_date->format('d M') }}</span>
-          <span class="badge badge-soft-primary d-print-none">{{ $sales->count() }} Data</span>
+        <div class="card-header d-flex justify-content-between align-items-center" style="background: rgba(99, 102, 241, 0.2);">
+          <span class="text-white"><i class="bi bi-controller me-2"></i>Laporan Rental PS</span>
+          <span class="badge badge-soft-primary d-print-none">{{ $rentalSales->count() }} Data</span>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
@@ -285,13 +285,65 @@
               <thead>
                 <tr>
                   <th>Waktu</th>
-                  <th>Item / Catatan</th>
+                  <th>Detail Rental</th>
                   <th class="text-end">Total</th>
-                  <th class="text-end d-print-none" style="width: 100px;">Aksi</th>
+                  <th class="text-end d-print-none" style="width: 80px;">Aksi</th>
                 </tr>
               </thead>
               <tbody>
-                @forelse($sales as $s)
+                @forelse($rentalSales as $s)
+                  <tr>
+                    <td>
+                        <div class="d-flex flex-column small text-secondary">
+                            <span>{{ \Carbon\Carbon::parse($s->sold_at)->format('d-m-y') }}</span>
+                            <span class="text-light fw-bold">{{ \Carbon\Carbon::parse($s->sold_at)->format('H:i') }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="text-truncate text-light fw-bold" style="max-width: 180px;" title="{{ $s->display_note }}">
+                            {{ $s->display_note }}
+                        </div>
+                    </td>
+                    <td class="text-end amount-mono text-info">Rp {{ number_format($s->total ?? 0,0,',','.') }}</td>
+                    <td class="text-end d-print-none">
+                      <div class="btn-action-group justify-content-end">
+                          <button type="button" class="btn btn-outline-secondary-soft" title="Edit"
+                                  onclick='editSaleModal({{ $s->id }}, {!! json_encode($s->note) !!}, {!! json_encode($s->payment_method) !!}, {{ $s->paid_amount ?? 0 }}, {{ $s->total ?? 0 }}, {!! json_encode($s->sold_at->format("Y-m-d\TH:i")) !!})'>
+                            <i class="bi bi-pencil"></i>
+                          </button>
+                      </div>
+                    </td>
+                  </tr>
+                @empty
+                  <tr><td colspan="4" class="text-center text-light p-4 opacity-50">Tidak ada transaksi rental.</td></tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{-- 2. TABEL RIWAYAT PRODUK --}}
+    <div class="col-lg-6">
+      <div class="card card-glass h-100">
+        <div class="card-header d-flex justify-content-between align-items-center" style="background: rgba(34, 197, 94, 0.15);">
+          <span class="text-white"><i class="bi bi-basket3 me-2"></i>Laporan Produk (F&B)</span>
+          <span class="badge badge-soft-primary d-print-none">{{ $productSales->count() }} Data</span>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-modern table-sm">
+              <thead>
+                <tr>
+                  <th>Waktu</th>
+                  <th>Barang</th>
+                  <th class="text-end">Total</th>
+                  <th class="text-end d-print-none" style="width: 80px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                @forelse($productSales as $s)
                   <tr>
                     <td>
                         <div class="d-flex flex-column small text-secondary">
@@ -304,10 +356,9 @@
                             {{ $s->display_note }}
                         </div>
                     </td>
-                    <td class="text-end amount-mono text-info">Rp {{ number_format($s->total ?? 0,0,',','.') }}</td>
+                    <td class="text-end amount-mono text-success">Rp {{ number_format($s->total ?? 0,0,',','.') }}</td>
                     <td class="text-end d-print-none">
-                      <div class="btn-action-group">
-                          <a class="btn btn-outline-primary-soft" href="{{ url('/sales/'.$s->id) }}" title="Lihat"><i class="bi bi-eye"></i></a>
+                      <div class="btn-action-group justify-content-end">
                           <button type="button" class="btn btn-outline-secondary-soft" title="Edit"
                                   onclick='editSaleModal({{ $s->id }}, {!! json_encode($s->note) !!}, {!! json_encode($s->payment_method) !!}, {{ $s->paid_amount ?? 0 }}, {{ $s->total ?? 0 }}, {!! json_encode($s->sold_at->format("Y-m-d\TH:i")) !!})'>
                             <i class="bi bi-pencil"></i>
@@ -316,27 +367,23 @@
                     </td>
                   </tr>
                 @empty
-                  <tr><td colspan="4" class="text-center text-light p-4">Belum ada penjualan.</td></tr>
+                  <tr><td colspan="4" class="text-center text-light p-4 opacity-50">Tidak ada penjualan produk.</td></tr>
                 @endforelse
               </tbody>
-              <tfoot>
-                <tr class="fw-bold bg-dark bg-opacity-50">
-                  <td colspan="2" class="text-end text-secondary">TOTAL PERIODE</td>
-                  <td class="text-end text-success">Rp {{ number_format($sales_total,0,',','.') }}</td>
-                  <td></td>
-                </tr>
-              </tfoot>
             </table>
           </div>
         </div>
       </div>
     </div>
 
-    {{-- TABEL PENGELUARAN --}}
-    <div class="col-lg-6">
+  </div>
+
+  {{-- TABEL PENGELUARAN (Full Width di Bawah) --}}
+  <div class="row g-4 mt-2">
+    <div class="col-12">
       <div class="card card-glass h-100">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <span>Pengeluaran</span>
+        <div class="card-header d-flex justify-content-between align-items-center" style="background: rgba(239, 68, 68, 0.1);">
+          <span class="text-white"><i class="bi bi-wallet2 me-2"></i>Daftar Pengeluaran</span>
           <span class="badge badge-soft-danger d-print-none">{{ $expenses->count() }} Item</span>
         </div>
         <div class="card-body p-0">
@@ -360,11 +407,11 @@
                   </td>
                   <td>
                       <div class="text-light fw-semibold">{{ $e->category }}</div>
-                      <div class="small text-secondary text-truncate" style="max-width: 150px;">{{ $e->description }}</div>
+                      <div class="small text-secondary text-truncate" style="max-width: 350px;">{{ $e->description }}</div>
                   </td>
                   <td class="text-end amount-mono text-danger">Rp {{ number_format($e->amount ?? 0,0,',','.') }}</td>
                   <td class="text-end d-print-none">
-                    <div class="btn-action-group">
+                    <div class="btn-action-group justify-content-end">
                         <button type="button" class="btn btn-outline-secondary-soft" title="Edit"
                                 onclick='editExpenseModal({{ $e->id }}, {!! json_encode($e->category) !!}, {!! json_encode($e->description ?? "") !!}, {{ (int)($e->amount ?? 0) }}, {!! json_encode(isset($e->timestamp) ? ($e->timestamp_fmt ?? $e->timestamp) : "") !!})'>
                           <i class="bi bi-pencil"></i>
@@ -382,7 +429,7 @@
               </tbody>
               <tfoot>
                 <tr class="fw-bold bg-dark bg-opacity-50">
-                  <td colspan="2" class="text-end text-secondary">TOTAL PERIODE</td>
+                  <td colspan="2" class="text-end text-secondary">TOTAL PENGELUARAN PERIODE</td>
                   <td class="text-end text-danger">Rp {{ number_format($expenses_total,0,',','.') }}</td>
                   <td></td>
                 </tr>
