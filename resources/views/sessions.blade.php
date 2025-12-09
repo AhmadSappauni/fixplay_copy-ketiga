@@ -332,6 +332,14 @@
               @endforeach
             </select>
 
+            <label class="form-label mt-3">Durasi</label>
+            <select class="form-select" id="hoursSel" name="hours">
+              <option value="0.5">30 menit</option>
+              @for($h=1; $h<=6; $h++)
+                <option value="{{ $h }}">{{ $h }} jam</option>
+              @endfor
+            </select>
+
             {{-- TARIF PER JAM (MANUAL) --}}
             <label class="form-label mt-3">Tarif per Jam (boleh diubah)</label>
             <div class="input-group">
@@ -346,6 +354,17 @@
             </div>
             <div class="form-text text-secondary small">
               Default mengikuti tarif di menu <b>Unit PS</b>, tapi bisa diubah per sesi.
+            </div>
+
+            
+            {{-- STIK TAMBAHAN --}}
+            <div class="mt-3">
+              <label class="form-label">Jumlah Stik Tambahan</label>
+              <select class="form-select" id="extraSel" name="extra_controllers">
+                @for($n=0;$n<=4;$n++)
+                <option value="{{ $n }}">{{ $n }}</option>
+                @endfor
+              </select>
             </div>
 
             {{-- HARGA STIK TAMBAHAN PER JAM (MANUAL) --}}
@@ -363,27 +382,10 @@
             <div class="form-text text-secondary small">
               Default Rp 10.000 per stik per jam, bisa diubah per sesi.
             </div>
-
-            {{-- STIK TAMBAHAN --}}
-            <div class="mt-3">
-              <label class="form-label">Jumlah Stik Tambahan</label>
-              <select class="form-select" id="extraSel" name="extra_controllers">
-                @for($n=0;$n<=4;$n++)
-                  <option value="{{ $n }}">{{ $n }}</option>
-                @endfor
-              </select>
-            </div>
-
+            
             <label class="form-label mt-3">Waktu Mulai</label>
             <input type="datetime-local" class="form-control" name="start_time" id="startInput" value="{{ \Carbon\Carbon::now()->format('Y-m-d\TH:i') }}" required>
 
-            <label class="form-label mt-3">Durasi</label>
-            <select class="form-select" id="hoursSel" name="hours">
-              <option value="0.5">30 menit</option>
-              @for($h=1; $h<=6; $h++)
-                <option value="{{ $h }}">{{ $h }} jam</option>
-              @endfor
-            </select>
 
             <div class="row mt-3 g-2">
               <div class="col-md-4">
