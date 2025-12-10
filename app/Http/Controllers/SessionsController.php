@@ -15,17 +15,17 @@ class SessionsController extends Controller
     {
         $units = PSUnit::orderBy('name')->get();
 
-        // 1. Ambil Sesi yang Sedang Main (Open Billing / Aktif)
+        // 1. Ambil Sesi Aktif
         $active_sessions = GameSession::with('psUnit')
             ->whereNull('end_time')
             ->orderBy('start_time', 'asc')
             ->get();
 
-        // 2. Ambil Sesi Selesai (Riwayat)
+        // 2. Ambil Sesi Selesai
         $closed_sessions = GameSession::with('psUnit')
             ->whereNotNull('end_time')
             ->orderBy('start_time', 'desc')
-            ->limit(20)
+            ->limit(100)
             ->get();
 
         return view('sessions', compact('units', 'active_sessions', 'closed_sessions'));
@@ -33,60 +33,63 @@ class SessionsController extends Controller
 
     public function storeFixed(Request $request)
     {
-        // Validasi Awal (Hanya untuk Unit & Waktu Mulai)
         $request->validate([
             'ps_unit_id' => 'required|exists:ps_units,id',
             'start_time' => 'required|date',
-            'hours'      => 'required', // Bisa numeric atau string 'open'
+            'hours'      => 'required',
         ]);
 
-        // === KASUS 1: OPEN BILLING (BAYAR NANTI) ===
+        // === KASUS 1: OPEN BILLING ===
         if ($request->hours === 'open') {
             $unit = PSUnit::findOrFail($request->ps_unit_id);
             $start = Carbon::parse($request->start_time);
 
             $session = new GameSession();
             $session->ps_unit_id       = $unit->id;
-            $session->sale_id          = null; // Belum ada transaksi
             $session->start_time       = $start;
-            $session->end_time         = null; // Durasi tidak terbatas
+            $session->end_time         = null; 
             $session->minutes          = 0;
             $session->extra_controllers = (int) $request->extra_controllers;
             $session->arcade_controllers = 0;
-            $session->bill             = 0;    // Belum ada tagihan
-            $session->status           = 'active'; // Status Aktif
+            $session->bill             = 0;
+            $session->status           = 'active';
             $session->save();
 
             return back()->with('success', "Open Billing dimulai untuk unit {$unit->name}.");
         }
 
-        // === KASUS 2: PAKET DURASI TETAP (BAYAR DI MUKA / SELESAI LANGSUNG) ===
-        // Validasi Lanjutan untuk input harga manual
+        // === KASUS 2: PAKET DURASI TETAP ===
         $request->validate([
             'hours'          => 'numeric|min:0.5',
             'paid_amount'    => 'required|numeric|min:0',
             'payment_method' => 'required|string',
-            'bill'           => 'required|numeric|min:0', // Manual Input Wajib
+            'bill'           => 'required|numeric|min:0',
         ]);
 
-        $saleId = DB::transaction(function () use ($request) {
+        // Variabel untuk menampung data timer agar bisa dikirim ke View
+        $timerData = null;
+
+        $saleId = DB::transaction(function () use ($request, &$timerData) {
             $unit  = PSUnit::findOrFail($request->ps_unit_id);
             $start = Carbon::parse($request->start_time);
             $hours = (float) $request->hours;
             $end   = $start->copy()->addMinutes($hours * 60);
 
-            // LOGIKA UTAMA: TARIF MURNI MANUAL
-            $totalBill = (float) $request->bill;
+            // Simpan data timer untuk dikirim ke JS
+            $timerData = [
+                'unit'     => $unit->name,
+                'end_time' => $end->toIso8601String() // Format waktu standar ISO
+            ];
 
+            $totalBill = (float) $request->bill;
             $extraControllers  = (int) ($request->extra_controllers ?? 0);
             $arcadeControllers = (int) ($request->arcade_controllers ?? 0);
 
-            // Validasi pembayaran
             if ($request->payment_method === 'Tunai' && $request->paid_amount < $totalBill) {
                 throw new \Exception('Pembayaran kurang dari total tagihan.');
             }
 
-            // Create Sale Header
+            // Create Sale
             $sale = Sale::create([
                 'sold_at'        => now(),
                 'total'          => $totalBill,
@@ -99,7 +102,7 @@ class SessionsController extends Controller
                 'updated_at'     => now(),
             ]);
 
-            // SALE ITEMS (STRUK)
+            // Sale Items
             $itemDesc = "Sewa {$unit->name} ({$hours} jam)";
             if ($extraControllers > 0) $itemDesc .= " + {$extraControllers} Stik";
             if ($arcadeControllers > 0) $itemDesc .= " + {$arcadeControllers} Arcade";
@@ -115,7 +118,7 @@ class SessionsController extends Controller
                 'updated_at'  => now(),
             ]);
 
-            // Create Session (Closed)
+            // Create Session
             $session = new GameSession();
             $session->ps_unit_id       = $unit->id;
             $session->sale_id          = $sale->id;
@@ -133,17 +136,18 @@ class SessionsController extends Controller
             return $sale->id;
         });
 
+        // REDIRECT DENGAN DATA TIMER (PENTING!)
         return redirect()
             ->route('sales.show', $saleId)
-            ->with('success', 'Sesi berhasil dibuat. Silakan cetak struk.');
+            ->with('success', 'Sesi berhasil dibuat.')
+            ->with('new_timer', $timerData); // <--- INI KUNCINYA
     }
 
-    // --- FITUR BARU: STOP OPEN BILLING & BAYAR ---
     public function stopOpen(Request $request)
     {
         $request->validate([
             'session_id'     => 'required|exists:game_sessions,id',
-            'final_bill'     => 'required|numeric|min:0', // Manual Input
+            'final_bill'     => 'required|numeric|min:0',
             'paid_amount'    => 'required|numeric|min:0',
             'payment_method' => 'required|string',
         ]);
@@ -151,7 +155,6 @@ class SessionsController extends Controller
         $saleId = DB::transaction(function () use ($request) {
             $session = GameSession::with('psUnit')->findOrFail($request->session_id);
             
-            // Hitung Durasi Akhir Real
             $start = Carbon::parse($session->start_time);
             $end   = now();
             $minutes = $start->diffInMinutes($end);
@@ -163,7 +166,6 @@ class SessionsController extends Controller
                 throw new \Exception('Pembayaran kurang.');
             }
 
-            // 1. Buat Transaksi (Sale)
             $sale = Sale::create([
                 'sold_at'        => now(),
                 'total'          => $totalBill,
@@ -176,7 +178,6 @@ class SessionsController extends Controller
                 'updated_at'     => now(),
             ]);
 
-            // 2. Buat Item Struk
             $desc = "Open Billing {$session->psUnit->name} (±{$hours} jam)";
             if ($session->extra_controllers > 0) $desc .= " + {$session->extra_controllers} Stik";
 
@@ -191,7 +192,6 @@ class SessionsController extends Controller
                 'updated_at'  => now(),
             ]);
 
-            // 3. Update Session Menjadi Closed
             $session->sale_id        = $sale->id;
             $session->end_time       = $end;
             $session->minutes        = $minutes;
@@ -204,7 +204,7 @@ class SessionsController extends Controller
             return $sale->id;
         });
 
-        return redirect()->route('sales.show', $saleId)->with('success', 'Open billing selesai & dibayar.');
+        return redirect()->route('sales.show', $saleId)->with('success', 'Open billing selesai.');
     }
 
     public function destroy($sid)
@@ -221,9 +221,7 @@ class SessionsController extends Controller
             $session->delete();
         });
 
-        return redirect()
-            ->route('sessions.index')
-            ->with('success', 'Riwayat sesi dihapus.');
+        return redirect()->route('sessions.index')->with('success', 'Riwayat sesi dihapus.');
     }
 
     public function addTime(Request $request)
@@ -233,19 +231,27 @@ class SessionsController extends Controller
             'hours'          => 'required|numeric|min:0.5',
             'paid_amount'    => 'nullable|numeric|min:0',
             'payment_method' => 'required|string',
-            'add_bill'       => 'required|numeric|min:0', // Manual Input
+            'add_bill'       => 'required|numeric|min:0',
         ]);
 
-        $saleId = DB::transaction(function () use ($request) {
+        $timerData = null;
+
+        $saleId = DB::transaction(function () use ($request, &$timerData) {
             $session = GameSession::with('psUnit')->findOrFail($request->session_id);
             $unit = $session->psUnit;
 
             $addedHours = (float) $request->hours;
             $totalAddOnCost = (float) $request->add_bill;
 
-            // Update Sesi
             $currentEnd = Carbon::parse($session->end_time);
             $newEnd = $currentEnd->copy()->addMinutes($addedHours * 60);
+            
+            // Simpan data timer update
+            $timerData = [
+                'unit'     => $unit->name,
+                'end_time' => $newEnd->toIso8601String()
+            ];
+
             $session->end_time = $newEnd;
             $session->minutes += ($addedHours * 60);
             $session->bill += $totalAddOnCost;
@@ -255,7 +261,6 @@ class SessionsController extends Controller
             $session->payment_method = $request->payment_method;
             $session->save();
 
-            // Update Sale
             if ($session->sale_id) {
                 $sale = Sale::find($session->sale_id);
                 if ($sale) {
@@ -285,7 +290,8 @@ class SessionsController extends Controller
         if ($saleId) {
             return redirect()
                 ->route('sales.show', $saleId)
-                ->with('success', 'Waktu berhasil ditambahkan.');
+                ->with('success', 'Waktu berhasil ditambahkan.')
+                ->with('new_timer', $timerData); // <--- KIRIM DATA TIMER JUGA
         }
 
         return back()->with('success', 'Waktu berhasil ditambahkan.');

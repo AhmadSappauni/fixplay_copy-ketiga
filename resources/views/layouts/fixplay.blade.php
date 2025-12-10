@@ -434,6 +434,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 {{-- Script utama (sidebar, notifikasi, riwayat, konfirmasi) --}}
+{{-- Script utama (sidebar, notifikasi, riwayat, konfirmasi) --}}
 <script>
 (function () {
     // ===== Sidebar persist =====
@@ -448,7 +449,6 @@
         else root.classList.remove('sidebar-collapsed');
     }
 
-    // default dari localStorage (desktop)
     applySidebar(localStorage.getItem(KEY_SIDEBAR) === '1');
 
     sidebarBtn?.addEventListener('click', () => {
@@ -457,198 +457,113 @@
         localStorage.setItem(KEY_SIDEBAR, next ? '1' : '0');
     });
 
-    sidebarCloseBtn?.addEventListener('click', () => {
-        applySidebar(true);
-        localStorage.setItem(KEY_SIDEBAR, '1');
-    });
-
-    // klik overlay di luar sidebar → tutup (mobile)
+    // Mobile logic
     root?.addEventListener('click', (e) => {
         if (window.innerWidth > 992) return;
         if (root.classList.contains('sidebar-collapsed')) return;
         if (e.target.closest('.shell-aside')) return;
         if (e.target.closest('#sidebarToggle')) return;
-
         applySidebar(true);
         localStorage.setItem(KEY_SIDEBAR, '1');
     });
 
-    // Klik salah satu menu di sidebar (HP/tablet) -> sidebar otomatis menutup
-    document.querySelectorAll('.shell-aside .menu a').forEach(link => {
-        link.addEventListener('click', () => {
+    document.querySelectorAll('.shell-aside a').forEach(el => {
+        el.addEventListener('click', () => {
             if (window.innerWidth <= 992) {
-                applySidebar(true);                
-                localStorage.setItem(KEY_SIDEBAR, '1'); 
+                applySidebar(true);
+                localStorage.setItem(KEY_SIDEBAR, '1');
             }
         });
     });
 
-    // klik menu / logout di sidebar → auto close di HP
-    document.querySelectorAll('.shell-aside a[data-close-sidebar], .shell-aside button[data-close-sidebar]')
-        .forEach(el => {
-            el.addEventListener('click', () => {
-                if (window.innerWidth <= 992) {
-                    applySidebar(true);
-                    localStorage.setItem(KEY_SIDEBAR, '1');
-                }
-            });
-        });
-
-    // ===== Notifikasi & Riwayat =====
+    // ===== Notifikasi & Riwayat (GLOBAL) =====
     const KEY_TIMERS  = 'fixplay.rental.timers';
     const KEY_INBOX   = 'fixplay.rental.inbox';
     const KEY_HISTORY = 'fixplay.rental.history';
     const POLL_MS     = 15000;
 
-    // [PERBAIKAN 1]: Variabel isKasirPage DIHAPUS karena tidak lagi dibutuhkan
-    
     const notifBadge  = document.getElementById('notifBadge');
     const notifList   = document.getElementById('notifList');
     const clearBtn    = document.getElementById('notifClear');
-
     const historyBtn  = document.getElementById('historyBtn');
     const historyList = document.getElementById('historyList');
     const clearHistBtn = document.getElementById('clearHistoryBtn');
-
     const toastEl     = document.getElementById('liveToast');
-    const toastTitle  = document.getElementById('toastTitle');
-    const toastBody   = document.getElementById('toastBody');
     const notifSound  = document.getElementById('notifSound');
-
     const bsToast     = toastEl ? new bootstrap.Toast(toastEl) : null;
-    const historyModal = document.getElementById('historyModal')
-        ? new bootstrap.Modal(document.getElementById('historyModal'))
-        : null;
+    const historyModal = document.getElementById('historyModal') ? new bootstrap.Modal(document.getElementById('historyModal')) : null;
 
-    const jget = (k, d) => {
-        try {
-            const v = localStorage.getItem(k);
-            return v === null ? d : JSON.parse(v);
-        } catch (e) {
-            return d;
-        }
-    };
+    // Helper LocalStorage
+    const jget = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };
     const jset = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+
+    // --- [LOGIKA BARU] Tangkap Timer dari Controller (Bridge) ---
+    // Jika ada session flash 'new_timer', masukkan ke LocalStorage
+    @if(session('new_timer'))
+        try {
+            const newT = @json(session('new_timer'));
+            if(newT && newT.unit && newT.end_time) {
+                const timers = jget(KEY_TIMERS, []);
+                // Hapus timer lama untuk unit yg sama (kalau ada)
+                const cleanTimers = timers.filter(t => t.unit !== newT.unit);
+                cleanTimers.push({
+                    id: Date.now() + '-' + Math.random().toString(36).slice(2),
+                    unit: newT.unit,
+                    endAt: newT.end_time,
+                    notified: false
+                });
+                jset(KEY_TIMERS, cleanTimers);
+                console.log('Timer baru ditambahkan:', newT);
+            }
+        } catch(e) { console.error('Gagal simpan timer:', e); }
+    @endif
 
     function renderInbox() {
         if (!notifList) return;
         const inbox = jget(KEY_INBOX, []);
-
         if (notifBadge) {
-            if (inbox.length) {
-                notifBadge.textContent = String(inbox.length);
-                notifBadge.classList.remove('d-none');
-            } else {
-                notifBadge.classList.add('d-none');
-            }
+            notifBadge.textContent = String(inbox.length);
+            inbox.length ? notifBadge.classList.remove('d-none') : notifBadge.classList.add('d-none');
         }
-
         notifList.innerHTML = '';
         if (!inbox.length) {
-            notifList.innerHTML = '<div class="p-3 text-secondary">Belum ada notifikasi.</div>';
+            notifList.innerHTML = '<div class="p-3 text-secondary small text-center">Belum ada notifikasi.</div>';
             return;
         }
-
         inbox.slice().reverse().forEach(item => {
-            const a = document.createElement('a');
-            a.href = '#';
-            a.className = 'list-group-item list-group-item-action';
             const d = new Date(item.time);
             const t = d.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
-
-            a.innerHTML =
-                `<div class="d-flex w-100 justify-content-between">
-                    <div><strong>${item.title}</strong></div>
-                    <small class="small">${t}</small>
-                 </div>
-                 ${item.detail ? `<div class="small mt-1">${item.detail}</div>` : ''}`;
-
-            a.addEventListener('click', e => {
-                e.preventDefault();
-                moveToHistory(item);
-            });
-
+            const a = document.createElement('a');
+            a.className = 'list-group-item list-group-item-action border-bottom border-secondary border-opacity-25';
+            a.innerHTML = `<div class="d-flex justify-content-between align-items-center"><strong class="text-white small">${item.title}</strong><small class="text-secondary" style="font-size:0.7rem;">${t}</small></div><div class="text-secondary small mt-1 text-truncate">${item.detail}</div>`;
+            a.addEventListener('click', e => { e.preventDefault(); moveToHistory(item); });
             notifList.appendChild(a);
-        });
-    }
-
-    function addToHistoryStorage(item) {
-        const hist = jget(KEY_HISTORY, []);
-        hist.unshift(item);
-        if (hist.length > 100) hist.length = 100;
-        jset(KEY_HISTORY, hist);
-    }
-
-    function renderHistory() {
-        if (!historyList) return;
-        const hist = jget(KEY_HISTORY, []);
-
-        historyList.innerHTML = '';
-        if (!hist.length) {
-            historyList.innerHTML = '<div class="p-4 text-center text-muted">Belum ada riwayat.</div>';
-            return;
-        }
-
-        hist.forEach(it => {
-            const d = new Date(it.time);
-            const dateStr = d.toLocaleDateString('id-ID', {day:'numeric', month:'short'});
-            const timeStr = d.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
-
-            const div = document.createElement('div');
-            div.className = 'list-group-item';
-            div.innerHTML = `
-                <div class="d-flex justify-content-between align-items-start">
-                    <div class="fw-bold text-dark">${it.title}</div>
-                    <small class="text-muted" style="font-size:0.75rem;">${dateStr} ${timeStr}</small>
-                </div>
-                ${it.detail ? `<div class="small text-muted mt-1">${it.detail}</div>` : ''}
-            `;
-            historyList.appendChild(div);
         });
     }
 
     function addNotification(title, detail) {
         const inbox = jget(KEY_INBOX, []);
-        inbox.push({
-            id: Date.now() + '-' + Math.random().toString(36).slice(2),
-            title,
-            detail,
-            time: new Date().toISOString()
-        });
+        inbox.push({ id: Date.now(), title, detail, time: new Date().toISOString() });
         jset(KEY_INBOX, inbox);
         renderInbox();
-
-        try {
-            if (notifSound) {
-                notifSound.currentTime = 0;
-                notifSound.play().catch(() => {});
-            }
-        } catch (e) {}
-
-        if (bsToast && toastTitle && toastBody) {
-            toastTitle.textContent = title;
-            toastBody.textContent  = detail || '';
+        
+        // Audio & Toast
+        try { if (notifSound) { notifSound.currentTime = 0; notifSound.play().catch(()=>{}); } } catch (e) {}
+        if (bsToast) {
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastBody').textContent = detail;
             bsToast.show();
         }
     }
 
-    function moveToHistory(item) {
-        const inbox = jget(KEY_INBOX, []);
-        const newInbox = inbox.filter(x => String(x.id) !== String(item.id));
-        jset(KEY_INBOX, newInbox);
-        addToHistoryStorage(item);
-        renderInbox();
-    }
-
     function pollTimers() {
-        // [PERBAIKAN 2]: Pengecekan isKasirPage DIHAPUS agar timer berjalan global
-        
         const now = new Date();
         const timers = jget(KEY_TIMERS, []);
         let changed = false;
 
         timers.forEach(t => {
             const endAt = new Date(t.endAt);
+            // Toleransi 10 detik agar tidak bunyi terus menerus
             if (!t.notified && endAt <= now) {
                 addNotification('Waktu Habis!', `Unit ${t.unit} telah selesai.`);
                 t.notified = true;
@@ -656,115 +571,90 @@
             }
         });
 
-        const keep = timers.filter(t =>
-            (Date.now() - new Date(t.endAt)) < 24 * 3600 * 1000
-        );
+        // Hapus timer yg lewat > 12 jam
+        const keep = timers.filter(t => (Date.now() - new Date(t.endAt)) < 12 * 3600 * 1000);
         if (changed || keep.length !== timers.length) {
             jset(KEY_TIMERS, keep);
         }
     }
 
+    function moveToHistory(item) {
+        const inbox = jget(KEY_INBOX, []);
+        const newInbox = inbox.filter(x => String(x.id) !== String(item.id));
+        jset(KEY_INBOX, newInbox);
+        
+        const hist = jget(KEY_HISTORY, []);
+        hist.unshift(item);
+        if(hist.length > 50) hist.length = 50;
+        jset(KEY_HISTORY, hist);
+        renderInbox();
+    }
+
+    function renderHistory() {
+        if (!historyList) return;
+        const hist = jget(KEY_HISTORY, []);
+        historyList.innerHTML = '';
+        if (!hist.length) { historyList.innerHTML = '<div class="p-4 text-center text-muted small">Belum ada riwayat.</div>'; return; }
+        hist.forEach(it => {
+            const d = new Date(it.time);
+            const dateStr = d.toLocaleDateString('id-ID', {day:'numeric', month:'short'});
+            const timeStr = d.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+            const div = document.createElement('div');
+            div.className = 'list-group-item bg-transparent text-light border-bottom border-secondary border-opacity-25';
+            div.innerHTML = `<div class="d-flex justify-content-between"><div class="fw-bold small">${it.title}</div><small class="text-secondary" style="font-size:0.65rem;">${dateStr} ${timeStr}</small></div><div class="small text-secondary mt-1">${it.detail}</div>`;
+            historyList.appendChild(div);
+        });
+    }
+
+    // Event Listeners
     clearBtn?.addEventListener('click', e => {
         e.preventDefault();
         const inbox = jget(KEY_INBOX, []);
-        if (inbox.length) {
+        if(inbox.length){
             const hist = jget(KEY_HISTORY, []);
-            const newHist = [...inbox.reverse(), ...hist].slice(0, 100);
+            const newHist = [...inbox.reverse(), ...hist].slice(0, 50);
             jset(KEY_HISTORY, newHist);
             jset(KEY_INBOX, []);
             renderInbox();
         }
     });
-
-    historyBtn?.addEventListener('click', () => {
-        renderHistory();
-        historyModal?.show();
-    });
-
+    historyBtn?.addEventListener('click', () => { renderHistory(); historyModal?.show(); });
     clearHistBtn?.addEventListener('click', () => {
-        Swal.fire({
-            title: 'Hapus semua riwayat?',
-            text: 'Riwayat notifikasi yang dihapus tidak bisa dikembalikan.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, hapus',
-            cancelButtonText: 'Batal',
-            reverseButtons: true,
-            background: '#151528',
-            color: '#e5e7eb',
-            customClass: {
-                popup: 'fx-neon-card',
-                confirmButton: 'fx-btn-primary swal-btn-confirm',
-                cancelButton: 'btn btn-outline-light swal-btn-cancel',
-                actions: 'swal-actions-neon'
-            },
-            buttonsStyling: false
-        }).then((result) => {
-            if (result.isConfirmed) {
-                jset(KEY_HISTORY, []);
-                renderHistory();
-
-                Swal.fire({
-                    title: 'Riwayat terhapus',
-                    text: 'Semua riwayat notifikasi sudah dibersihkan.',
-                    icon: 'success',
-                    timer: 1800,
-                    showConfirmButton: false,
-                    background: '#151528',
-                    color: '#e5e7eb',
-                    customClass: {
-                        popup: 'fx-neon-card'
-                    },
-                    buttonsStyling: false
-                });
-            }
-        });
+        if(confirm('Hapus riwayat?')) { jset(KEY_HISTORY, []); renderHistory(); }
     });
 
-    window.addEventListener('storage', e => {
-        if ([KEY_INBOX, KEY_TIMERS, KEY_HISTORY].includes(e.key)) {
-            renderInbox();
-            renderHistory();
-        }
-    });
+    // Auto Run
+    renderInbox();
+    pollTimers();
+    setInterval(pollTimers, POLL_MS); // Cek setiap 15 detik
 
-    document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
-            renderInbox();
-            pollTimers();
-        }
-    });
-
-    // ===== Modal konfirmasi global (hapus & logout) =====
+    // Modal Konfirmasi Hapus/Stop
     (function setupConfirmModal() {
         let pendingForm = null;
         const modalEl = document.getElementById('fxConfirm');
         if (!modalEl) return;
-
         const modal = new bootstrap.Modal(modalEl);
-        const txt   = document.getElementById('fxConfirmText');
+        const txt = document.getElementById('fxConfirmText');
         const okBtn = document.getElementById('fxConfirmOk');
 
-        document.querySelectorAll('form.confirm-delete, form[data-confirm]').forEach(form => {
-            form.addEventListener('submit', function (e) {
+        document.body.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (form.classList.contains('confirm-delete') || form.dataset.confirm) {
                 e.preventDefault();
-                pendingForm = this;
-                txt.textContent = this.dataset.confirm || 'Yakin?';
+                pendingForm = form;
+                txt.textContent = form.dataset.confirm || 'Yakin?';
                 modal.show();
-            });
+            }
         });
 
         okBtn?.addEventListener('click', function () {
             if (pendingForm) {
+                // Hapus timer jika tombol stop/hapus diklik
                 const unitName = pendingForm.dataset.timerUnit;
                 if (unitName) {
-                    try {
-                        const timers = jget(KEY_TIMERS, []);
-                        const keep = timers.filter(t => t.unit !== unitName);
-                        jset(KEY_TIMERS, keep);
-                    } catch (e) {
-                        console.warn('Gagal membersihkan timer lokal:', e);
-                    }
+                    const timers = jget(KEY_TIMERS, []);
+                    const keep = timers.filter(t => t.unit !== unitName);
+                    jset(KEY_TIMERS, keep);
                 }
                 pendingForm.submit();
                 pendingForm = null;
@@ -772,12 +662,6 @@
             modal.hide();
         });
     })();
-
-    // initial
-    renderInbox();
-    // [PERBAIKAN 3]: pollTimers dijalankan tanpa syarat agar jalan di semua halaman
-    pollTimers();
-    setInterval(pollTimers, POLL_MS);
 })();
 </script>
 
