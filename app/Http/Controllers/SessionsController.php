@@ -25,7 +25,7 @@ class SessionsController extends Controller
         $closed_sessions = GameSession::with('psUnit')
             ->whereNotNull('end_time')
             ->orderBy('start_time', 'desc')
-            ->limit(100)
+            //->limit(100)
             ->get();
 
         return view('sessions', compact('units', 'active_sessions', 'closed_sessions'));
