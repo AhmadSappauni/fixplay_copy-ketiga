@@ -438,7 +438,7 @@
 (function () {
     // ===== Sidebar persist =====
     const KEY_SIDEBAR = 'fixplay.sidebar.collapsed';
-    const root       = document.querySelector('.fix-shell');
+    const root        = document.querySelector('.fix-shell');
     const sidebarBtn = document.getElementById('sidebarToggle');
     const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
 
@@ -473,17 +473,15 @@
         localStorage.setItem(KEY_SIDEBAR, '1');
     });
 
-        // Klik salah satu menu di sidebar (HP/tablet) -> sidebar otomatis menutup
+    // Klik salah satu menu di sidebar (HP/tablet) -> sidebar otomatis menutup
     document.querySelectorAll('.shell-aside .menu a').forEach(link => {
         link.addEventListener('click', () => {
-            // Hanya berlaku untuk layar kecil
             if (window.innerWidth <= 992) {
-                applySidebar(true);                 // tutup sidebar
-                localStorage.setItem(KEY_SIDEBAR, '1'); // simpan state tertutup
+                applySidebar(true);                
+                localStorage.setItem(KEY_SIDEBAR, '1'); 
             }
         });
     });
-
 
     // klik menu / logout di sidebar → auto close di HP
     document.querySelectorAll('.shell-aside a[data-close-sidebar], .shell-aside button[data-close-sidebar]')
@@ -502,19 +500,20 @@
     const KEY_HISTORY = 'fixplay.rental.history';
     const POLL_MS     = 15000;
 
-    const isKasirPage = !!document.querySelector('.session-shell');
+    // [PERBAIKAN 1]: Variabel isKasirPage DIHAPUS karena tidak lagi dibutuhkan
+    
     const notifBadge  = document.getElementById('notifBadge');
     const notifList   = document.getElementById('notifList');
     const clearBtn    = document.getElementById('notifClear');
 
-    const historyBtn   = document.getElementById('historyBtn');
-    const historyList  = document.getElementById('historyList');
+    const historyBtn  = document.getElementById('historyBtn');
+    const historyList = document.getElementById('historyList');
     const clearHistBtn = document.getElementById('clearHistoryBtn');
 
-    const toastEl    = document.getElementById('liveToast');
-    const toastTitle = document.getElementById('toastTitle');
-    const toastBody  = document.getElementById('toastBody');
-    const notifSound = document.getElementById('notifSound');
+    const toastEl     = document.getElementById('liveToast');
+    const toastTitle  = document.getElementById('toastTitle');
+    const toastBody   = document.getElementById('toastBody');
+    const notifSound  = document.getElementById('notifSound');
 
     const bsToast     = toastEl ? new bootstrap.Toast(toastEl) : null;
     const historyModal = document.getElementById('historyModal')
@@ -642,9 +641,8 @@
     }
 
     function pollTimers() {
-        // waktu habis hanya dicek di halaman kasir
-        if (!isKasirPage) return;
-
+        // [PERBAIKAN 2]: Pengecekan isKasirPage DIHAPUS agar timer berjalan global
+        
         const now = new Date();
         const timers = jget(KEY_TIMERS, []);
         let changed = false;
@@ -698,7 +696,7 @@
                 popup: 'fx-neon-card',
                 confirmButton: 'fx-btn-primary swal-btn-confirm',
                 cancelButton: 'btn btn-outline-light swal-btn-cancel',
-                actions: 'swal-actions-neon' // ⬅️ area tombol
+                actions: 'swal-actions-neon'
             },
             buttonsStyling: false
         }).then((result) => {
@@ -722,8 +720,6 @@
             }
         });
     });
-
-
 
     window.addEventListener('storage', e => {
         if ([KEY_INBOX, KEY_TIMERS, KEY_HISTORY].includes(e.key)) {
@@ -779,10 +775,9 @@
 
     // initial
     renderInbox();
-    if (isKasirPage) {
-        pollTimers();
-        setInterval(pollTimers, POLL_MS);
-    }
+    // [PERBAIKAN 3]: pollTimers dijalankan tanpa syarat agar jalan di semua halaman
+    pollTimers();
+    setInterval(pollTimers, POLL_MS);
 })();
 </script>
 
