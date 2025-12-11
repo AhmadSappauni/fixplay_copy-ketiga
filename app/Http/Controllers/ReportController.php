@@ -12,9 +12,8 @@ class ReportController extends Controller
 {
     public function index(Request $r)
     {
-        // --- parse filters ---
-        $range = $r->query('range', 'day'); // day|week|month|custom
-
+        // --- 1. SETUP TANGGAL UTAMA (Sesuai Filter User) ---
+        $range = $r->query('range', 'day'); 
         $refDate = $r->query('date') ? Carbon::parse($r->query('date')) : Carbon::now();
 
         if ($range === 'day') {
@@ -33,10 +32,17 @@ class ReportController extends Controller
             $end   = $e ? Carbon::parse($e)->endOfDay() : Carbon::now()->endOfDay();
         }
 
-        $start = Carbon::parse($start);
-        $end   = Carbon::parse($end);
+        // --- 2. SETUP TANGGAL UNTUK REKAPITULASI (Agar Data Lebih Luas) ---
+        // Rekap Harian: Kita ambil data 1 Bulan penuh dari tanggal yang dipilih
+        $recapDailyStart = $start->copy()->startOfMonth();
+        $recapDailyEnd   = $start->copy()->endOfMonth();
 
-        // --- TOTALS (Card Ringkasan) ---
+        // Rekap Mingguan & Bulanan: Kita ambil data 1 Tahun penuh (Jan - Des)
+        $recapYearStart  = $start->copy()->startOfYear();
+        $recapYearEnd    = $start->copy()->endOfYear();
+
+
+        // --- QUERY TOTAL (Tetap pakai $start & $end sesuai filter) ---
         $ps_total = DB::table('sale_items')
             ->join('sales','sale_items.sale_id','sales.id')
             ->whereBetween('sales.sold_at', [$start, $end])
@@ -58,21 +64,18 @@ class ReportController extends Controller
             ->selectRaw('COALESCE(SUM(amount),0) as total')
             ->value('total');
 
-        // --- PERBAIKAN 1: LIST PENJUALAN ---
-        // Hapus ->limit(100) agar laporan menampilkan SELURUH data di tanggal tsb
+        // --- LIST PENJUALAN (Tetap pakai $start & $end) ---
         $sales = Sale::with(['items.product']) 
             ->whereBetween('sold_at', [$start, $end])
             ->orderBy('sold_at','desc')
             ->get()
             ->map(function($s){
-                // 1. Fix Total
                 $totalFix = $s->total ?? $s->total_amount ?? 0;
                 if ($totalFix == 0) {
                     $totalFix = $s->items->sum('subtotal');
                 }
                 $s->total = $totalFix;
 
-                // 2. Fix Judul/Catatan
                 $names = [];
                 foreach($s->items as $it) {
                     if($it->product) {
@@ -85,22 +88,18 @@ class ReportController extends Controller
                 return $s;
             });
 
-        // --- BARU: MEMISAHKAN RENTAL & PRODUK ---
-        // Logic: Jika dalam transaksi ada item yg product_id-nya NULL, itu Rental.
+        // Split Rental & Produk
         $rentalSales = $sales->filter(function ($s) {
             return $s->items->contains(function ($item) {
                 return $item->product_id === null;
             });
         });
-
-        // Sisanya adalah transaksi Produk (F&B)
         $productSales = $sales->diff($rentalSales);
 
-        // --- Expenses list ---
+        // Expenses List
         $expenses = DB::table('expenses')
             ->whereBetween('timestamp', [$start, $end])
             ->orderBy('timestamp','desc')
-            // ->limit(100)
             ->get()
             ->map(function($e){
                 $e->timestamp = isset($e->timestamp) ? Carbon::parse($e->timestamp) : null;
@@ -108,9 +107,10 @@ class ReportController extends Controller
                 return $e;
             });
 
-        // --- PERBAIKAN 2: REKAP PER PERIODE (Pisahkan PS dan Produk dengan SQL) ---
+        // --- PERBAIKAN DI SINI: REKAP MENGGUNAKAN RENTANG WAKTU LUAS ---
         
-        // 1. Daily Rows
+        // 1. Daily Rows (Tampilkan data sebulan penuh)
+        // Gunakan $recapDailyStart & $recapDailyEnd
         $daily_rows = DB::table('sales')
             ->join('sale_items', 'sales.id', '=', 'sale_items.sale_id')
             ->selectRaw("
@@ -119,21 +119,21 @@ class ReportController extends Controller
                 COALESCE(SUM(CASE WHEN sale_items.product_id IS NULL THEN sale_items.subtotal ELSE 0 END),0) as ps_amount,
                 COALESCE(SUM(CASE WHEN sale_items.product_id IS NOT NULL THEN sale_items.subtotal ELSE 0 END),0) as prod_amount
             ")
-            ->whereBetween('sales.sold_at', [$start, $end])
+            ->whereBetween('sales.sold_at', [$recapDailyStart, $recapDailyEnd]) // <--- UBAH DI SINI
             ->groupBy('d')
             ->orderBy('d','asc')
             ->get()
             ->map(function($row){
                 return (object)[
-                    'label' => Carbon::parse($row->d)->format('d-m-Y'),
+                    'label' => Carbon::parse($row->d)->format('d/m'), // Format tgl/bln
                     'ps'    => (int)$row->ps_amount,
                     'prod'  => (int)$row->prod_amount,
                     'total' => (int)$row->total
                 ];
             });
 
-        // 2. Weekly Rows
-        // 2. Weekly Rows - label "Minggu ke-X Bulan YYYY"
+        // 2. Weekly Rows (Tampilkan data setahun penuh)
+        // Gunakan $recapYearStart & $recapYearEnd
         $weekly_rows = DB::table('sales')
             ->join('sale_items', 'sales.id', '=', 'sale_items.sale_id')
             ->selectRaw("
@@ -143,20 +143,16 @@ class ReportController extends Controller
                 COALESCE(SUM(CASE WHEN sale_items.product_id IS NULL THEN sale_items.subtotal ELSE 0 END),0) as ps_amount,
                 COALESCE(SUM(CASE WHEN sale_items.product_id IS NOT NULL THEN sale_items.subtotal ELSE 0 END),0) as prod_amount
             ")
-            ->whereBetween('sales.sold_at', [$start, $end])
+            ->whereBetween('sales.sold_at', [$recapYearStart, $recapYearEnd]) // <--- UBAH DI SINI
             ->groupBy('y','w')
             ->orderBy('y','asc')
             ->orderBy('w','asc')
             ->get()
             ->map(function($r){
-                // Dapatkan tanggal awal minggu tsb berdasarkan year + ISO week
-                $weekStart = Carbon::now()->setISODate($r->y, $r->w)->startOfWeek(); // Senin
-
-                // Minggu ke berapa di bulan itu
+                $weekStart = Carbon::now()->setISODate($r->y, $r->w)->startOfWeek();
                 $weekOfMonth = $weekStart->weekOfMonth;
-
-                // Label contoh: "Minggu ke-2 Nov 2025"
-                $label = 'Minggu ke-' . $weekOfMonth . ' ' . $weekStart->translatedFormat('M Y');
+                // Label lebih pendek agar muat di tabel
+                $label = 'Mg ' . $weekOfMonth . ' ' . $weekStart->translatedFormat('M');
 
                 return (object)[
                     'label' => $label,
@@ -166,8 +162,8 @@ class ReportController extends Controller
                 ];
             });
 
-
-        // 3. Monthly Rows
+        // 3. Monthly Rows (Tampilkan data setahun penuh)
+        // Gunakan $recapYearStart & $recapYearEnd
         $monthly_rows = DB::table('sales')
             ->join('sale_items', 'sales.id', '=', 'sale_items.sale_id')
             ->selectRaw("
@@ -176,13 +172,13 @@ class ReportController extends Controller
                 COALESCE(SUM(CASE WHEN sale_items.product_id IS NULL THEN sale_items.subtotal ELSE 0 END),0) as ps_amount,
                 COALESCE(SUM(CASE WHEN sale_items.product_id IS NOT NULL THEN sale_items.subtotal ELSE 0 END),0) as prod_amount
             ")
-            ->whereBetween('sales.sold_at', [$start, $end])
+            ->whereBetween('sales.sold_at', [$recapYearStart, $recapYearEnd]) // <--- UBAH DI SINI
             ->groupBy('m')
             ->orderBy('m','asc')
             ->get()
             ->map(function($r){
                 return (object)[
-                    'label' => Carbon::parse($r->m . '-01')->format('M Y'),
+                    'label' => Carbon::parse($r->m . '-01')->translatedFormat('F'), // Nama Bulan Full
                     'ps'    => (int)$r->ps_amount,
                     'prod'  => (int)$r->prod_amount,
                     'total' => (int)$r->total
@@ -212,9 +208,9 @@ class ReportController extends Controller
             'sales_total'    => (int)$sales_total,
             'expenses_total' => (int)$expenses_total,
             
-            'sales'          => $sales,        // Tetap dikirim (opsional)
-            'rentalSales'    => $rentalSales,  // <--- TAMBAHKAN INI
-            'productSales'   => $productSales, // <--- TAMBAHKAN INI
+            'sales'          => $sales, 
+            'rentalSales'    => $rentalSales,
+            'productSales'   => $productSales,
             
             'expenses'       => $expenses,
             'daily_rows'     => $daily_rows,
