@@ -287,7 +287,7 @@
                   <th>Waktu</th>
                   <th>Detail Rental</th>
                   <th class="text-end">Total</th>
-                  <th class="text-end d-print-none" style="width: 80px;">Aksi</th>
+                  <th class="text-end d-print-none" style="width: 100px;">Aksi</th>
                 </tr>
               </thead>
               <tbody>
@@ -307,10 +307,23 @@
                     <td class="text-end amount-mono text-info">Rp {{ number_format($s->total ?? 0,0,',','.') }}</td>
                     <td class="text-end d-print-none">
                       <div class="btn-action-group justify-content-end">
+                          {{-- Edit --}}
                           <button type="button" class="btn btn-outline-secondary-soft" title="Edit"
                                   onclick='editSaleModal({{ $s->id }}, {!! json_encode($s->note) !!}, {!! json_encode($s->payment_method) !!}, {{ $s->paid_amount ?? 0 }}, {{ $s->total ?? 0 }}, {!! json_encode($s->sold_at->format("Y-m-d\TH:i")) !!})'>
                             <i class="bi bi-pencil"></i>
                           </button>
+
+                          {{-- HAPUS (Hanya Boss) --}}
+                          @if(auth()->user() && auth()->user()->role === 'boss')
+                            <form class="d-inline confirm-delete" method="POST" 
+                                  action="{{ route('sales.destroy', $s->id) }}" 
+                                  data-confirm="Hapus data rental ini? Pendapatan akan berkurang.">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger-soft" title="Hapus">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                          @endif
                       </div>
                     </td>
                   </tr>
@@ -333,7 +346,7 @@
              <span class="badge badge-soft-primary d-print-none">{{ $productSales->count() }} Data</span>
           </div>
           
-          {{-- INPUT PENCARIAN BARU --}}
+          {{-- INPUT PENCARIAN --}}
           <div class="d-print-none">
              <input type="text" id="searchProductInput" 
                     class="form-control form-control-sm text-white" 
@@ -350,7 +363,7 @@
                   <th>Waktu</th>
                   <th>Barang</th>
                   <th class="text-end">Total</th>
-                  <th class="text-end d-print-none" style="width: 80px;">Aksi</th>
+                  <th class="text-end d-print-none" style="width: 100px;">Aksi</th>
                 </tr>
               </thead>
               <tbody>
@@ -362,7 +375,7 @@
                             <span class="text-light fw-bold">{{ \Carbon\Carbon::parse($s->sold_at)->format('H:i') }}</span>
                         </div>
                     </td>
-                    {{-- Tambahkan class 'searchable-text' untuk target pencarian --}}
+                    {{-- Class searchable-text untuk pencarian JS --}}
                     <td class="searchable-text">
                         <div class="text-light" style="max-width: 180px;">
                             {{ $s->display_note }}
@@ -371,10 +384,23 @@
                     <td class="text-end amount-mono text-success">Rp {{ number_format($s->total ?? 0,0,',','.') }}</td>
                     <td class="text-end d-print-none">
                       <div class="btn-action-group justify-content-end">
+                          {{-- Edit --}}
                           <button type="button" class="btn btn-outline-secondary-soft" title="Edit"
                                   onclick='editSaleModal({{ $s->id }}, {!! json_encode($s->note) !!}, {!! json_encode($s->payment_method) !!}, {{ $s->paid_amount ?? 0 }}, {{ $s->total ?? 0 }}, {!! json_encode($s->sold_at->format("Y-m-d\TH:i")) !!})'>
                             <i class="bi bi-pencil"></i>
                           </button>
+
+                          {{-- HAPUS (Hanya Boss) --}}
+                          @if(auth()->user() && auth()->user()->role === 'boss')
+                            <form class="d-inline confirm-delete" method="POST" 
+                                  action="{{ route('sales.destroy', $s->id) }}" 
+                                  data-confirm="Hapus penjualan produk ini?">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger-soft" title="Hapus">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                          @endif
                       </div>
                     </td>
                   </tr>
@@ -382,7 +408,6 @@
                   <tr><td colspan="4" class="text-center text-light p-4 opacity-50">Tidak ada penjualan produk.</td></tr>
                 @endforelse
                 
-                {{-- Pesan jika pencarian tidak ditemukan --}}
                 <tr id="noProductFound" style="display: none;">
                     <td colspan="4" class="text-center text-secondary py-3">
                         <i class="bi bi-search me-1"></i> Produk tidak ditemukan.
@@ -394,7 +419,6 @@
         </div>
       </div>
     </div>
-
   </div>
 
   {{-- TABEL PENGELUARAN (Full Width di Bawah) --}}
