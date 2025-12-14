@@ -68,14 +68,13 @@
   /* ====== CARD GLASS & TABLES ====== */
   .card-glass{
     border-radius:1.1rem; border:1px solid rgba(148,163,184,.25);
-    /* Latar Belakang Gelap Transparan */
     background: linear-gradient(145deg, rgba(2,6,23,0.9), rgba(15,23,42,0.85));
     box-shadow:0 18px 38px rgba(0,0,0,.6); backdrop-filter:blur(20px); color:#e5e7eb;
     overflow: hidden;
   }
   .card-glass .card-header{
     border-bottom:1px solid rgba(148,163,184,.2); 
-    background: rgba(30, 41, 59, 0.4); /* Header sedikit lebih terang */
+    background: rgba(30, 41, 59, 0.4); 
     font-weight:700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color:#cbd5e1;
     padding: 0.8rem 1.2rem;
   }
@@ -97,20 +96,15 @@
 
   .amount-mono{ font-family: 'Consolas', 'Monaco', monospace; font-weight: 600; color: #818cf8; }
   
-  /* Badge */
   .badge-soft-primary{ background:rgba(59,130,246,.2); color:#93c5fd; border: 1px solid rgba(59,130,246,.3); border-radius:99px; font-size: 0.65rem; padding: 0.3rem 0.6rem; }
   .badge-soft-danger{ background:rgba(248,113,113,.2); color:#fca5a5; border: 1px solid rgba(248,113,113,.3); border-radius:99px; font-size: 0.65rem; padding: 0.3rem 0.6rem; }
 
-  /* Tombol Aksi Kecil */
   .btn-action-group .btn { padding: 0.2rem 0.5rem; font-size: 0.7rem; border-radius: 6px; margin-right: 4px; }
-  .btn-outline-primary-soft { color: #a5b4fc; border: 1px solid #6366f1; background: rgba(99,102,241,0.1); }
-  .btn-outline-primary-soft:hover { background: #6366f1; color: #fff; }
   .btn-outline-secondary-soft { color: #cbd5e1; border: 1px solid #475569; background: rgba(71,85,105,0.1); }
   .btn-outline-secondary-soft:hover { background: #475569; color: #fff; }
   .btn-outline-danger-soft { color: #fca5a5; border: 1px solid #ef4444; background: rgba(239,68,68,0.1); }
   .btn-outline-danger-soft:hover { background: #ef4444; color: #fff; }
 
-  /* Tabs */
   .rng-day, .rng-week, .rng-month, .rng-custom { display:none; }
   #rekapTabs .nav-link{
     border-radius:999px; padding:.3rem .9rem; font-size:.75rem; border:1px solid transparent; color:#94a3b8; background:transparent;
@@ -122,13 +116,10 @@
   .rekap-pane { display:none; }
   .rekap-pane.show { display:block; }
 
-  /* MODAL STYLE (DARK GLASS) */
   .modal-glass .modal-content {
     background: radial-gradient(circle at top left, #1e1e2f, #0f1020);
     border: 1px solid rgba(124,58,237,.3);
-    box-shadow: 0 0 30px rgba(0,0,0,.8);
-    color: #e5e7eb;
-    border-radius: 1.25rem;
+    box-shadow: 0 0 30px rgba(0,0,0,.8); color: #e5e7eb; border-radius: 1.25rem;
   }
   .modal-glass .modal-header { border-bottom: 1px solid rgba(255,255,255,.08); }
   .modal-glass .modal-footer { border-top: 1px solid rgba(255,255,255,.08); }
@@ -147,18 +138,14 @@
     background: linear-gradient(135deg, #7c3aed, #2563eb); color: white; transform: translateY(-1px);
   }
 
-  input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-  }
+  input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
 
-  /* Responsive */
   @media (max-width: 768px){
     .report-shell{ padding:1.25rem 1rem 2rem; border-radius:1rem; }
     .metric-card{ padding:.9rem .95rem 1rem; margin-bottom:.5rem; }
     .d-flex.align-items-center.justify-content-between.mb-3{ flex-direction:column; align-items:flex-start !important; gap:.75rem; }
     .report-filter .col-6, .report-filter .col-12{ flex:0 0 100%; max-width:100%; }
   }
-
   @media print {
     .report-shell, .card-glass, .table-modern tbody tr, .table-modern tfoot tr{ background:#fff; box-shadow:none; color:#000; }
     .card-glass{ border-color:#e5e7eb; }
@@ -233,43 +220,82 @@
     </div>
   </form>
 
-  {{-- Ringkasan metrik utama --}}
+  {{-- Ringkasan metrik utama (SPLIT LABA) --}}
   <div class="row g-4 mb-4">
+    {{-- CARD 1: LABA BERSIH PS --}}
     <div class="col-md-3 col-6">
-      <div class="metric-card metric-blue">
-        <div class="metric-icon"><i class="bi bi-controller"></i></div>
-        <div class="metric-label">Pendapatan PS</div>
-        <div class="metric-value">Rp {{ number_format($ps_total,0,',','.') }}</div>
-        <div class="metric-caption">Sewa Unit & Alat</div>
+      <div class="metric-card metric-blue h-100">
+        <div class="d-flex justify-content-between">
+            <div class="metric-icon"><i class="bi bi-controller"></i></div>
+            <div class="text-end">
+                <span class="badge bg-primary bg-opacity-25 text-primary" style="font-size:0.65rem;">NETTO PS</span>
+            </div>
+        </div>
+        <div class="metric-label text-primary">Laba Bersih PS</div>
+        
+        {{-- Rumus: Pendapatan PS - Pengeluaran yg pakai uang PS --}}
+        <div class="metric-value">
+            Rp {{ number_format($ps_total - $exp_from_ps, 0, ',', '.') }}
+        </div>
+        
+        <div class="metric-caption d-flex flex-column mt-2">
+            <span class="text-success"><i class="bi bi-arrow-up-short"></i> Masuk: Rp {{ number_format($ps_total,0,',','.') }}</span>
+            <span class="text-danger"><i class="bi bi-arrow-down-short"></i> Keluar: Rp {{ number_format($exp_from_ps,0,',','.') }}</span>
+        </div>
       </div>
     </div>
+
+    {{-- CARD 2: LABA BERSIH PRODUK --}}
     <div class="col-md-3 col-6">
-      <div class="metric-card metric-green">
-        <div class="metric-icon"><i class="bi bi-basket3"></i></div>
-        <div class="metric-label">Pendapatan Produk</div>
-        <div class="metric-value">Rp {{ number_format($prod_total,0,',','.') }}</div>
-        <div class="metric-caption">F&B / Barang</div>
+      <div class="metric-card metric-green h-100">
+        <div class="d-flex justify-content-between">
+            <div class="metric-icon"><i class="bi bi-basket3"></i></div>
+            <div class="text-end">
+                <span class="badge bg-success bg-opacity-25 text-success" style="font-size:0.65rem;">NETTO PRODUK</span>
+            </div>
+        </div>
+        <div class="metric-label text-success">Laba Bersih Produk</div>
+        
+        {{-- Rumus: Pendapatan Produk - Pengeluaran yg pakai uang Produk --}}
+        <div class="metric-value">
+            Rp {{ number_format($prod_total - $exp_from_prod, 0, ',', '.') }}
+        </div>
+
+        <div class="metric-caption d-flex flex-column mt-2">
+            <span class="text-success"><i class="bi bi-arrow-up-short"></i> Masuk: Rp {{ number_format($prod_total,0,',','.') }}</span>
+            <span class="text-danger"><i class="bi bi-arrow-down-short"></i> Keluar: Rp {{ number_format($exp_from_prod,0,',','.') }}</span>
+        </div>
       </div>
     </div>
+
+    {{-- CARD 3: PENGELUARAN LAINNYA --}}
     <div class="col-md-3 col-6">
-      <div class="metric-card metric-purple">
-        <div class="metric-icon"><i class="bi bi-receipt"></i></div>
-        <div class="metric-label">Total Penjualan</div>
-        <div class="metric-value">Rp {{ number_format($sales_total,0,',','.') }}</div>
-        <div class="metric-caption">Semua Pemasukan</div>
-      </div>
-    </div>
-    <div class="col-md-3 col-6">
-      <div class="metric-card metric-yellow">
+      <div class="metric-card metric-purple h-100">
         <div class="metric-icon"><i class="bi bi-wallet2"></i></div>
-        <div class="metric-label">Laba Bersih</div>
-        <div class="metric-value">Rp {{ number_format($sales_total - $expenses_total,0,',','.') }}</div>
-        <div class="metric-caption text-danger">Keluar: Rp {{ number_format($expenses_total,0,',','.') }}</div>
+        <div class="metric-label">Pengeluaran Lain</div>
+        <div class="metric-value text-danger">
+            - Rp {{ number_format($exp_from_other, 0, ',', '.') }}
+        </div>
+        <div class="metric-caption">Dari Kas Umum / Modal</div>
+      </div>
+    </div>
+
+    {{-- CARD 4: TOTAL SALDO AKHIR --}}
+    <div class="col-md-3 col-6">
+      <div class="metric-card metric-yellow h-100">
+        <div class="metric-icon"><i class="bi bi-safe"></i></div>
+        <div class="metric-label">Sisa Kas Total</div>
+        
+        {{-- Rumus: (Total Semua Masuk) - (Total Semua Keluar) --}}
+        <div class="metric-value text-warning">
+            Rp {{ number_format($sales_total - $expenses_total, 0, ',', '.') }}
+        </div>
+        <div class="metric-caption">Laba Bersih Keseluruhan</div>
       </div>
     </div>
   </div>
 
-  {{-- Detail transaksi (DIPISAH: RENTAL & PRODUK) --}}
+  {{-- Detail transaksi --}}
   <div class="row g-4 mt-2">
     
     {{-- 1. TABEL RIWAYAT RENTAL --}}
@@ -307,17 +333,15 @@
                     <td class="text-end amount-mono text-info">Rp {{ number_format($s->total ?? 0,0,',','.') }}</td>
                     <td class="text-end d-print-none">
                       <div class="btn-action-group justify-content-end">
-                          {{-- Edit --}}
                           <button type="button" class="btn btn-outline-secondary-soft" title="Edit"
                                   onclick='editSaleModal({{ $s->id }}, {!! json_encode($s->note) !!}, {!! json_encode($s->payment_method) !!}, {{ $s->paid_amount ?? 0 }}, {{ $s->total ?? 0 }}, {!! json_encode($s->sold_at->format("Y-m-d\TH:i")) !!})'>
                             <i class="bi bi-pencil"></i>
                           </button>
 
-                          {{-- HAPUS (Hanya Boss) --}}
                           @if(auth()->user() && auth()->user()->role === 'boss')
                             <form class="d-inline confirm-delete" method="POST" 
                                   action="{{ route('sales.destroy', $s->id) }}" 
-                                  data-confirm="Hapus data rental ini? Pendapatan akan berkurang.">
+                                  data-confirm="Hapus data rental ini?">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="btn btn-outline-danger-soft" title="Hapus">
                                     <i class="bi bi-trash"></i>
@@ -346,7 +370,6 @@
              <span class="badge badge-soft-primary d-print-none">{{ $productSales->count() }} Data</span>
           </div>
           
-          {{-- INPUT PENCARIAN --}}
           <div class="d-print-none">
              <input type="text" id="searchProductInput" 
                     class="form-control form-control-sm text-white" 
@@ -375,7 +398,6 @@
                             <span class="text-light fw-bold">{{ \Carbon\Carbon::parse($s->sold_at)->format('H:i') }}</span>
                         </div>
                     </td>
-                    {{-- Class searchable-text untuk pencarian JS --}}
                     <td class="searchable-text">
                         <div class="text-light" style="max-width: 180px;">
                             {{ $s->display_note }}
@@ -384,13 +406,11 @@
                     <td class="text-end amount-mono text-success">Rp {{ number_format($s->total ?? 0,0,',','.') }}</td>
                     <td class="text-end d-print-none">
                       <div class="btn-action-group justify-content-end">
-                          {{-- Edit --}}
                           <button type="button" class="btn btn-outline-secondary-soft" title="Edit"
                                   onclick='editSaleModal({{ $s->id }}, {!! json_encode($s->note) !!}, {!! json_encode($s->payment_method) !!}, {{ $s->paid_amount ?? 0 }}, {{ $s->total ?? 0 }}, {!! json_encode($s->sold_at->format("Y-m-d\TH:i")) !!})'>
                             <i class="bi bi-pencil"></i>
                           </button>
 
-                          {{-- HAPUS (Hanya Boss) --}}
                           @if(auth()->user() && auth()->user()->role === 'boss')
                             <form class="d-inline confirm-delete" method="POST" 
                                   action="{{ route('sales.destroy', $s->id) }}" 
@@ -421,7 +441,7 @@
     </div>
   </div>
 
-  {{-- TABEL PENGELUARAN (Full Width di Bawah) --}}
+  {{-- TABEL PENGELUARAN --}}
   <div class="row g-4 mt-2">
     <div class="col-12">
       <div class="card card-glass h-100">
@@ -484,7 +504,7 @@
     </div>
   </div>
 
-  {{-- Rekap per periode (Tabular) --}}
+  {{-- Rekap per periode --}}
   <div class="card card-glass mt-4">
     <div class="card-header d-flex align-items-center gap-3 border-bottom border-secondary border-opacity-25 py-2">
       <span class="text-uppercase small text-secondary fw-bold"><i class="bi bi-table me-1"></i> Rekapitulasi</span>
@@ -589,7 +609,7 @@
     </div>
   </div>
 
-</div> {{-- /.report-shell --}}
+</div>
 
 {{-- MODAL EDIT PENJUALAN --}}
 <div class="modal fade modal-glass" id="editSaleModal" tabindex="-1" aria-hidden="true">
@@ -721,41 +741,36 @@
   }));
 })();
 
-// Fungsi untuk membuka Modal Edit Penjualan
+// Edit Sale
 function editSaleModal(id, note, method, paid, total, date) {
   const form = document.getElementById('editSaleForm');
-  form.action = '/sales/' + id; // Pastikan route ini benar
-
+  form.action = '/sales/' + id;
   document.getElementById('saleDate').value = date;
   document.getElementById('saleNote').value = note || '';
   document.getElementById('saleMethod').value = method || 'Tunai';
   document.getElementById('salePaid').value = paid || 0;
   document.getElementById('saleTotal').value = total || 0;
-
   const modal = new bootstrap.Modal(document.getElementById('editSaleModal'));
   modal.show();
 }
 
-// Fungsi untuk membuka Modal Edit Pengeluaran
+// Edit Expense
 function editExpenseModal(id, category, description, amount, ts) {
   const form = document.getElementById('editExpenseForm');
   form.action = '/purchases/expenses/' + id;
-
   document.getElementById('expDate').value = ts || '';
   document.getElementById('expCat').value = category || '';
   document.getElementById('expDesc').value = description || '';
   document.getElementById('expAmount').value = amount || 0;
-
   const modal = new bootstrap.Modal(document.getElementById('editExpenseModal'));
   modal.show();
 }
 
-// Script Pencarian Real-time untuk Tabel Produk
+// Search
 document.getElementById('searchProductInput')?.addEventListener('keyup', function() {
     let filter = this.value.toLowerCase();
     let rows = document.querySelectorAll('#productTable .product-row');
     let hasVisible = false;
-
     rows.forEach(function(row) {
         let text = row.querySelector('.searchable-text').textContent.toLowerCase();
         if (text.includes(filter)) {
@@ -765,13 +780,10 @@ document.getElementById('searchProductInput')?.addEventListener('keyup', functio
             row.style.display = 'none';
         }
     });
-
-    // Tampilkan pesan jika tidak ada hasil
     let noResultRow = document.getElementById('noProductFound');
     if (noResultRow) {
         noResultRow.style.display = hasVisible ? 'none' : 'table-row';
     }
 });
-
 </script>
 @endpush

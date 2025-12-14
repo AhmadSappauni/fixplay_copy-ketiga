@@ -42,7 +42,7 @@ class ReportController extends Controller
         $recapYearEnd    = $start->copy()->endOfYear();
 
 
-        // --- QUERY TOTAL (Tetap pakai $start & $end sesuai filter) ---
+        // --- QUERY TOTAL PENDAPATAN (Tetap pakai $start & $end sesuai filter) ---
         $ps_total = DB::table('sale_items')
             ->join('sales','sale_items.sale_id','sales.id')
             ->whereBetween('sales.sold_at', [$start, $end])
@@ -59,10 +59,30 @@ class ReportController extends Controller
 
         $sales_total = ($ps_total ?? 0) + ($prod_total ?? 0);
 
-        $expenses_total = DB::table('expenses')
-            ->whereBetween('timestamp', [$start, $end])
-            ->selectRaw('COALESCE(SUM(amount),0) as total')
-            ->value('total');
+        // --- [BARU] QUERY TOTAL PENGELUARAN (DIPISAH SUMBER DANA) ---
+        $expenses_query = DB::table('expenses')->whereBetween('timestamp', [$start, $end]);
+
+        // 1. Pengeluaran dari Uang PS
+        $exp_from_ps = (clone $expenses_query)
+            ->where('fund_source', 'ps')
+            ->sum('amount');
+
+        // 2. Pengeluaran dari Uang Produk
+        $exp_from_prod = (clone $expenses_query)
+            ->where('fund_source', 'product')
+            ->sum('amount');
+
+        // 3. Pengeluaran Lainnya (Kas Umum/Modal)
+        // Ambil yang fund_source = 'other' ATAU NULL (untuk data lama)
+        $exp_from_other = (clone $expenses_query)
+            ->where(function($q) {
+                $q->where('fund_source', 'other')->orWhereNull('fund_source');
+            })
+            ->sum('amount');
+
+        // Total Semua Pengeluaran
+        $expenses_total = $exp_from_ps + $exp_from_prod + $exp_from_other;
+
 
         // --- LIST PENJUALAN (Tetap pakai $start & $end) ---
         $sales = Sale::with(['items.product']) 
@@ -107,10 +127,9 @@ class ReportController extends Controller
                 return $e;
             });
 
-        // --- PERBAIKAN DI SINI: REKAP MENGGUNAKAN RENTANG WAKTU LUAS ---
+        // --- REKAPITULASI (MENGGUNAKAN RENTANG WAKTU LUAS) ---
         
         // 1. Daily Rows (Tampilkan data sebulan penuh)
-        // Gunakan $recapDailyStart & $recapDailyEnd
         $daily_rows = DB::table('sales')
             ->join('sale_items', 'sales.id', '=', 'sale_items.sale_id')
             ->selectRaw("
@@ -119,13 +138,13 @@ class ReportController extends Controller
                 COALESCE(SUM(CASE WHEN sale_items.product_id IS NULL THEN sale_items.subtotal ELSE 0 END),0) as ps_amount,
                 COALESCE(SUM(CASE WHEN sale_items.product_id IS NOT NULL THEN sale_items.subtotal ELSE 0 END),0) as prod_amount
             ")
-            ->whereBetween('sales.sold_at', [$recapDailyStart, $recapDailyEnd]) // <--- UBAH DI SINI
+            ->whereBetween('sales.sold_at', [$recapDailyStart, $recapDailyEnd]) 
             ->groupBy('d')
             ->orderBy('d','asc')
             ->get()
             ->map(function($row){
                 return (object)[
-                    'label' => Carbon::parse($row->d)->format('d/m'), // Format tgl/bln
+                    'label' => Carbon::parse($row->d)->format('d/m'), 
                     'ps'    => (int)$row->ps_amount,
                     'prod'  => (int)$row->prod_amount,
                     'total' => (int)$row->total
@@ -133,7 +152,6 @@ class ReportController extends Controller
             });
 
         // 2. Weekly Rows (Tampilkan data setahun penuh)
-        // Gunakan $recapYearStart & $recapYearEnd
         $weekly_rows = DB::table('sales')
             ->join('sale_items', 'sales.id', '=', 'sale_items.sale_id')
             ->selectRaw("
@@ -143,7 +161,7 @@ class ReportController extends Controller
                 COALESCE(SUM(CASE WHEN sale_items.product_id IS NULL THEN sale_items.subtotal ELSE 0 END),0) as ps_amount,
                 COALESCE(SUM(CASE WHEN sale_items.product_id IS NOT NULL THEN sale_items.subtotal ELSE 0 END),0) as prod_amount
             ")
-            ->whereBetween('sales.sold_at', [$recapYearStart, $recapYearEnd]) // <--- UBAH DI SINI
+            ->whereBetween('sales.sold_at', [$recapYearStart, $recapYearEnd]) 
             ->groupBy('y','w')
             ->orderBy('y','asc')
             ->orderBy('w','asc')
@@ -151,7 +169,6 @@ class ReportController extends Controller
             ->map(function($r){
                 $weekStart = Carbon::now()->setISODate($r->y, $r->w)->startOfWeek();
                 $weekOfMonth = $weekStart->weekOfMonth;
-                // Label lebih pendek agar muat di tabel
                 $label = 'Mg ' . $weekOfMonth . ' ' . $weekStart->translatedFormat('M');
 
                 return (object)[
@@ -163,7 +180,6 @@ class ReportController extends Controller
             });
 
         // 3. Monthly Rows (Tampilkan data setahun penuh)
-        // Gunakan $recapYearStart & $recapYearEnd
         $monthly_rows = DB::table('sales')
             ->join('sale_items', 'sales.id', '=', 'sale_items.sale_id')
             ->selectRaw("
@@ -172,13 +188,13 @@ class ReportController extends Controller
                 COALESCE(SUM(CASE WHEN sale_items.product_id IS NULL THEN sale_items.subtotal ELSE 0 END),0) as ps_amount,
                 COALESCE(SUM(CASE WHEN sale_items.product_id IS NOT NULL THEN sale_items.subtotal ELSE 0 END),0) as prod_amount
             ")
-            ->whereBetween('sales.sold_at', [$recapYearStart, $recapYearEnd]) // <--- UBAH DI SINI
+            ->whereBetween('sales.sold_at', [$recapYearStart, $recapYearEnd]) 
             ->groupBy('m')
             ->orderBy('m','asc')
             ->get()
             ->map(function($r){
                 return (object)[
-                    'label' => Carbon::parse($r->m . '-01')->translatedFormat('F'), // Nama Bulan Full
+                    'label' => Carbon::parse($r->m . '-01')->translatedFormat('F'), 
                     'ps'    => (int)$r->ps_amount,
                     'prod'  => (int)$r->prod_amount,
                     'total' => (int)$r->total
@@ -203,10 +219,17 @@ class ReportController extends Controller
             'end_date'       => $end,
             'start_date_str' => $start->format('Y-m-d'),
             'end_date_str'   => $end->format('Y-m-d'),
+            
+            // TOTAL PENDAPATAN
             'ps_total'       => (int)$ps_total,
             'prod_total'     => (int)$prod_total,
             'sales_total'    => (int)$sales_total,
+            
+            // TOTAL PENGELUARAN (GLOBAL & SPLIT)
             'expenses_total' => (int)$expenses_total,
+            'exp_from_ps'    => (int)$exp_from_ps,    // <--- Dikirim ke View
+            'exp_from_prod'  => (int)$exp_from_prod,  // <--- Dikirim ke View
+            'exp_from_other' => (int)$exp_from_other, // <--- Dikirim ke View
             
             'sales'          => $sales, 
             'rentalSales'    => $rentalSales,

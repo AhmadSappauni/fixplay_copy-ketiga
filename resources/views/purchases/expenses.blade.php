@@ -153,6 +153,14 @@
     border: 1px solid rgba(148, 163, 184, 0.2);
     color: #cbd5e1;
   }
+  
+  .badge-fund {
+      font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;
+      font-weight: 700; margin-bottom: 2px; display: inline-block;
+  }
+  .bg-fund-ps { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
+  .bg-fund-product { background: rgba(34, 197, 94, 0.2); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.3); }
+  .bg-fund-other { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); }
 
   input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
@@ -224,6 +232,18 @@
         <div class="card-body p-4">
           <form method="post" action="{{ route('purchases.expenses.store') }}">
             @csrf
+            
+            {{-- [BARU] PILIH SUMBER DANA --}}
+            <div class="mb-3">
+                <label class="form-label fx-form-label text-warning">Pakai Uang Dari?</label>
+                <select name="fund_source" class="form-select text-white" style="border-color: #f59e0b;">
+                    <option value="ps">💰 Pendapatan Billing PS</option>
+                    <option value="product">🍔 Pendapatan Jual Produk</option>
+                    <option value="other">🏦 Kas Lainnya / Modal</option>
+                </select>
+                <div class="form-text text-secondary small" style="opacity: 0.7;">Pilih saldo yang akan dikurangi.</div>
+            </div>
+
             <div class="mb-3">
               <label class="form-label fx-form-label">Kategori</label>
               <input name="category" class="form-control" placeholder="Listrik / Belanja Stok / Sewa / dll." required value="{{ old('category') }}">
@@ -286,7 +306,15 @@
                         </div>
                     </td>
                     <td>
-                        <span class="text-white">{{ $e->category }}</span>
+                        {{-- Badge Sumber Dana --}}
+                        @if($e->fund_source === 'ps')
+                            <span class="badge-fund bg-fund-ps">DARI PS</span>
+                        @elseif($e->fund_source === 'product')
+                            <span class="badge-fund bg-fund-product">DARI PRODUK</span>
+                        @else
+                            <span class="badge-fund bg-fund-other">DARI KAS LAIN</span>
+                        @endif
+                        <div class="text-white">{{ $e->category }}</div>
                     </td>
                     <td>
                         <div class="text-truncate text-secondary" style="max-width:180px;">
@@ -298,11 +326,12 @@
                     </td>
                     <td class="text-end d-print-none">
                       <div class="btn-icon-group">
-                        {{-- TOMBOL EDIT: PAKAI DATA-* UNTUK MODAL --}}
+                        {{-- TOMBOL EDIT --}}
                         <button type="button"
                                 class="btn-icon btn-icon-edit btn-edit-expense"
                                 title="Edit"
                                 data-id="{{ $e->id }}"
+                                data-fund="{{ $e->fund_source ?? 'other' }}"
                                 data-category="{{ $e->category }}"
                                 data-description="{{ $e->description }}"
                                 data-amount="{{ $e->amount }}"
@@ -310,7 +339,7 @@
                           <i class="bi bi-pencil"></i>
                         </button>
 
-                        {{-- HAPUS (masih pakai konfirmasi global dari layout via class confirm-delete) --}}
+                        {{-- HAPUS --}}
                         <form class="d-inline confirm-delete"
                               method="post"
                               action="{{ route('purchases.expenses.destroy', $e->id) }}">
@@ -355,6 +384,17 @@
         @csrf
         @method('PUT')
         <div class="modal-body p-4">
+          
+          {{-- [BARU] EDIT SUMBER DANA --}}
+          <div class="mb-3">
+             <label class="form-label fx-form-label text-warning">Sumber Dana</label>
+             <select name="fund_source" id="editFund" class="form-select text-white" style="border-color: #f59e0b;">
+                 <option value="ps">💰 Pendapatan Billing PS</option>
+                 <option value="product">🍔 Pendapatan Jual Produk</option>
+                 <option value="other">🏦 Kas Lainnya / Modal</option>
+             </select>
+          </div>
+
           <div class="mb-3">
             <label class="form-label fx-form-label">Kategori</label>
             <input id="editCategory" name="category" class="form-control" required>
@@ -397,6 +437,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const editModal = modalEl ? new bootstrap.Modal(modalEl) : null;
 
   const form      = document.getElementById('expenseEditForm');
+  const inFund    = document.getElementById('editFund'); // Baru
   const inCat     = document.getElementById('editCategory');
   const inDesc    = document.getElementById('editDescription');
   const inAmount  = document.getElementById('editAmount');
@@ -407,11 +448,13 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.btn-edit-expense').forEach(function (btn) {
     btn.addEventListener('click', function () {
       const id    = this.dataset.id;
+      const fund  = this.dataset.fund || 'other'; // Baru
       const cat   = this.dataset.category || '';
       const desc  = this.dataset.description || '';
       const amt   = this.dataset.amount || '';
       const ts    = this.dataset.timestamp || '';
 
+      inFund.value   = fund; // Set dropdown modal
       inCat.value    = cat;
       inDesc.value   = desc;
       inAmount.value = amt;

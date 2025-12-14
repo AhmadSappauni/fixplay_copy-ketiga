@@ -24,11 +24,13 @@ class ExpenseController extends Controller
 
     public function store(Request $r)
     {
+        // [UPDATE] Tambahkan validasi fund_source
         $data = $r->validate([
-            'category' => 'required|string|max:191',
+            'fund_source' => 'required|in:ps,product,other', // <--- Baru
+            'category'    => 'required|string|max:191',
             'description' => 'nullable|string|max:1000',
-            'amount' => 'required|integer|min:0',
-            'timestamp' => 'nullable|date',
+            'amount'      => 'required|integer|min:0',
+            'timestamp'   => 'nullable|date',
         ]);
 
         if (empty($data['timestamp'])) $data['timestamp'] = now();
@@ -39,11 +41,13 @@ class ExpenseController extends Controller
 
     public function update(Request $r, $id)
     {
+        // [UPDATE] Tambahkan validasi fund_source
         $data = $r->validate([
-            'category' => 'required|string|max:191',
+            'fund_source' => 'required|in:ps,product,other', // <--- Baru
+            'category'    => 'required|string|max:191',
             'description' => 'nullable|string|max:1000',
-            'amount' => 'required|integer|min:0',
-            'timestamp' => 'nullable|date',
+            'amount'      => 'required|integer|min:0',
+            'timestamp'   => 'nullable|date',
         ]);
 
         $e = Expense::findOrFail($id);
