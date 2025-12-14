@@ -308,13 +308,15 @@
                     <td>
                         {{-- Badge Sumber Dana --}}
                         @if($e->fund_source === 'ps')
-                            <span class="badge-fund bg-fund-ps">DARI PS</span>
+                            <span class="badge-fund bg-fund-ps" style="border-color: #3b82f6; color: #93c5fd;">DARI BILLING PS</span>
                         @elseif($e->fund_source === 'product')
-                            <span class="badge-fund bg-fund-product">DARI PRODUK</span>
+                            <span class="badge-fund bg-fund-product" style="border-color: #22c55e; color: #86efac;">DARI PRODUK</span>
                         @else
+                            {{-- Default jika null atau 'other' --}}
                             <span class="badge-fund bg-fund-other">DARI KAS LAIN</span>
                         @endif
-                        <div class="text-white">{{ $e->category }}</div>
+                        
+                        <div class="text-white mt-1">{{ $e->category }}</div>
                     </td>
                     <td>
                         <div class="text-truncate text-secondary" style="max-width:180px;">

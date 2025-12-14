@@ -234,8 +234,9 @@
         <div class="metric-label text-primary">Laba Bersih PS</div>
         
         {{-- Rumus: Pendapatan PS - Pengeluaran yg pakai uang PS --}}
-        <div class="metric-value">
-            Rp {{ number_format($ps_total - $exp_from_ps, 0, ',', '.') }}
+        @php $netPs = $ps_total - $exp_from_ps; @endphp
+        <div class="metric-value {{ $netPs < 0 ? 'text-danger' : '' }}">
+            Rp {{ number_format($netPs, 0, ',', '.') }}
         </div>
         
         <div class="metric-caption d-flex flex-column mt-2">
@@ -257,8 +258,9 @@
         <div class="metric-label text-success">Laba Bersih Produk</div>
         
         {{-- Rumus: Pendapatan Produk - Pengeluaran yg pakai uang Produk --}}
-        <div class="metric-value">
-            Rp {{ number_format($prod_total - $exp_from_prod, 0, ',', '.') }}
+        @php $netProd = $prod_total - $exp_from_prod; @endphp
+        <div class="metric-value {{ $netProd < 0 ? 'text-danger' : '' }}">
+            Rp {{ number_format($netProd, 0, ',', '.') }}
         </div>
 
         <div class="metric-caption d-flex flex-column mt-2">
@@ -273,6 +275,7 @@
       <div class="metric-card metric-purple h-100">
         <div class="metric-icon"><i class="bi bi-wallet2"></i></div>
         <div class="metric-label">Pengeluaran Lain</div>
+        {{-- Pengeluaran selalu merah --}}
         <div class="metric-value text-danger">
             - Rp {{ number_format($exp_from_other, 0, ',', '.') }}
         </div>
@@ -287,8 +290,10 @@
         <div class="metric-label">Sisa Kas Total</div>
         
         {{-- Rumus: (Total Semua Masuk) - (Total Semua Keluar) --}}
-        <div class="metric-value text-warning">
-            Rp {{ number_format($sales_total - $expenses_total, 0, ',', '.') }}
+        @php $netTotal = $sales_total - $expenses_total; @endphp
+        {{-- Jika Minus Merah, Jika Plus Kuning (Warning/Gold) --}}
+        <div class="metric-value {{ $netTotal < 0 ? 'text-danger' : 'text-warning' }}">
+            Rp {{ number_format($netTotal, 0, ',', '.') }}
         </div>
         <div class="metric-caption">Laba Bersih Keseluruhan</div>
       </div>
@@ -469,6 +474,15 @@
                       </div>
                   </td>
                   <td>
+                      {{-- BADGE SUMBER DANA (BARU) --}}
+                      @if($e->fund_source === 'ps')
+                          <span class="badge rounded-pill bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 mb-1" style="font-size: 0.6rem;">BILLING PS</span>
+                      @elseif($e->fund_source === 'product')
+                          <span class="badge rounded-pill bg-success bg-opacity-25 text-success border border-success border-opacity-25 mb-1" style="font-size: 0.6rem;">PRODUK</span>
+                      @else
+                          <span class="badge rounded-pill bg-secondary bg-opacity-25 text-secondary border border-secondary border-opacity-25 mb-1" style="font-size: 0.6rem;">KAS LAIN</span>
+                      @endif
+
                       <div class="text-light fw-semibold">{{ $e->category }}</div>
                       <div class="small text-secondary text-truncate" style="max-width: 350px;">{{ $e->description }}</div>
                   </td>

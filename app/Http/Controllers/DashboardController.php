@@ -11,13 +11,14 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $tz = 'Asia/Makassar';
+        $tz = 'Asia/Makassar'; // Sesuaikan timezone
 
-        // 1. === Ringkasan hari ini ===
+        // 1. === Hitung Pendapatan & Pengeluaran Hari Ini ===
         $start = Carbon::today($tz)->startOfDay();
         $end   = Carbon::today($tz)->endOfDay();
 
-        $totals = DB::table('sale_items')
+        // A. Hitung PENDAPATAN (Income)
+        $income = DB::table('sale_items')
             ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
             ->selectRaw("
                 COALESCE(SUM(CASE WHEN sale_items.product_id IS NULL THEN sale_items.subtotal ELSE 0 END), 0) AS ps,
@@ -26,11 +27,34 @@ class DashboardController extends Controller
             ->whereBetween('sales.sold_at', [$start, $end])
             ->first();
 
-        $todayPs    = (int) ($totals->ps   ?? 0);
-        $todayProd  = (int) ($totals->prod ?? 0);
-        $todayTotal = $todayPs + $todayProd;
+        $incomePs   = (int) ($income->ps ?? 0);
+        $incomeProd = (int) ($income->prod ?? 0);
 
-        // 2. === Grafik 10 hari terakhir ===
+        // B. Hitung PENGELUARAN (Expenses) - [LOGIKA BARU]
+        $expenses = DB::table('expenses')
+            ->selectRaw("
+                COALESCE(SUM(CASE WHEN fund_source = 'ps' THEN amount ELSE 0 END), 0) AS ps,
+                COALESCE(SUM(CASE WHEN fund_source = 'product' THEN amount ELSE 0 END), 0) AS prod,
+                COALESCE(SUM(amount), 0) AS total
+            ")
+            ->whereBetween('timestamp', [$start, $end])
+            ->first();
+
+        $expPs    = (int) ($expenses->ps ?? 0);
+        $expProd  = (int) ($expenses->prod ?? 0);
+        $expTotal = (int) ($expenses->total ?? 0);
+
+        // C. Hitung LABA BERSIH (Netto) untuk Dashboard
+        // Rumus: Pendapatan - Pengeluaran
+        $todayPs    = $incomePs - $expPs;       // Netto PS
+        $todayProd  = $incomeProd - $expProd;   // Netto Produk
+        
+        // Total Keseluruhan (Termasuk pengeluaran kas lain jika mau ditampilkan di total)
+        // Jika ingin total dashboard = (Netto PS + Netto Produk - Pengeluaran Lain), gunakan logika ini:
+        $todayTotal = ($incomePs + $incomeProd) - $expTotal;
+
+        // 2. === Grafik Pendapatan (10 Hari Terakhir) ===
+        // Catatan: Grafik biasanya tetap menampilkan OMZET (Pemasukan) agar terlihat tren penjualannya.
         $daysBack   = 10;
         $chartStart = Carbon::today($tz)->subDays($daysBack - 1)->startOfDay();
         $chartEnd   = Carbon::today($tz)->endOfDay();
@@ -53,53 +77,50 @@ class DashboardController extends Controller
         for ($i = 0; $i < $daysBack; $i++) {
             $d   = $chartStart->copy()->addDays($i);
             $key = $d->toDateString();
-            $chartLabels[] = $d->format('d-m');
+            $chartLabels[] = $d->format('d M'); 
             $chartData[]   = $byDate[$key] ?? 0;
         }
 
-        // 3. === Riwayat Transaksi (DIPISAH RENTAL & PRODUK) ===
-        // Ambil SEMUA data (tanpa limit)
-        $allSales = Sale::with(['items.product'])
+        // 3. === Riwayat Transaksi ===
+        $recentSales = Sale::with(['items.product'])
             ->orderBy('sold_at', 'desc')
+            ->limit(50) 
             ->get(); 
 
         $rentalTx  = [];
         $productTx = [];
 
-        foreach ($allSales as $s) {
-            // Cek apakah ini transaksi rental (ada item yg product_id nya NULL)
+        foreach ($recentSales as $s) {
             $isRental = $s->items->contains(function ($item) {
                 return $item->product_id === null;
             });
 
-            // Formatting Nama Item
             $names = [];
             foreach ($s->items->take(3) as $it) {
                 if ($it->product) {
-                    $names[] = $it->product->name;
+                    $names[] = $it->product->name . ' (' . $it->qty . ')';
                 } elseif (!empty($it->description)) {
-                    $names[] = $it->description;
+                    $names[] = $it->description; 
                 }
             }
+            
             $title = !empty($names) ? implode(', ', $names) : ($s->note ?: 'Item');
             if ($s->items->count() > 3) {
-                $title .= ' +' . ($s->items->count() - 3) . ' item';
+                $title .= ' +' . ($s->items->count() - 3) . ' item lainnya';
             }
 
-            // Hitung Total
             $totalFix = $s->total ?? $s->total_amount ?? 0;
             if ($totalFix == 0) {
                 $totalFix = (int) $s->items->sum('subtotal');
             }
 
             $dataTransaksi = [
-                'id'          => $s->id,
-                'date'        => Carbon::parse($s->sold_at, $tz)->format('d-m-Y H:i'),
-                'title'       => $title,
-                'total'       => $totalFix,
+                'id'    => $s->id,
+                'date'  => Carbon::parse($s->sold_at)->setTimezone($tz)->format('d-m-Y H:i'),
+                'title' => $title, 
+                'total' => $totalFix,
             ];
 
-            // Pisahkan ke array yang sesuai
             if ($isRental) {
                 $rentalTx[] = $dataTransaksi;
             } else {
@@ -107,9 +128,9 @@ class DashboardController extends Controller
             }
         }
 
-        // 4. === RESTORE: Produk Paling Laris (YANG HILANG TADI) ===
-        $weekStart = Carbon::now($tz)->startOfWeek(Carbon::MONDAY)->startOfDay();
-        $weekEnd   = Carbon::now($tz)->endOfWeek(Carbon::SUNDAY)->endOfDay();
+        // 4. === Produk Paling Laris ===
+        $weekStart = Carbon::now($tz)->startOfWeek()->startOfDay();
+        $weekEnd   = Carbon::now($tz)->endOfWeek()->endOfDay();
 
         $topRow = DB::table('sale_items')
             ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
@@ -139,16 +160,15 @@ class DashboardController extends Controller
             ];
         }
 
-        // 5. === Return View ===
         return view('dashboard', compact(
             'todayPs',
             'todayProd',
             'todayTotal',
             'chartLabels',
             'chartData',
-            'rentalTx',   // Data Rental
-            'productTx',  // Data Produk
-            'topProduct'  // Data Top Produk (Sudah dikembalikan)
+            'rentalTx',   
+            'productTx', 
+            'topProduct'
         ));
     }
 }

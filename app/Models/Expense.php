@@ -10,6 +10,7 @@ class Expense extends Model
 
     // hanya gunakan 1 fillable (gabungkan di sini)
     protected $fillable = [
+        'fund_source', // <--- TAMBAHAN BARU
         'category',
         'description',
         'amount',

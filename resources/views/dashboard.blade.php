@@ -62,7 +62,6 @@
   .stat-card.warning::after{ background:radial-gradient(circle,#f97316,#facc15); }
 
   /* ====== CARD GRAPH & TABLE (DARK THEME) ====== */
-  /* Ini yang membuat background tabel jadi gelap, bukan putih */
   .card-trans {
     border-radius: 1.25rem;
     border: 1px solid rgba(148,163,184,.25);
@@ -75,7 +74,7 @@
   
   .card-trans .card-header {
     border-bottom: 1px solid rgba(148,163,184,.2);
-    background: rgba(30, 41, 59, 0.4); /* Header sedikit lebih terang */
+    background: rgba(30, 41, 59, 0.4); 
     color: #e5e7eb;
     font-weight: 700;
     letter-spacing: .06em;
@@ -95,105 +94,46 @@
   .chart-wrapper{ position:relative; width:100%; min-height:240px; max-height:300px; }
   .chart-wrapper canvas{ width:100% !important; height:100% !important; }
 
-  /* ====== TABEL NEON (GAYA SESI RENTAL) ====== */
-  .table-neon {
-    width: 100%;
-    margin-bottom: 0;
-    color: #cbd5e1;
-  }
-  /* Header Tabel */
+  /* ====== TABEL NEON ====== */
+  .table-neon { width: 100%; margin-bottom: 0; color: #cbd5e1; }
   .table-neon thead th {
-    background: rgba(15, 23, 42, 0.8);
-    color: #94a3b8;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-    padding: 1rem 1.5rem;
-    white-space: nowrap;
+    background: rgba(15, 23, 42, 0.8); color: #94a3b8; font-size: 0.75rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    padding: 1rem 1.5rem; white-space: nowrap;
   }
-  /* Body Tabel */
   .table-neon tbody td {
-    background: transparent; /* Transparan agar background card terlihat */
-    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-    padding: 1rem 1.5rem;
-    vertical-align: middle;
-    font-size: 0.9rem;
-    color: #f8fafc; /* Teks Putih Terang */
+    background: transparent; border-bottom: 1px solid rgba(148, 163, 184, 0.1); padding: 1rem 1.5rem;
+    vertical-align: middle; font-size: 0.9rem; color: #f8fafc;
   }
-  /* Hover Effect */
-  .table-neon tbody tr:hover td {
-    background: rgba(99, 102, 241, 0.08); /* Highlight ungu tipis */
-  }
+  .table-neon tbody tr:hover td { background: rgba(99, 102, 241, 0.08); }
 
   .mono { font-family: 'Consolas', 'Monaco', monospace; color: #818cf8; font-weight: 600; }
 
-    /* Tombol Aksi Kecil */
-    /* Tombol Aksi Kecil – LEBIH RAPI DI TABEL */
-  .btn-action-group {
-    display: inline-flex;
-    align-items: center;
-    gap: .25rem;           /* jarak antar tombol */
-  }
+  /* Tombol Aksi */
+  .btn-action-group { display: inline-flex; align-items: center; gap: .25rem; }
+  .btn-action-group .btn { padding: 0.25rem 0.7rem; font-size: 0.7rem; border-radius: 999px; font-weight: 600; }
 
-  .btn-action-group .btn {
-    padding: 0.25rem 0.7rem;
-    font-size: 0.7rem;
-    border-radius: 999px;
-    font-weight: 600;
-  }
+  .btn-action-detail{ color: #e2e8f0; border-color: #475569; }
+  .btn-action-detail:hover{ background:#475569; color:#fff; }
 
-  /* warna disesuaikan biar konsisten */
-  .btn-action-detail{
-    color: #e2e8f0;
-    border-color: #475569;
-  }
-  .btn-action-detail:hover{
-    background:#475569;
-    color:#fff;
-  }
+  .btn-action-edit{ color:#fcd34d; border-color:#b45309; }
+  .btn-action-edit:hover{ background:#b45309; color:#fff; }
 
-  .btn-action-edit{
-    color:#fcd34d;
-    border-color:#b45309;
-  }
-  .btn-action-edit:hover{
-    background:#b45309;
-    color:#fff;
-  }
+  .btn-action-delete{ color:#fca5a5; border-color:#991b1b; }
+  .btn-action-delete:hover{ background:#991b1b; color:#fff; }
 
-  .btn-action-delete{
-    color:#fca5a5;
-    border-color:#991b1b;
-  }
-  .btn-action-delete:hover{
-    background:#991b1b;
-    color:#fff;
-  }
-
-  /* Badge Hitungan */
   .badge-count {
-    background: rgba(255,255,255,0.1);
-    color: #e2e8f0;
-    border: 1px solid rgba(255,255,255,0.2);
-    font-size: 0.7rem;
-    padding: 0.35rem 0.7rem;
-    border-radius: 99px;
+    background: rgba(255,255,255,0.1); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.2);
+    font-size: 0.7rem; padding: 0.35rem 0.7rem; border-radius: 99px;
   }
 
-  /* Responsive */
   @media (max-width: 992px){ .dash-shell{ padding:1.35rem 1.1rem 2rem; border-radius:1.1rem; } }
   @media (max-width: 768px){
     .dash-header-stack{ flex-direction:column; align-items:flex-start !important; gap:.7rem; }
     .dash-header-actions{ width:100%; justify-content:flex-end; }
     .stat-card{ margin-bottom:.5rem; }
     .chart-wrapper{ min-height:200px; max-height:260px; }
-  }
-  @media (max-width: 768px) {
-    .btn-action-group .btn span.label-text {
-      display: none;       /* sembunyikan tulisan, icon tetap */
-    }
+    .btn-action-group .btn span.label-text { display: none; }
   }
   @media print{
     .dash-shell{ background:#fff; box-shadow:none; }
@@ -233,7 +173,10 @@
     <div class="col-lg-4 col-md-6">
       <div class="stat-card primary h-100">
         <div class="stat-label">Pendapatan PS</div>
-        <div class="stat-value mono">Rp {{ number_format($todayPs,0,',','.') }}</div>
+        {{-- Jika Minus jadi Merah --}}
+        <div class="stat-value mono {{ $todayPs < 0 ? 'text-danger' : '' }}">
+            Rp {{ number_format($todayPs,0,',','.') }}
+        </div>
         <div class="stat-sub">Total sesi rental hari ini</div>
       </div>
     </div>
@@ -241,7 +184,10 @@
     <div class="col-lg-4 col-md-6">
       <div class="stat-card success h-100">
         <div class="stat-label">Total Pendapatan</div>
-        <div class="stat-value mono">Rp {{ number_format($todayTotal,0,',','.') }}</div>
+        {{-- Jika Minus jadi Merah --}}
+        <div class="stat-value mono {{ $todayTotal < 0 ? 'text-danger' : '' }}">
+            Rp {{ number_format($todayTotal,0,',','.') }}
+        </div>
         <div class="stat-sub">Gabungan PS + Produk</div>
       </div>
     </div>
@@ -249,7 +195,10 @@
     <div class="col-lg-4 col-md-6">
       <div class="stat-card warning h-100">
         <div class="stat-label">Pendapatan Produk</div>
-        <div class="stat-value mono">Rp {{ number_format($todayProd,0,',','.') }}</div>
+        {{-- Jika Minus jadi Merah --}}
+        <div class="stat-value mono {{ $todayProd < 0 ? 'text-danger' : '' }}">
+            Rp {{ number_format($todayProd,0,',','.') }}
+        </div>
         <div class="stat-sub">Penjualan makanan & minuman</div>
       </div>
     </div>
@@ -267,7 +216,6 @@
           <div class="chart-wrapper">
             <canvas id="revChart"></canvas>
           </div>
-          {{-- Data Chart Tersembunyi --}}
           <div id="chartPayload" data-labels='@json($chartLabels)' data-series='@json($chartData)' hidden></div>
         </div>
       </div>
