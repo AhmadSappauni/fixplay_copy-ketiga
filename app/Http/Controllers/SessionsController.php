@@ -25,7 +25,6 @@ class SessionsController extends Controller
         $closed_sessions = GameSession::with('psUnit')
             ->whereNotNull('end_time')
             ->orderBy('start_time', 'desc')
-            //->limit(100)
             ->get();
 
         return view('sessions', compact('units', 'active_sessions', 'closed_sessions'));
@@ -45,14 +44,14 @@ class SessionsController extends Controller
             $start = Carbon::parse($request->start_time);
 
             $session = new GameSession();
-            $session->ps_unit_id       = $unit->id;
-            $session->start_time       = $start;
-            $session->end_time         = null; 
-            $session->minutes          = 0;
+            $session->ps_unit_id      = $unit->id;
+            $session->start_time      = $start;
+            $session->end_time        = null; 
+            $session->minutes         = 0;
             $session->extra_controllers = (int) $request->extra_controllers;
             $session->arcade_controllers = 0;
-            $session->bill             = 0;
-            $session->status           = 'active';
+            $session->bill            = 0;
+            $session->status          = 'active';
             $session->save();
 
             return back()->with('success', "Open Billing dimulai untuk unit {$unit->name}.");
@@ -66,10 +65,19 @@ class SessionsController extends Controller
             'bill'           => 'required|numeric|min:0',
         ]);
 
+        // [PERBAIKAN] Cek Pembayaran DI LUAR Transaction agar tidak crash
+        $totalBill = (float) $request->bill;
+        if ($request->payment_method === 'Tunai' && $request->paid_amount < $totalBill) {
+            // Jangan throw Exception, tapi kembalikan dengan pesan error
+            return back()
+                ->withInput()
+                ->with('error', 'Pembayaran gagal! Uang yang diterima kurang dari total tagihan.');
+        }
+
         // Variabel untuk menampung data timer agar bisa dikirim ke View
         $timerData = null;
 
-        $saleId = DB::transaction(function () use ($request, &$timerData) {
+        $saleId = DB::transaction(function () use ($request, &$timerData, $totalBill) {
             $unit  = PSUnit::findOrFail($request->ps_unit_id);
             $start = Carbon::parse($request->start_time);
             $hours = (float) $request->hours;
@@ -78,16 +86,11 @@ class SessionsController extends Controller
             // Simpan data timer untuk dikirim ke JS
             $timerData = [
                 'unit'     => $unit->name,
-                'end_time' => $end->toIso8601String() // Format waktu standar ISO
+                'end_time' => $end->toIso8601String() 
             ];
 
-            $totalBill = (float) $request->bill;
             $extraControllers  = (int) ($request->extra_controllers ?? 0);
             $arcadeControllers = (int) ($request->arcade_controllers ?? 0);
-
-            if ($request->payment_method === 'Tunai' && $request->paid_amount < $totalBill) {
-                throw new \Exception('Pembayaran kurang dari total tagihan.');
-            }
 
             // Create Sale
             $sale = Sale::create([
@@ -136,11 +139,11 @@ class SessionsController extends Controller
             return $sale->id;
         });
 
-        // REDIRECT DENGAN DATA TIMER (PENTING!)
+        // REDIRECT DENGAN DATA TIMER
         return redirect()
             ->route('sales.show', $saleId)
             ->with('success', 'Sesi berhasil dibuat.')
-            ->with('new_timer', $timerData); // <--- INI KUNCINYA
+            ->with('new_timer', $timerData);
     }
 
     public function stopOpen(Request $request)
@@ -152,19 +155,21 @@ class SessionsController extends Controller
             'payment_method' => 'required|string',
         ]);
 
-        $saleId = DB::transaction(function () use ($request) {
+        // [PERBAIKAN] Cek Pembayaran Stop Open DI LUAR Transaction
+        $totalBill = (float) $request->final_bill;
+        if ($request->payment_method === 'Tunai' && $request->paid_amount < $totalBill) {
+            return back()
+                ->withInput()
+                ->with('error', 'Pembayaran gagal! Uang kurang dari total tagihan.');
+        }
+
+        $saleId = DB::transaction(function () use ($request, $totalBill) {
             $session = GameSession::with('psUnit')->findOrFail($request->session_id);
             
             $start = Carbon::parse($session->start_time);
             $end   = now();
             $minutes = $start->diffInMinutes($end);
             $hours   = round($minutes / 60, 1);
-
-            $totalBill = (float) $request->final_bill;
-
-            if ($request->payment_method === 'Tunai' && $request->paid_amount < $totalBill) {
-                throw new \Exception('Pembayaran kurang.');
-            }
 
             $sale = Sale::create([
                 'sold_at'        => now(),
@@ -234,14 +239,22 @@ class SessionsController extends Controller
             'add_bill'       => 'required|numeric|min:0',
         ]);
 
+        // [TAMBAHAN] Cek Pembayaran Add Time (Optional, tapi bagus untuk konsistensi)
+        $totalAddOnCost = (float) $request->add_bill;
+        $addedPaid      = (float) ($request->paid_amount ?? 0);
+        if ($request->payment_method === 'Tunai' && $addedPaid < $totalAddOnCost) {
+             return back()
+                ->withInput()
+                ->with('error', 'Pembayaran gagal! Uang tambahan kurang.');
+        }
+
         $timerData = null;
 
-        $saleId = DB::transaction(function () use ($request, &$timerData) {
+        $saleId = DB::transaction(function () use ($request, &$timerData, $totalAddOnCost, $addedPaid) {
             $session = GameSession::with('psUnit')->findOrFail($request->session_id);
             $unit = $session->psUnit;
 
             $addedHours = (float) $request->hours;
-            $totalAddOnCost = (float) $request->add_bill;
 
             $currentEnd = Carbon::parse($session->end_time);
             $newEnd = $currentEnd->copy()->addMinutes($addedHours * 60);
@@ -256,7 +269,6 @@ class SessionsController extends Controller
             $session->minutes += ($addedHours * 60);
             $session->bill += $totalAddOnCost;
             
-            $addedPaid = $request->paid_amount ?? 0;
             $session->paid_amount += $addedPaid;
             $session->payment_method = $request->payment_method;
             $session->save();
@@ -291,7 +303,7 @@ class SessionsController extends Controller
             return redirect()
                 ->route('sales.show', $saleId)
                 ->with('success', 'Waktu berhasil ditambahkan.')
-                ->with('new_timer', $timerData); // <--- KIRIM DATA TIMER JUGA
+                ->with('new_timer', $timerData);
         }
 
         return back()->with('success', 'Waktu berhasil ditambahkan.');

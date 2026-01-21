@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sale;
+use App\Models\DeletionRequest; // <--- Pastikan Model Ini Ada
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth; // <--- Pastikan Auth Ada
 
 class DashboardController extends Controller
 {
@@ -30,7 +32,7 @@ class DashboardController extends Controller
         $incomePs   = (int) ($income->ps ?? 0);
         $incomeProd = (int) ($income->prod ?? 0);
 
-        // B. Hitung PENGELUARAN (Expenses) - [LOGIKA BARU]
+        // B. Hitung PENGELUARAN (Expenses)
         $expenses = DB::table('expenses')
             ->selectRaw("
                 COALESCE(SUM(CASE WHEN fund_source = 'ps' THEN amount ELSE 0 END), 0) AS ps,
@@ -45,16 +47,13 @@ class DashboardController extends Controller
         $expTotal = (int) ($expenses->total ?? 0);
 
         // C. Hitung LABA BERSIH (Netto) untuk Dashboard
-        // Rumus: Pendapatan - Pengeluaran
         $todayPs    = $incomePs - $expPs;       // Netto PS
         $todayProd  = $incomeProd - $expProd;   // Netto Produk
         
-        // Total Keseluruhan (Termasuk pengeluaran kas lain jika mau ditampilkan di total)
-        // Jika ingin total dashboard = (Netto PS + Netto Produk - Pengeluaran Lain), gunakan logika ini:
+        // Total Keseluruhan (Pendapatan Kotor - Total Pengeluaran)
         $todayTotal = ($incomePs + $incomeProd) - $expTotal;
 
         // 2. === Grafik Pendapatan (10 Hari Terakhir) ===
-        // Catatan: Grafik biasanya tetap menampilkan OMZET (Pemasukan) agar terlihat tren penjualannya.
         $daysBack   = 10;
         $chartStart = Carbon::today($tz)->subDays($daysBack - 1)->startOfDay();
         $chartEnd   = Carbon::today($tz)->endOfDay();
@@ -160,6 +159,16 @@ class DashboardController extends Controller
             ];
         }
 
+        // 5. === [BARU] AMBIL REQUEST HAPUS (KHUSUS BOSS) ===
+        $pendingRequests = [];
+        if (Auth::check() && Auth::user()->role === 'boss') {
+            // Pastikan model DeletionRequest sudah dibuat
+            $pendingRequests = DeletionRequest::with('user')
+                ->where('status', 'pending')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
         return view('dashboard', compact(
             'todayPs',
             'todayProd',
@@ -168,7 +177,8 @@ class DashboardController extends Controller
             'chartData',
             'rentalTx',   
             'productTx', 
-            'topProduct'
+            'topProduct',
+            'pendingRequests' // <--- Kirim variabel ini ke View
         ));
     }
 }

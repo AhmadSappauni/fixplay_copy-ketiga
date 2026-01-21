@@ -193,18 +193,41 @@
         </div>
 
         <div class="row g-2">
-          <div class="col-md-4">
-            <label class="form-label">Harga (Rp)</label>
-            <input
-              type="number"
-              name="price"
-              class="form-control"
-              placeholder="0"
-              value="{{ old('price', $product->price) }}"
-              required
-            >
+          {{-- [BARU] Input Harga Modal --}}
+          <div class="col-md-6">
+            <label class="form-label">Harga Modal (Beli)</label>
+            <div class="input-group">
+                <span class="input-group-text bg-dark border-secondary text-secondary" style="font-size: 0.8rem;">Rp</span>
+                <input
+                  type="number"
+                  name="cost_price"
+                  class="form-control"
+                  placeholder="0"
+                  value="{{ old('cost_price', $product->cost_price ?? 0) }}"
+                  min="0"
+                >
+            </div>
+            <div class="form-text text-secondary mb-2" style="font-size: 0.7rem;">Harga beli dari distributor.</div>
           </div>
-          <div class="col-md-4">
+
+          <div class="col-md-6">
+            <label class="form-label">Harga Jual</label>
+            <div class="input-group">
+                <span class="input-group-text bg-dark border-secondary text-secondary" style="font-size: 0.8rem;">Rp</span>
+                <input
+                  type="number"
+                  name="price"
+                  class="form-control"
+                  placeholder="0"
+                  value="{{ old('price', $product->price) }}"
+                  required
+                >
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-2">
+          <div class="col-md-6">
             <label class="form-label">Stok</label>
             <input
               type="number"
@@ -215,7 +238,7 @@
               required
             >
           </div>
-          <div class="col-md-4">
+          <div class="col-md-6">
             <label class="form-label">Satuan</label>
             <input
               type="text"

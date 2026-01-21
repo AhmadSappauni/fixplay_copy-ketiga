@@ -43,7 +43,7 @@
   }
   .btn-soft-primary:hover{ filter:brightness(1.06); }
 
-  /* ====== STAT CARDS (Kotak Ringkasan) ====== */
+  /* ====== STAT CARDS ====== */
   .stat-card{
     position:relative; border-radius:1.25rem; padding:1.2rem;
     background: linear-gradient(145deg, rgba(30,41,59,0.8), rgba(15,23,42,0.9));
@@ -61,7 +61,7 @@
   .stat-card.success::after{ background:radial-gradient(circle,#22c55e,#a3e635); }
   .stat-card.warning::after{ background:radial-gradient(circle,#f97316,#facc15); }
 
-  /* ====== CARD GRAPH & TABLE (DARK THEME) ====== */
+  /* ====== CARD GRAPH & TABLE ====== */
   .card-trans {
     border-radius: 1.25rem;
     border: 1px solid rgba(148,163,184,.25);
@@ -122,10 +122,27 @@
   .btn-action-delete{ color:#fca5a5; border-color:#991b1b; }
   .btn-action-delete:hover{ background:#991b1b; color:#fff; }
 
+  /* Tombol Request Hapus (Kuning) */
+  .btn-action-request{ color:#fde047; border-color:#ca8a04; }
+  .btn-action-request:hover{ background:#ca8a04; color:#fff; }
+
   .badge-count {
     background: rgba(255,255,255,0.1); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.2);
     font-size: 0.7rem; padding: 0.35rem 0.7rem; border-radius: 99px;
   }
+
+  /* MODAL GLASS STYLE (Untuk Request Hapus) */
+  .modal-glass .modal-content {
+    background: radial-gradient(circle at top left, #1e1e2f, #0f1020);
+    border: 1px solid rgba(124,58,237,.3);
+    box-shadow: 0 0 30px rgba(0,0,0,.8); color: #e5e7eb; border-radius: 1.25rem;
+  }
+  .modal-glass .modal-header { border-bottom: 1px solid rgba(255,255,255,.08); }
+  .modal-glass .modal-footer { border-top: 1px solid rgba(255,255,255,.08); }
+  .modal-glass .form-control {
+    background: rgba(2, 6, 23, 0.8); border: 1px solid rgba(148,163,184,.2); color: #f1f5f9;
+  }
+  .modal-glass .btn-close-white { filter: invert(1) grayscale(100%) brightness(200%); }
 
   @media (max-width: 992px){ .dash-shell{ padding:1.35rem 1.1rem 2rem; border-radius:1.1rem; } }
   @media (max-width: 768px){
@@ -135,18 +152,67 @@
     .chart-wrapper{ min-height:200px; max-height:260px; }
     .btn-action-group .btn span.label-text { display: none; }
   }
-  @media print{
-    .dash-shell{ background:#fff; box-shadow:none; }
-    .card-trans, .card-graph, .stat-card{ box-shadow:none; border-color:#e5e7eb; background:#fff; color:#111827; }
-    .table-neon thead th{ background:#f3f4f6; color:#111827; }
-    .table-neon tbody td{ color:#000; border-bottom:1px solid #e5e7eb; }
-    .d-print-none{ display:none !important; }
-  }
 </style>
 @endpush
 
 @section('page_content')
 <div class="dash-shell">
+
+  {{-- ALERT SUCCESS --}}
+  @if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show bg-success-subtle border-success text-success-emphasis mb-4" role="alert">
+      <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  @endif
+
+  {{-- [BARU] NOTIFIKASI REQUEST HAPUS (KHUSUS BOSS) --}}
+  @if(isset($pendingRequests) && count($pendingRequests) > 0)
+    <div class="alert alert-warning border-warning border-opacity-50 mb-4" role="alert" style="background: rgba(234, 179, 8, 0.1);">
+        <h5 class="alert-heading fw-bold text-warning fs-6 mb-3">
+            <i class="bi bi-bell-fill me-2"></i> Permintaan Penghapusan Data ({{ count($pendingRequests) }})
+        </h5>
+        
+        <div class="d-flex flex-column gap-2">
+            @foreach($pendingRequests as $req)
+                <div class="p-3 rounded border border-warning border-opacity-25" style="background: rgba(0,0,0,0.2);">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <span class="badge bg-warning text-dark me-2">{{ $req->user->name ?? 'Karyawan' }}</span>
+                            <span class="text-secondary small">{{ $req->created_at->diffForHumans() }}</span>
+                        </div>
+                        <span class="badge bg-dark border border-secondary text-secondary" style="font-size: 0.65rem;">
+                            {{ strtoupper($req->target_table) }} #{{ $req->target_id }}
+                        </span>
+                    </div>
+                    
+                    <div class="text-white fw-semibold mb-1">{{ $req->description }}</div>
+                    <div class="text-warning small fst-italic mb-3">"{{ $req->reason }}"</div>
+
+                    <div class="d-flex gap-2">
+                        {{-- Approve --}}
+                        <form action="{{ route('deletion.handle', $req->id) }}" method="POST">
+                            @csrf 
+                            <input type="hidden" name="action" value="approve">
+                            <button class="btn btn-sm btn-success px-3" onclick="return confirm('Yakin setujui hapus data ini?')">
+                                <i class="bi bi-check-lg me-1"></i> Setujui
+                            </button>
+                        </form>
+
+                        {{-- Reject --}}
+                        <form action="{{ route('deletion.handle', $req->id) }}" method="POST">
+                            @csrf 
+                            <input type="hidden" name="action" value="reject">
+                            <button class="btn btn-sm btn-danger px-3">
+                                <i class="bi bi-x-lg me-1"></i> Tolak
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+  @endif
 
   {{-- HEADER --}}
   <div class="d-flex align-items-center justify-content-between mb-4 dash-header-stack">
@@ -173,7 +239,6 @@
     <div class="col-lg-4 col-md-6">
       <div class="stat-card primary h-100">
         <div class="stat-label">Pendapatan PS</div>
-        {{-- Jika Minus jadi Merah --}}
         <div class="stat-value mono {{ $todayPs < 0 ? 'text-danger' : '' }}">
             Rp {{ number_format($todayPs,0,',','.') }}
         </div>
@@ -184,7 +249,6 @@
     <div class="col-lg-4 col-md-6">
       <div class="stat-card success h-100">
         <div class="stat-label">Total Pendapatan</div>
-        {{-- Jika Minus jadi Merah --}}
         <div class="stat-value mono {{ $todayTotal < 0 ? 'text-danger' : '' }}">
             Rp {{ number_format($todayTotal,0,',','.') }}
         </div>
@@ -195,7 +259,6 @@
     <div class="col-lg-4 col-md-6">
       <div class="stat-card warning h-100">
         <div class="stat-label">Pendapatan Produk</div>
-        {{-- Jika Minus jadi Merah --}}
         <div class="stat-value mono {{ $todayProd < 0 ? 'text-danger' : '' }}">
             Rp {{ number_format($todayProd,0,',','.') }}
         </div>
@@ -253,11 +316,19 @@
                       <a href="{{ route('sales.show', $t['id']) }}" class="btn btn-action-detail" title="Detail"><i class="bi bi-info-circle"></i></a>
                       <a href="{{ route('sales.edit', $t['id']) }}" class="btn btn-action-edit" title="Edit"><i class="bi bi-pencil-square"></i></a>
                       
-                      @if(auth()->user() && auth()->user()->role === 'boss')
+                      {{-- LOGIKA TOMBOL HAPUS --}}
+                      @if(auth()->user()->role === 'boss')
+                        {{-- BOSS: Hapus Langsung --}}
                         <form class="d-inline confirm-delete" method="POST" action="{{ route('sales.destroy', $t['id']) }}">
                             @csrf @method('DELETE')
                             <button type="submit" class="btn btn-action-delete" title="Hapus"><i class="bi bi-trash"></i></button>
                         </form>
+                      @else
+                        {{-- KARYAWAN: Request Hapus --}}
+                        <button type="button" class="btn btn-action-request" title="Request Hapus"
+                                onclick="openRequestModal('sales', {{ $t['id'] }}, '{{ $t['title'] }}')">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </button>
                       @endif
                     </div>
                   </td>
@@ -273,7 +344,7 @@
     </div>
   </div>
 
-  {{-- CARD 2: RIWAYAT PENJUALAN PRODUK (MAKANAN/MINUMAN) --}}
+  {{-- CARD 2: RIWAYAT PENJUALAN PRODUK --}}
   <div class="row g-4 mt-2">
     <div class="col-12">
       <div class="card card-trans">
@@ -283,7 +354,6 @@
              <span class="badge-count d-print-none">{{ count($productTx) }} DATA</span>
           </div>
 
-          {{-- INPUT PENCARIAN DASHBOARD --}}
           <div class="d-print-none">
              <input type="text" id="dashSearchInput" 
                     class="form-control form-control-sm text-white" 
@@ -294,7 +364,6 @@
         
         <div class="card-body p-0">
           <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-            {{-- Tambahkan ID 'dashProductTable' --}}
             <table class="table table-sm align-middle table-neon mb-0" id="dashProductTable">
               <thead style="position: sticky; top: 0; z-index: 10;">
                 <tr>
@@ -308,7 +377,6 @@
               @forelse ($productTx as $t)
                 <tr class="dash-prod-row">
                   <td class="text-secondary fw-semibold" style="font-size: 0.85rem;">{{ $t['date'] }}</td>
-                  {{-- Tambahkan class 'searchable-dash' di kolom Nama Barang --}}
                   <td class="text-white searchable-dash">{{ $t['title'] }}</td>
                   <td class="text-end mono text-success">Rp {{ number_format($t['total'],0,',','.') }}</td>
                   <td class="text-end d-print-none">
@@ -316,11 +384,19 @@
                       <a href="{{ route('sales.show', $t['id']) }}" class="btn btn-action-detail" title="Detail"><i class="bi bi-info-circle"></i></a>
                       <a href="{{ route('sales.edit', $t['id']) }}" class="btn btn-action-edit" title="Edit"><i class="bi bi-pencil-square"></i></a>
                       
-                      @if(auth()->user() && auth()->user()->role === 'boss')
+                      {{-- LOGIKA TOMBOL HAPUS --}}
+                      @if(auth()->user()->role === 'boss')
+                        {{-- BOSS: Hapus Langsung --}}
                         <form class="d-inline confirm-delete" method="POST" action="{{ route('sales.destroy', $t['id']) }}">
                             @csrf @method('DELETE')
                             <button type="submit" class="btn btn-action-delete" title="Hapus"><i class="bi bi-trash"></i></button>
                         </form>
+                      @else
+                        {{-- KARYAWAN: Request Hapus --}}
+                        <button type="button" class="btn btn-action-request" title="Request Hapus"
+                                onclick="openRequestModal('sales', {{ $t['id'] }}, '{{ $t['title'] }}')">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </button>
                       @endif
                     </div>
                   </td>
@@ -329,7 +405,6 @@
                 <tr><td colspan="4" class="text-center text-secondary p-4">Belum ada penjualan produk.</td></tr>
               @endforelse
               
-              {{-- Pesan jika pencarian nihil --}}
               <tr id="dashNoResult" style="display: none;">
                   <td colspan="4" class="text-center text-secondary py-3">
                       <i class="bi bi-search me-1"></i> Produk tidak ditemukan.
@@ -343,7 +418,49 @@
     </div>
   </div>
 
-</div> {{-- /.dash-shell --}}
+</div>
+
+{{-- MODAL REQUEST HAPUS (KHUSUS KARYAWAN) --}}
+<div class="modal fade modal-glass" id="requestDeletionModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>Request Hapus Data
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pt-3">
+        <form action="{{ route('deletion.store') }}" method="POST">
+          @csrf
+          <input type="hidden" name="target_table" id="reqTargetTable">
+          <input type="hidden" name="target_id" id="reqTargetId">
+
+          <p class="text-secondary small mb-3">
+            Anda tidak memiliki akses untuk menghapus data ini secara langsung. 
+            Silakan kirim permintaan ke Boss.
+          </p>
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Data yang akan dihapus:</label>
+            <input type="text" id="reqDataTitle" class="form-control text-white" readonly>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Alasan Penghapusan (Wajib)</label>
+            <textarea name="reason" class="form-control text-white" rows="3" required placeholder="Contoh: Salah input nominal / Pelanggan cancel"></textarea>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-warning btn-sm fw-bold">Kirim Request</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -371,60 +488,43 @@
         data: series,
         borderWidth: 0,
         borderRadius: 4,
-        backgroundColor: 'rgba(99, 102, 241, 0.85)', // Indigo
-        hoverBackgroundColor: 'rgba(168, 85, 247, 1)', // Purple
+        backgroundColor: 'rgba(99, 102, 241, 0.85)',
+        hoverBackgroundColor: 'rgba(168, 85, 247, 1)',
         barThickness: 24
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false, 
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#0f172a',
-          titleColor: '#f8fafc',
-          bodyColor: '#cbd5e1',
-          borderColor: '#334155',
-          borderWidth: 1,
-          padding: 10,
-          displayColors: false,
-        }
-      },
+      plugins: { legend: { display: false } },
       scales: {
-        x: {
-          ticks: { color: '#94a3b8', font: { size: 11 } },
-          grid: { display: false }
-        },
-        y: {
-          beginAtZero: true,
-          ticks: { color: '#94a3b8', font: { size: 11 } },
-          grid: { color: 'rgba(51, 65, 85, 0.2)', borderDash: [4, 4] },
-          border: { display: false }
-        }
+        x: { ticks: { color: '#94a3b8', font: { size: 11 } }, grid: { display: false } },
+        y: { beginAtZero: true, ticks: { color: '#94a3b8', font: { size: 11 } }, grid: { color: 'rgba(51, 65, 85, 0.2)', borderDash: [4, 4] }, border: { display: false } }
       }
     }
   });
 })();
 
-// Script Pencarian Real-time Dashboard (Produk)
+// Script Pencarian Real-time Dashboard
 document.getElementById('dashSearchInput')?.addEventListener('keyup', function() {
     let filter = this.value.toLowerCase();
     let rows = document.querySelectorAll('#dashProductTable .dash-prod-row');
     let hasVisible = false;
-
     rows.forEach(function(row) {
         let text = row.querySelector('.searchable-dash').textContent.toLowerCase();
-        if (text.includes(filter)) {
-            row.style.display = '';
-            hasVisible = true;
-        } else {
-            row.style.display = 'none';
-        }
+        if (text.includes(filter)) { row.style.display = ''; hasVisible = true; } else { row.style.display = 'none'; }
     });
-
     let noRes = document.getElementById('dashNoResult');
     if (noRes) noRes.style.display = hasVisible ? 'none' : 'table-row';
 });
+
+// Function Buka Modal Request Hapus
+function openRequestModal(table, id, title) {
+    document.getElementById('reqTargetTable').value = table;
+    document.getElementById('reqTargetId').value = id;
+    document.getElementById('reqDataTitle').value = title;
+    
+    new bootstrap.Modal(document.getElementById('requestDeletionModal')).show();
+}
 </script>
 @endpush

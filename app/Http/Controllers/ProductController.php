@@ -34,13 +34,20 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        // Tambahkan 'cost_price' ke dalam validasi
         $data = $request->validate([
-            'name'     => 'required|string|max:255',
-            'category' => 'nullable|string|max:100',
-            'price'    => 'required|integer|min:0',
-            'stock'    => 'required|integer|min:0',
-            'unit'     => 'nullable|string|max:30',
+            'name'       => 'required|string|max:255',
+            'category'   => 'nullable|string|max:100',
+            'price'      => 'required|integer|min:0',      // Harga Jual
+            'cost_price' => 'nullable|integer|min:0',      // <--- BARU: Harga Modal
+            'stock'      => 'required|integer|min:0',
+            'unit'       => 'nullable|string|max:30',
         ]);
+
+        // Jika cost_price kosong, set default 0
+        if (!isset($data['cost_price'])) {
+            $data['cost_price'] = 0;
+        }
 
         Product::create($data);
 
@@ -56,12 +63,14 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
+        // Tambahkan 'cost_price' ke dalam validasi update juga
         $data = $request->validate([
-            'name'     => 'required|string|max:255',
-            'category' => 'nullable|string|max:100',
-            'price'    => 'required|integer|min:0',
-            'stock'    => 'required|integer|min:0',
-            'unit'     => 'nullable|string|max:30',
+            'name'       => 'required|string|max:255',
+            'category'   => 'nullable|string|max:100',
+            'price'      => 'required|integer|min:0',
+            'cost_price' => 'nullable|integer|min:0',      // <--- BARU: Harga Modal
+            'stock'      => 'required|integer|min:0',
+            'unit'       => 'nullable|string|max:30',
         ]);
 
         $product->update($data);

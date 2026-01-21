@@ -8,19 +8,26 @@ class Product extends Model
 {
     protected $table = 'products';
 
-    // HANYA 1 fillable → gabungan dari semua field yang benar
     protected $fillable = [
         'name',
         'category',
         'price',
+        'cost_price', // <--- TAMBAHAN BARU
         'stock',
         'unit',
-        'active',   // kembalikan field active jika memang ada di tabel
+        'active',
     ];
 
     protected $casts = [
-        'price' => 'integer',
-        'stock' => 'integer',
-        'active' => 'boolean',
+        'price'      => 'integer',
+        'cost_price' => 'integer', // <--- TAMBAHAN BARU
+        'stock'      => 'integer',
+        'active'     => 'boolean',
     ];
+    
+    // Helper untuk menghitung profit per item
+    public function getProfitAttribute()
+    {
+        return $this->price - $this->cost_price;
+    }
 }

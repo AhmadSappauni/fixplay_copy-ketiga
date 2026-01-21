@@ -15,13 +15,12 @@ use App\Http\Controllers\POSController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\DeletionRequestController; // <--- Controller Baru
 use Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
 | REDIRECT DEFAULT
-|--------------------------------------------------------------------------
-| Ketika user membuka "/", arahkan ke login jika belum login.
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
@@ -72,6 +71,8 @@ Route::middleware('auth')->group(function () {
     // Jadwal
     Route::get('/jadwal', [JadwalKaryawanController::class, 'index'])->name('jadwal.index');
     Route::post('/jadwal', [JadwalKaryawanController::class, 'store'])->name('jadwal.store');
+    Route::get('/jadwal/report/excel', [JadwalKaryawanController::class, 'exportExcel'])->name('jadwal.report.excel');
+    Route::get('/jadwal/report/pdf', [JadwalKaryawanController::class, 'exportPdf'])->name('jadwal.report.pdf');
 
     // KHUSUS BOSS
     Route::middleware('role:boss')->group(function () {
@@ -86,6 +87,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/sessions', [SessionsController::class, 'index'])->name('sessions.index');
     Route::post('/sessions/fixed', [SessionsController::class, 'storeFixed'])->name('sessions.fixed');
     Route::delete('/sessions/{sid}', [SessionsController::class, 'destroy'])->name('sessions.delete');
+    Route::post('/sessions/add-time', [SessionsController::class, 'addTime'])->name('sessions.add_time');
+    Route::post('/sessions/stop-open', [SessionsController::class, 'stopOpen'])->name('sessions.stop_open');
 
     // PS Units
     Route::get('/ps-units', [PSUnitController::class, 'index'])->name('ps_units.index');
@@ -116,37 +119,15 @@ Route::middleware('auth')->group(function () {
         Route::put('/{id}', [SaleController::class, 'update'])->name('update');
         Route::delete('/{id}', [SaleController::class, 'destroy'])->name('destroy');
     });
+
+    // --- FITUR REQUEST HAPUS (BARU) ---
+    Route::post('/deletion-request/store', [DeletionRequestController::class, 'store'])->name('deletion.store');
+    // Hanya Boss yang bisa Approve/Reject (Middleware role:boss bisa ditambahkan disini atau check di controller)
+    Route::post('/deletion-request/{id}/handle', [DeletionRequestController::class, 'handle'])->name('deletion.handle');
 });
 
-// Tambahkan route sementara ini
-
+// ROUTE SEMENTARA UNTUK LINK STORAGE (Hapus jika sudah tidak dipakai di production)
 Route::get('/buat-storage-link', function () {
     Artisan::call('storage:link');
-    return 'Folder Storage berhasil di-link! Silakan kembali ke halaman karyawan.';
+    return 'Folder Storage berhasil di-link!';
 });
-
-// --- ROUTE SEMENTARA UNTUK LINK STORAGE ---
-
-Route::get('/buat-storage-link', function () {
-    // Menjalankan perintah 'php artisan storage:link' lewat browser
-    Artisan::call('storage:link');
-    return 'Folder Storage berhasil di-link! Silakan kembali ke halaman karyawan.';
-});
-
-// ...
-// Sessions (rental)
-Route::get('/sessions', [SessionsController::class, 'index'])->name('sessions.index');
-Route::post('/sessions/fixed', [SessionsController::class, 'storeFixed'])->name('sessions.fixed');
-Route::delete('/sessions/{sid}', [SessionsController::class, 'destroy'])->name('sessions.delete');
-
-// --- TAMBAHAN ROUTE BARU ---
-Route::post('/sessions/add-time', [SessionsController::class, 'addTime'])->name('sessions.add_time');
-// ---------------------------
-
-
-// ... route lainnya ...
-Route::get('/jadwal/report/excel', [JadwalKaryawanController::class, 'exportExcel'])->name('jadwal.report.excel');
-Route::get('/jadwal/report/pdf', [JadwalKaryawanController::class, 'exportPdf'])->name('jadwal.report.pdf');
-// ...
-
-Route::post('/sessions/stop-open', [App\Http\Controllers\SessionsController::class, 'stopOpen'])->name('sessions.stop_open');

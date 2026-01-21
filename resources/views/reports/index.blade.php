@@ -105,6 +105,10 @@
   .btn-outline-danger-soft { color: #fca5a5; border: 1px solid #ef4444; background: rgba(239,68,68,0.1); }
   .btn-outline-danger-soft:hover { background: #ef4444; color: #fff; }
 
+  /* [BARU] TOMBOL REQUEST HAPUS (KUNING) */
+  .btn-action-request{ color:#fde047; border-color:#ca8a04; }
+  .btn-action-request:hover{ background:#ca8a04; color:#fff; }
+
   .rng-day, .rng-week, .rng-month, .rng-custom { display:none; }
   #rekapTabs .nav-link{
     border-radius:999px; padding:.3rem .9rem; font-size:.75rem; border:1px solid transparent; color:#94a3b8; background:transparent;
@@ -158,6 +162,14 @@
 
 @section('page_content')
 <div class="report-shell">
+
+  {{-- Alert Success --}}
+  @if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show bg-success-subtle border-success text-success-emphasis mb-4" role="alert">
+      <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  @endif
 
   {{-- Header + tombol cetak --}}
   <div class="d-flex align-items-center justify-content-between mb-4">
@@ -233,7 +245,6 @@
         </div>
         <div class="metric-label text-primary">Laba Bersih PS</div>
         
-        {{-- Rumus: Pendapatan PS - Pengeluaran yg pakai uang PS --}}
         @php $netPs = $ps_total - $exp_from_ps; @endphp
         <div class="metric-value {{ $netPs < 0 ? 'text-danger' : '' }}">
             Rp {{ number_format($netPs, 0, ',', '.') }}
@@ -257,7 +268,6 @@
         </div>
         <div class="metric-label text-success">Laba Bersih Produk</div>
         
-        {{-- Rumus: Pendapatan Produk - Pengeluaran yg pakai uang Produk --}}
         @php $netProd = $prod_total - $exp_from_prod; @endphp
         <div class="metric-value {{ $netProd < 0 ? 'text-danger' : '' }}">
             Rp {{ number_format($netProd, 0, ',', '.') }}
@@ -275,7 +285,6 @@
       <div class="metric-card metric-purple h-100">
         <div class="metric-icon"><i class="bi bi-wallet2"></i></div>
         <div class="metric-label">Pengeluaran Lain</div>
-        {{-- Pengeluaran selalu merah --}}
         <div class="metric-value text-danger">
             - Rp {{ number_format($exp_from_other, 0, ',', '.') }}
         </div>
@@ -289,9 +298,7 @@
         <div class="metric-icon"><i class="bi bi-safe"></i></div>
         <div class="metric-label">Sisa Kas Total</div>
         
-        {{-- Rumus: (Total Semua Masuk) - (Total Semua Keluar) --}}
         @php $netTotal = $sales_total - $expenses_total; @endphp
-        {{-- Jika Minus Merah, Jika Plus Kuning (Warning/Gold) --}}
         <div class="metric-value {{ $netTotal < 0 ? 'text-danger' : 'text-warning' }}">
             Rp {{ number_format($netTotal, 0, ',', '.') }}
         </div>
@@ -352,6 +359,12 @@
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
+                          @else
+                            {{-- REQUEST HAPUS (KARYAWAN) --}}
+                            <button type="button" class="btn btn-action-request" title="Request Hapus"
+                                    onclick="openRequestModal('sales', {{ $s->id }}, '{{ $s->display_note }}')">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </button>
                           @endif
                       </div>
                     </td>
@@ -390,7 +403,8 @@
                 <tr>
                   <th>Waktu</th>
                   <th>Barang</th>
-                  <th class="text-end">Total</th>
+                  <th class="text-end">Harga Jual</th>
+                  <th class="text-end text-success">Est. Laba</th> {{-- KOLOM BARU --}}
                   <th class="text-end d-print-none" style="width: 100px;">Aksi</th>
                 </tr>
               </thead>
@@ -407,8 +421,42 @@
                         <div class="text-light" style="max-width: 180px;">
                             {{ $s->display_note }}
                         </div>
+                        {{-- Detail Item untuk melihat modal per barang --}}
+                        <div class="small text-secondary" style="font-size: 0.7rem;">
+                            @foreach($s->items as $item)
+                                @if($item->product)
+                                   @php 
+                                        $modalUnit = $item->product->cost_price ?? 0;
+                                        $marginUnit = $item->unit_price - $modalUnit; 
+                                   @endphp
+                                   {{-- Hanya tampilkan detail jika ada margin --}}
+                                   @if($modalUnit > 0)
+                                     <div>{{ $item->product->name }} (Modal: {{ number_format($modalUnit) }})</div>
+                                   @endif
+                                @endif
+                            @endforeach
+                        </div>
                     </td>
-                    <td class="text-end amount-mono text-success">Rp {{ number_format($s->total ?? 0,0,',','.') }}</td>
+                    <td class="text-end amount-mono text-white">Rp {{ number_format($s->total ?? 0,0,',','.') }}</td>
+                    
+                    {{-- KOLOM PERHITUNGAN LABA --}}
+                    <td class="text-end amount-mono text-success fw-bold">
+                        @php
+                            $totalLaba = 0;
+                            foreach($s->items as $item) {
+                                if($item->product) {
+                                    $modal = ($item->product->cost_price ?? 0) * $item->qty;
+                                    $jual  = $item->subtotal;
+                                    $totalLaba += ($jual - $modal);
+                                } else {
+                                    // Item manual (tanpa produk), anggap 100% laba
+                                    $totalLaba += $item->subtotal; 
+                                }
+                            }
+                        @endphp
+                        +Rp {{ number_format($totalLaba, 0, ',', '.') }}
+                    </td>
+
                     <td class="text-end d-print-none">
                       <div class="btn-action-group justify-content-end">
                           <button type="button" class="btn btn-outline-secondary-soft" title="Edit"
@@ -425,16 +473,22 @@
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
+                          @else
+                            {{-- REQUEST HAPUS (KARYAWAN) --}}
+                            <button type="button" class="btn btn-action-request" title="Request Hapus"
+                                    onclick="openRequestModal('sales', {{ $s->id }}, '{{ $s->display_note }}')">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </button>
                           @endif
                       </div>
                     </td>
                   </tr>
                 @empty
-                  <tr><td colspan="4" class="text-center text-light p-4 opacity-50">Tidak ada penjualan produk.</td></tr>
+                  <tr><td colspan="5" class="text-center text-light p-4 opacity-50">Tidak ada penjualan produk.</td></tr>
                 @endforelse
                 
                 <tr id="noProductFound" style="display: none;">
-                    <td colspan="4" class="text-center text-secondary py-3">
+                    <td colspan="5" class="text-center text-secondary py-3">
                         <i class="bi bi-search me-1"></i> Produk tidak ditemukan.
                     </td>
                 </tr>
@@ -474,7 +528,6 @@
                       </div>
                   </td>
                   <td>
-                      {{-- BADGE SUMBER DANA (BARU) --}}
                       @if($e->fund_source === 'ps')
                           <span class="badge rounded-pill bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 mb-1" style="font-size: 0.6rem;">BILLING PS</span>
                       @elseif($e->fund_source === 'product')
@@ -493,10 +546,14 @@
                                 onclick='editExpenseModal({{ $e->id }}, {!! json_encode($e->category) !!}, {!! json_encode($e->description ?? "") !!}, {{ (int)($e->amount ?? 0) }}, {!! json_encode(isset($e->timestamp) ? ($e->timestamp_fmt ?? $e->timestamp) : "") !!})'>
                           <i class="bi bi-pencil"></i>
                         </button>
-                        <form class="d-inline" method="POST" action="{{ route('purchases.expenses.destroy', $e->id) }}" onsubmit="return confirm('Hapus pengeluaran ini?');">
-                          @csrf @method('DELETE')
-                          <button class="btn btn-outline-danger-soft" title="Hapus"><i class="bi bi-trash"></i></button>
-                        </form>
+                        
+                        {{-- Pengeluaran hanya Boss yang bisa hapus (sesuai request) --}}
+                        @if(auth()->user() && auth()->user()->role === 'boss')
+                            <form class="d-inline" method="POST" action="{{ route('purchases.expenses.destroy', $e->id) }}" onsubmit="return confirm('Hapus pengeluaran ini?');">
+                              @csrf @method('DELETE')
+                              <button class="btn btn-outline-danger-soft" title="Hapus"><i class="bi bi-trash"></i></button>
+                            </form>
+                        @endif
                     </div>
                   </td>
                 </tr>
@@ -720,6 +777,48 @@
     </div>
   </div>
 </div>
+
+{{-- MODAL REQUEST HAPUS (KHUSUS KARYAWAN) --}}
+<div class="modal fade modal-glass" id="requestDeletionModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>Request Hapus Data
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pt-3">
+        <form action="{{ route('deletion.store') }}" method="POST">
+          @csrf
+          <input type="hidden" name="target_table" id="reqTargetTable">
+          <input type="hidden" name="target_id" id="reqTargetId">
+
+          <p class="text-secondary small mb-3">
+            Anda tidak memiliki akses untuk menghapus data ini secara langsung. 
+            Silakan kirim permintaan ke Boss.
+          </p>
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Data yang akan dihapus:</label>
+            <input type="text" id="reqDataTitle" class="form-control text-white" readonly>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small text-muted">Alasan Penghapusan (Wajib)</label>
+            <textarea name="reason" class="form-control text-white" rows="3" required placeholder="Contoh: Salah input nominal / Pelanggan cancel"></textarea>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-warning btn-sm fw-bold">Kirim Request</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -799,5 +898,14 @@ document.getElementById('searchProductInput')?.addEventListener('keyup', functio
         noResultRow.style.display = hasVisible ? 'none' : 'table-row';
     }
 });
+
+// Function Buka Modal Request Hapus (Sama seperti dashboard)
+function openRequestModal(table, id, title) {
+    document.getElementById('reqTargetTable').value = table;
+    document.getElementById('reqTargetId').value = id;
+    document.getElementById('reqDataTitle').value = title;
+    
+    new bootstrap.Modal(document.getElementById('requestDeletionModal')).show();
+}
 </script>
 @endpush

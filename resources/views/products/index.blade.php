@@ -265,20 +265,35 @@
               <input type="text" name="category" class="form-control"
                      placeholder="Makanan / Minuman / Cemilan ...">
             </div>
+            
             <div class="row g-2">
               <div class="col-md-6">
-                <label class="form-label">Harga (Rp)</label>
-                <input type="number" name="price" class="form-control" placeholder="0">
+                <label class="form-label">Harga Modal (Beli)</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-secondary" style="font-size: 0.8rem;">Rp</span>
+                    <input type="number" name="cost_price" class="form-control" placeholder="0" min="0">
+                </div>
+                <div class="form-text text-secondary" style="font-size: 0.7rem;">Harga beli dari distributor.</div>
               </div>
               <div class="col-md-6">
-                <label class="form-label">Stok awal</label>
-                <input type="number" name="stock" class="form-control" placeholder="0">
+                <label class="form-label">Harga Jual</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-secondary" style="font-size: 0.8rem;">Rp</span>
+                    <input type="number" name="price" class="form-control" placeholder="0" min="0" required>
+                </div>
               </div>
             </div>
-            <div class="mt-3">
-              <label class="form-label">Satuan</label>
-              <input type="text" name="unit" class="form-control"
-                     placeholder="pcs / cup / botol ..." value="pcs">
+
+            <div class="row g-2 mt-2">
+              <div class="col-md-6">
+                <label class="form-label">Stok awal</label>
+                <input type="number" name="stock" class="form-control" placeholder="0" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Satuan</label>
+                <input type="text" name="unit" class="form-control"
+                       placeholder="pcs / cup / botol ..." value="pcs">
+              </div>
             </div>
           </div>
 
@@ -296,5 +311,4 @@
       </div>
     </div>
 @endif
-
 @endsection
