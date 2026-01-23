@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\DeletionRequest;
 use App\Models\Sale;
 use App\Models\Product;
-use App\Models\GameSession; // <--- JANGAN LUPA TAMBAHKAN INI
+use App\Models\GameSession; // <--- [PENTING] Tambahkan Model Ini
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -71,20 +71,21 @@ class DeletionRequestController extends Controller
             try {
                 DB::transaction(function () use ($req) {
                     
-                    // === LOGIKA HAPUS DATA SALES ===
+                    // === LOGIKA HAPUS DATA SALES (KEUANGAN & SESI) ===
                     if ($req->target_table == 'sales') {
                         $sale = Sale::find($req->target_id);
                         
                         if ($sale) {
-                            // [PERBAIKAN] Cek apakah ada Sesi PS yang terhubung dengan Sale ini?
+                            // [PERBAIKAN UTAMA DISINI]
+                            // Cari Sesi yang terhubung dengan Transaksi ini
                             $session = GameSession::where('sale_id', $sale->id)->first();
                             
-                            // Jika ada, HAPUS JUGA SESINYA agar hilang dari daftar sesi
+                            // Jika ada sesinya, HAPUS JUGA SESINYA
                             if ($session) {
                                 $session->delete();
                             }
 
-                            // Hapus Transaksi Keuangan
+                            // Baru hapus uangnya
                             $sale->delete(); 
                         }
                     } 
@@ -98,7 +99,7 @@ class DeletionRequestController extends Controller
                     $req->update(['status' => 'approved']);
                 });
                 
-                return back()->with('success', 'Data berhasil dihapus (Sesi & Laporan).');
+                return back()->with('success', 'Data berhasil dihapus (Termasuk Riwayat Sesi).');
             } catch (\Exception $e) {
                 return back()->with('error', 'Gagal menghapus data: ' . $e->getMessage());
             }

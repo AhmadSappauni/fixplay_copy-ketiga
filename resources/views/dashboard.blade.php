@@ -289,9 +289,20 @@
   <div class="row g-4 mt-2">
     <div class="col-12">
       <div class="card card-trans">
+        {{-- HEADER TABEL RENTAL --}}
         <div class="card-header d-flex justify-content-between align-items-center" style="background: rgba(99, 102, 241, 0.2);">
           <span class="text-white"><i class="bi bi-controller me-2"></i>Riwayat Rental PS</span>
-          <span class="badge-count d-print-none">{{ count($rentalTx) }} DATA</span>
+          
+          <div class="d-flex align-items-center gap-2">
+              <span class="badge-count d-print-none">{{ count($rentalTx) }} DATA</span>
+              
+              {{-- [BARU] TOMBOL MODE HAPUS --}}
+              <button type="button" class="btn btn-sm btn-outline-light d-print-none" 
+                      onclick="toggleDeleteMode(this)" 
+                      style="font-size: 0.65rem; border-radius: 99px; padding: 2px 10px; opacity: 0.8;">
+                  <i class="bi bi-trash"></i> Hapus
+              </button>
+          </div>
         </div>
         
         <div class="card-body p-0">
@@ -316,16 +327,16 @@
                       <a href="{{ route('sales.show', $t['id']) }}" class="btn btn-action-detail" title="Detail"><i class="bi bi-info-circle"></i></a>
                       <a href="{{ route('sales.edit', $t['id']) }}" class="btn btn-action-edit" title="Edit"><i class="bi bi-pencil-square"></i></a>
                       
-                      {{-- LOGIKA TOMBOL HAPUS --}}
+                      {{-- LOGIKA TOMBOL HAPUS (SEMBUNYI DEFAULT) --}}
                       @if(auth()->user()->role === 'boss')
                         {{-- BOSS: Hapus Langsung --}}
-                        <form class="d-inline confirm-delete" method="POST" action="{{ route('sales.destroy', $t['id']) }}">
+                        <form class="d-inline confirm-delete btn-mode-hapus d-none" method="POST" action="{{ route('sales.destroy', $t['id']) }}">
                             @csrf @method('DELETE')
                             <button type="submit" class="btn btn-action-delete" title="Hapus"><i class="bi bi-trash"></i></button>
                         </form>
                       @else
                         {{-- KARYAWAN: Request Hapus --}}
-                        <button type="button" class="btn btn-action-request" title="Request Hapus"
+                        <button type="button" class="btn btn-action-request btn-mode-hapus d-none" title="Request Hapus"
                                 onclick="openRequestModal('sales', {{ $t['id'] }}, '{{ $t['title'] }}')">
                             <i class="bi bi-exclamation-triangle"></i>
                         </button>
@@ -348,13 +359,21 @@
   <div class="row g-4 mt-2">
     <div class="col-12">
       <div class="card card-trans">
+        {{-- HEADER TABEL PRODUK --}}
         <div class="card-header d-flex justify-content-between align-items-center" style="background: rgba(34, 197, 94, 0.15);">
           <div class="d-flex align-items-center gap-2">
              <span class="text-white"><i class="bi bi-cup-straw me-2"></i>Penjualan Produk (F&B)</span>
              <span class="badge-count d-print-none">{{ count($productTx) }} DATA</span>
           </div>
 
-          <div class="d-print-none">
+          <div class="d-flex align-items-center gap-2 d-print-none">
+             {{-- [BARU] TOMBOL MODE HAPUS --}}
+             <button type="button" class="btn btn-sm btn-outline-light me-2" 
+                     onclick="toggleDeleteMode(this)" 
+                     style="font-size: 0.65rem; border-radius: 99px; padding: 2px 10px; opacity: 0.8;">
+                 <i class="bi bi-trash"></i> Hapus
+             </button>
+
              <input type="text" id="dashSearchInput" 
                     class="form-control form-control-sm text-white" 
                     style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); width: 150px; font-size: 0.75rem;" 
@@ -384,16 +403,16 @@
                       <a href="{{ route('sales.show', $t['id']) }}" class="btn btn-action-detail" title="Detail"><i class="bi bi-info-circle"></i></a>
                       <a href="{{ route('sales.edit', $t['id']) }}" class="btn btn-action-edit" title="Edit"><i class="bi bi-pencil-square"></i></a>
                       
-                      {{-- LOGIKA TOMBOL HAPUS --}}
+                      {{-- LOGIKA TOMBOL HAPUS (SEMBUNYI DEFAULT) --}}
                       @if(auth()->user()->role === 'boss')
                         {{-- BOSS: Hapus Langsung --}}
-                        <form class="d-inline confirm-delete" method="POST" action="{{ route('sales.destroy', $t['id']) }}">
+                        <form class="d-inline confirm-delete btn-mode-hapus d-none" method="POST" action="{{ route('sales.destroy', $t['id']) }}">
                             @csrf @method('DELETE')
                             <button type="submit" class="btn btn-action-delete" title="Hapus"><i class="bi bi-trash"></i></button>
                         </form>
                       @else
                         {{-- KARYAWAN: Request Hapus --}}
-                        <button type="button" class="btn btn-action-request" title="Request Hapus"
+                        <button type="button" class="btn btn-action-request btn-mode-hapus d-none" title="Request Hapus"
                                 onclick="openRequestModal('sales', {{ $t['id'] }}, '{{ $t['title'] }}')">
                             <i class="bi bi-exclamation-triangle"></i>
                         </button>
@@ -525,6 +544,33 @@ function openRequestModal(table, id, title) {
     document.getElementById('reqDataTitle').value = title;
     
     new bootstrap.Modal(document.getElementById('requestDeletionModal')).show();
+}
+
+// [BARU] Fungsi Toggle Mode Hapus
+function toggleDeleteMode(btn) {
+    // 1. Cari Card terdekat
+    let card = btn.closest('.card');
+    
+    // 2. Cari semua tombol hapus/request di dalam card itu
+    let targets = card.querySelectorAll('.btn-mode-hapus');
+    
+    // 3. Toggle visibility (muncul/sembunyi)
+    targets.forEach(el => {
+        el.classList.toggle('d-none');
+    });
+
+    // 4. Ubah tampilan tombol toggle
+    if (btn.classList.contains('btn-outline-light')) {
+        // Mode Aktif (Tombol jadi merah)
+        btn.classList.remove('btn-outline-light');
+        btn.classList.add('btn-danger');
+        btn.innerHTML = '<i class="bi bi-x-circle me-1"></i> Batal';
+    } else {
+        // Mode Non-Aktif (Kembali normal)
+        btn.classList.add('btn-outline-light');
+        btn.classList.remove('btn-danger');
+        btn.innerHTML = '<i class="bi bi-trash me-1"></i> Hapus';
+    }
 }
 </script>
 @endpush

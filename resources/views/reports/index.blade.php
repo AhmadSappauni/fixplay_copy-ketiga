@@ -150,12 +150,51 @@
     .d-flex.align-items-center.justify-content-between.mb-3{ flex-direction:column; align-items:flex-start !important; gap:.75rem; }
     .report-filter .col-6, .report-filter .col-12{ flex:0 0 100%; max-width:100%; }
   }
+  /* ====== PENGATURAN CETAK (PRINT / PDF) ====== */
   @media print {
-    .report-shell, .card-glass, .table-modern tbody tr, .table-modern tfoot tr{ background:#fff; box-shadow:none; color:#000; }
-    .card-glass{ border-color:#e5e7eb; }
-    .table-modern thead{ background:#f3f4f6; color:#111827; }
-    .d-print-none { display: none !important; }
-    .card, .table { break-inside: avoid; }
+    /* Paksa Background Putih & Teks Hitam */
+    body, .report-shell {
+      background: #fff !important;
+      color: #000 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    /* Ubah warna kartu menjadi putih border biasa */
+    .card-glass, .metric-card, .fp-card {
+      background: #fff !important;
+      box-shadow: none !important;
+      border: 1px solid #ddd !important;
+      color: #000 !important;
+    }
+
+    /* [PENTING] Paksa semua teks jadi HITAM */
+    .text-white, .text-light, .text-secondary, .text-muted, 
+    .fw-bold, .amount-mono, h4, h5, span, div, td, th {
+      color: #000 !important;
+      text-shadow: none !important;
+    }
+
+    /* Rapikan Tabel */
+    .table-modern thead th {
+      background-color: #f3f4f6 !important;
+      color: #000 !important;
+      border-bottom: 2px solid #000 !important;
+    }
+    .table-modern tbody td {
+      border-bottom: 1px solid #ccc !important;
+      color: #000 !important;
+    }
+
+    /* Sembunyikan tombol-tombol saat print */
+    .d-print-none, 
+    .btn, 
+    .btn-action-group, 
+    .report-filter, 
+    .report-chip-icon,
+    .modal {
+      display: none !important;
+    }
   }
 </style>
 @endpush
@@ -315,8 +354,19 @@
       <div class="card card-glass h-100">
         <div class="card-header d-flex justify-content-between align-items-center" style="background: rgba(99, 102, 241, 0.2);">
           <span class="text-white"><i class="bi bi-controller me-2"></i>Laporan Rental PS</span>
-          <span class="badge badge-soft-primary d-print-none">{{ $rentalSales->count() }} Data</span>
+          
+          <div class="d-flex align-items-center gap-2">
+              <span class="badge badge-soft-primary d-print-none">{{ $rentalSales->count() }} Data</span>
+              
+              {{-- [BARU] TOMBOL TOGGLE MODE HAPUS --}}
+              <button type="button" class="btn btn-sm btn-outline-light d-print-none" 
+                      onclick="toggleDeleteMode(this)" 
+                      style="font-size: 0.65rem; border-radius: 99px; padding: 2px 10px; opacity: 0.8;">
+                  <i class="bi bi-trash"></i> Hapus
+              </button>
+          </div>
         </div>
+        
         <div class="card-body p-0">
           <div class="table-responsive">
             <table class="table table-modern table-sm">
@@ -350,8 +400,9 @@
                             <i class="bi bi-pencil"></i>
                           </button>
 
+                          {{-- LOGIKA TOMBOL HAPUS (SEMBUNYI DEFAULT) --}}
                           @if(auth()->user() && auth()->user()->role === 'boss')
-                            <form class="d-inline confirm-delete" method="POST" 
+                            <form class="d-inline confirm-delete btn-mode-hapus d-none" method="POST" 
                                   action="{{ route('sales.destroy', $s->id) }}" 
                                   data-confirm="Hapus data rental ini?">
                                 @csrf @method('DELETE')
@@ -361,7 +412,7 @@
                             </form>
                           @else
                             {{-- REQUEST HAPUS (KARYAWAN) --}}
-                            <button type="button" class="btn btn-action-request" title="Request Hapus"
+                            <button type="button" class="btn btn-action-request btn-mode-hapus d-none" title="Request Hapus"
                                     onclick="openRequestModal('sales', {{ $s->id }}, '{{ $s->display_note }}')">
                                 <i class="bi bi-exclamation-triangle"></i>
                             </button>
@@ -388,7 +439,14 @@
              <span class="badge badge-soft-primary d-print-none">{{ $productSales->count() }} Data</span>
           </div>
           
-          <div class="d-print-none">
+          <div class="d-print-none d-flex align-items-center">
+             {{-- [BARU] TOMBOL TOGGLE MODE HAPUS --}}
+             <button type="button" class="btn btn-sm btn-outline-light me-2" 
+                     onclick="toggleDeleteMode(this)" 
+                     style="font-size: 0.65rem; border-radius: 99px; padding: 2px 10px; opacity: 0.8;">
+                 <i class="bi bi-trash"></i> Hapus
+             </button>
+
              <input type="text" id="searchProductInput" 
                     class="form-control form-control-sm text-white" 
                     style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); width: 160px;" 
@@ -427,7 +485,6 @@
                                 @if($item->product)
                                    @php 
                                         $modalUnit = $item->product->cost_price ?? 0;
-                                        $marginUnit = $item->unit_price - $modalUnit; 
                                    @endphp
                                    {{-- Hanya tampilkan detail jika ada margin --}}
                                    @if($modalUnit > 0)
@@ -449,7 +506,6 @@
                                     $jual  = $item->subtotal;
                                     $totalLaba += ($jual - $modal);
                                 } else {
-                                    // Item manual (tanpa produk), anggap 100% laba
                                     $totalLaba += $item->subtotal; 
                                 }
                             }
@@ -465,7 +521,7 @@
                           </button>
 
                           @if(auth()->user() && auth()->user()->role === 'boss')
-                            <form class="d-inline confirm-delete" method="POST" 
+                            <form class="d-inline confirm-delete btn-mode-hapus d-none" method="POST" 
                                   action="{{ route('sales.destroy', $s->id) }}" 
                                   data-confirm="Hapus penjualan produk ini?">
                                 @csrf @method('DELETE')
@@ -475,7 +531,7 @@
                             </form>
                           @else
                             {{-- REQUEST HAPUS (KARYAWAN) --}}
-                            <button type="button" class="btn btn-action-request" title="Request Hapus"
+                            <button type="button" class="btn btn-action-request btn-mode-hapus d-none" title="Request Hapus"
                                     onclick="openRequestModal('sales', {{ $s->id }}, '{{ $s->display_note }}')">
                                 <i class="bi bi-exclamation-triangle"></i>
                             </button>
@@ -906,6 +962,33 @@ function openRequestModal(table, id, title) {
     document.getElementById('reqDataTitle').value = title;
     
     new bootstrap.Modal(document.getElementById('requestDeletionModal')).show();
+}
+
+// [BARU] Fungsi Toggle Mode Hapus (Sama seperti di Dashboard)
+function toggleDeleteMode(btn) {
+    // 1. Cari Card terdekat
+    let card = btn.closest('.card');
+    
+    // 2. Cari semua tombol hapus/request di dalam card itu
+    let targets = card.querySelectorAll('.btn-mode-hapus');
+    
+    // 3. Toggle visibility (muncul/sembunyi)
+    targets.forEach(el => {
+        el.classList.toggle('d-none');
+    });
+
+    // 4. Ubah tampilan tombol toggle
+    if (btn.classList.contains('btn-outline-light')) {
+        // Mode Aktif (Tombol jadi merah)
+        btn.classList.remove('btn-outline-light');
+        btn.classList.add('btn-danger');
+        btn.innerHTML = '<i class="bi bi-x-circle me-1"></i> Batal';
+    } else {
+        // Mode Non-Aktif (Kembali normal)
+        btn.classList.add('btn-outline-light');
+        btn.classList.remove('btn-danger');
+        btn.innerHTML = '<i class="bi bi-trash me-1"></i> Hapus';
+    }
 }
 </script>
 @endpush
